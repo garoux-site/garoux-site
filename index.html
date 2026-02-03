@@ -16,7 +16,7 @@ color:#fff;
 overflow-x:hidden;
 }
 
-/* HEADER + MENU */
+/* HEADER */
 header{
 position:fixed;
 top:0;
@@ -40,15 +40,11 @@ width:40px;
 height:40px;
 border-radius:50%;
 }
-nav{
-display:flex;
-gap:18px;
-}
 nav a{
+margin:0 12px;
 text-decoration:none;
 color:#aaa;
 transition:.3s;
-font-size:14px;
 }
 nav a:hover{color:#fff}
 
@@ -63,7 +59,7 @@ box-shadow:0 0 15px rgba(255,0,0,.6);
 
 /* HERO */
 .hero{
-padding:140px 20px 90px;
+padding:130px 20px 80px;
 text-align:center;
 background:radial-gradient(circle at top,#1a1a30,#05050a);
 }
@@ -94,6 +90,39 @@ text-align:center;
 }
 .dark{background:#0c0c14}
 
+/* CARDS */
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+max-width:1100px;
+margin:auto;
+}
+.card{
+background:#141421;
+padding:25px;
+border-radius:20px;
+transition:.3s;
+}
+.card:hover{
+transform:translateY(-10px);
+box-shadow:0 0 25px rgba(255,0,0,.3);
+}
+
+/* STEPS */
+.steps{
+list-style:none;
+padding:0;
+max-width:600px;
+margin:auto;
+}
+.steps li{
+padding:15px;
+margin:10px 0;
+background:#141421;
+border-radius:15px;
+}
+
 /* PRICE */
 .price{
 font-size:40px;
@@ -112,7 +141,6 @@ color:#888;
 font-size:14px;
 }
 
-/* COMMENTS */
 .comment-box{
 max-width:600px;
 margin:30px auto;
@@ -176,17 +204,18 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 gap:6px;
-background:#111;
+background:#0088cc;
 color:#fff;
 text-decoration:none;
-box-shadow:0 0 15px #000;
+box-shadow:0 0 20px #0088cc;
 transition:.3s;
 }
-.tg a:hover{transform:scale(1.1)}
-.tg-icon{
-font-size:28px;
-font-weight:bold;
+.tg a:hover{
+transform:scale(1.1);
+box-shadow:0 0 35px #00aaff;
 }
+.tg-icon{font-size:26px}
+.tg small{font-size:11px}
 
 /* FOOTER */
 footer{
@@ -196,7 +225,8 @@ color:#666;
 text-align:center;
 }
 
-@media(max-width:900px){
+@media(max-width:768px){
+.hero h1{font-size:28px}
 nav{display:none}
 }
 </style>
@@ -209,15 +239,12 @@ nav{display:none}
     <img src="bg.jpg">
     FFGarouX
   </div>
-
   <nav>
     <a href="#features">Особенности</a>
-    <a href="#how">Как работает</a>
+    <a href="#how">Как это работает</a>
     <a href="#price">Цены</a>
     <a href="#reviews">Отзывы</a>
-    <a href="#buy">Telegram</a>
   </nav>
-
   <a href="#buy" class="btn">Купить</a>
 </header>
 
@@ -230,22 +257,35 @@ nav{display:none}
   <div class="stat"><h2>101%</h2><span>Время отработки</span></div>
   <div class="stat"><h2>50+</h2><span>Пользователи</span></div>
 </div>
+
+<a href="#buy" class="btn">Начните сейчас</a>
 </section>
 
 <section id="features" class="section">
 <h2>Почему выбрали FFGarouX?</h2>
-<p>Умные боты, безопасность и стабильный рост славы</p>
+<div class="cards">
+  <div class="card">🤖 Умная автоматизация 24/7</div>
+  <div class="card">📊 Live мониторинг</div>
+  <div class="card">🌍 Поддержка Telegram</div>
+  <div class="card">🔐 100% безопасность</div>
+</div>
 </section>
 
 <section id="how" class="section dark">
 <h2>Как это работает</h2>
-<p>Купил → Отправил Clan ID → Слава растёт</p>
+<ul class="steps">
+<li>01 — Купить ботов</li>
+<li>02 — Открыть гильдию</li>
+<li>03 — Отправить Clan ID + чек</li>
+<li>04 — Слава растёт автоматически</li>
+</ul>
 </section>
 
 <section id="price" class="section">
 <h2>Цены</h2>
 <p class="price">1000₽</p>
 <p>1 отряд ботов (3 игрока)</p>
+<a href="#buy" class="btn">Купить</a>
 </section>
 
 <section id="reviews" class="section dark">
@@ -259,7 +299,7 @@ nav{display:none}
 
 <div class="comment-box">
   <input id="name" placeholder="Ваш ник">
-  <textarea id="text" placeholder="Комментарий..."></textarea>
+  <textarea id="text" placeholder="Напишите комментарий..."></textarea>
   <button onclick="addComment()">Отправить</button>
 </div>
 
@@ -267,26 +307,22 @@ nav{display:none}
 </section>
 
 <section id="buy" class="section">
-<h2>Telegram</h2>
-
+<h2>Купить / Поддержка Telegram</h2>
 <div class="tg">
   <a href="https://t.me/garoux24" target="_blank">
     <div class="tg-icon">1</div>
     <small>@garoux24</small>
   </a>
-
   <a href="https://t.me/scromnyi_modz" target="_blank">
     <div class="tg-icon">2</div>
     <small>@scromnyi_modz</small>
   </a>
-
   <a href="https://t.me/er1anovdas_07" target="_blank">
     <div class="tg-icon">3</div>
     <small>@er1anovdas_07</small>
   </a>
-
-  <a href="https://t.me/garouxbot" target="_blank">
-    <div class="tg-icon">🖥️</div>
+  <a href="https://t.me/garoux_bot" target="_blank">
+    <div class="tg-icon">4</div>
     <small>@garouxbot</small>
   </a>
 </div>
@@ -297,13 +333,22 @@ nav{display:none}
 </footer>
 
 <script>
-/* просмотры */
+/* scroll */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+a.onclick=e=>{
+e.preventDefault();
+document.querySelector(a.getAttribute('href'))
+.scrollIntoView({behavior:"smooth"});
+}
+});
+
+/* views */
 let views=localStorage.getItem("views")||0;
 views++;
 localStorage.setItem("views",views);
 document.getElementById("views").innerText=views;
 
-/* комментарии */
+/* comments */
 let comments=JSON.parse(localStorage.getItem("comments")||"[]");
 
 function renderComments(){
