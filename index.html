@@ -90,39 +90,6 @@ text-align:center;
 }
 .dark{background:#0c0c14}
 
-/* CARDS */
-.cards{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
-max-width:1100px;
-margin:auto;
-}
-.card{
-background:#141421;
-padding:25px;
-border-radius:20px;
-transition:.3s;
-}
-.card:hover{
-transform:translateY(-10px);
-box-shadow:0 0 25px rgba(255,0,0,.3);
-}
-
-/* STEPS */
-.steps{
-list-style:none;
-padding:0;
-max-width:600px;
-margin:auto;
-}
-.steps li{
-padding:15px;
-margin:10px 0;
-background:#141421;
-border-radius:15px;
-}
-
 /* PRICE */
 .price{
 font-size:40px;
@@ -204,18 +171,19 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 gap:6px;
-background:#0088cc;
+background:#111;
 color:#fff;
 text-decoration:none;
-box-shadow:0 0 20px #0088cc;
+box-shadow:0 0 15px #000;
 transition:.3s;
 }
 .tg a:hover{
 transform:scale(1.1);
-box-shadow:0 0 35px #00aaff;
 }
-.tg-icon{font-size:26px}
-.tg small{font-size:11px}
+.tg-icon{
+font-size:28px;
+font-weight:bold;
+}
 
 /* FOOTER */
 footer{
@@ -239,12 +207,6 @@ nav{display:none}
     <img src="bg.jpg">
     FFGarouX
   </div>
-  <nav>
-    <a href="#features">Особенности</a>
-    <a href="#how">Как это работает</a>
-    <a href="#price">Цены</a>
-    <a href="#reviews">Отзывы</a>
-  </nav>
   <a href="#buy" class="btn">Купить</a>
 </header>
 
@@ -257,35 +219,6 @@ nav{display:none}
   <div class="stat"><h2>101%</h2><span>Время отработки</span></div>
   <div class="stat"><h2>50+</h2><span>Пользователи</span></div>
 </div>
-
-<a href="#buy" class="btn">Начните сейчас</a>
-</section>
-
-<section id="features" class="section">
-<h2>Почему выбрали FFGarouX?</h2>
-<div class="cards">
-  <div class="card">🤖 Умная автоматизация 24/7</div>
-  <div class="card">📊 Live мониторинг</div>
-  <div class="card">🌍 Поддержка Telegram</div>
-  <div class="card">🔐 100% безопасность</div>
-</div>
-</section>
-
-<section id="how" class="section dark">
-<h2>Как это работает</h2>
-<ul class="steps">
-<li>01 — Купить ботов</li>
-<li>02 — Открыть гильдию</li>
-<li>03 — Отправить Clan ID + чек</li>
-<li>04 — Слава растёт автоматически</li>
-</ul>
-</section>
-
-<section id="price" class="section">
-<h2>Цены</h2>
-<p class="price">1000₽</p>
-<p>1 отряд ботов (3 игрока)</p>
-<a href="#buy" class="btn">Купить</a>
 </section>
 
 <section id="reviews" class="section dark">
@@ -293,7 +226,7 @@ nav{display:none}
 
 <p class="review">“FFGarouX вывел наш клан в ТОП-10 за 2 недели”</p>
 
-<div class="views">👁️ Просмотров: <span id="views">0</span></div>
+<div class="views">◉ Просмотров: <span id="views">0</span></div>
 
 <h3>Комментарии</h3>
 
@@ -307,23 +240,27 @@ nav{display:none}
 </section>
 
 <section id="buy" class="section">
-<h2>Купить / Поддержка Telegram</h2>
+<h2>Telegram</h2>
+
 <div class="tg">
   <a href="https://t.me/garoux24" target="_blank">
-    <div class="tg-icon">✈</div>
+    <div class="tg-icon">1</div>
     <small>@garoux24</small>
   </a>
+
   <a href="https://t.me/scromnyi_modz" target="_blank">
-    <div class="tg-icon">✈</div>
+    <div class="tg-icon">2</div>
     <small>@scromnyi_modz</small>
   </a>
+
   <a href="https://t.me/er1anovdas_07" target="_blank">
-    <div class="tg-icon">✈</div>
+    <div class="tg-icon">3</div>
     <small>@er1anovdas_07</small>
   </a>
-  <a href="https://t.me/garoux_bot" target="_blank">
-    <div class="tg-icon">📢</div>
-    <small>@garoux.bot</small>
+
+  <a href="https://t.me/garouxbot" target="_blank">
+    <div class="tg-icon">🖥️</div>
+    <small>@garouxbot</small>
   </a>
 </div>
 </section>
@@ -333,22 +270,13 @@ nav{display:none}
 </footer>
 
 <script>
-/* scroll */
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-a.onclick=e=>{
-e.preventDefault();
-document.querySelector(a.getAttribute('href'))
-.scrollIntoView({behavior:"smooth"});
-}
-});
-
-/* views */
+/* просмотры */
 let views=localStorage.getItem("views")||0;
 views++;
 localStorage.setItem("views",views);
 document.getElementById("views").innerText=views;
 
-/* comments */
+/* комментарии */
 let comments=JSON.parse(localStorage.getItem("comments")||"[]");
 
 function renderComments(){
@@ -384,4 +312,4 @@ renderComments();
 </script>
 
 </body>
-  </html>
+</html>
