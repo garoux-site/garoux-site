@@ -1,254 +1,69 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FFGarouX - Free Fire Info</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <style>
-    :root {
-      --bg: #0d0d1a;
-      --card: #1a1a2e;
-      --accent: #00f0ff;
-      --accent2: #ff00aa;
-      --text: #e0e0ff;
-      --gray: #a0a0cc;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      background: linear-gradient(135deg, #0d0d1a, #1a0033);
-    }
-    header {
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(0,240,255,0.2);
-    }
-    .logo {
-      font-size: 1.8rem;
-      font-weight: bold;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    nav button {
-      background: none;
-      border: none;
-      color: var(--accent);
-      font-size: 1.5rem;
-      cursor: pointer;
-      margin-left: 1rem;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    h1 {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      background: linear-gradient(90deg, #00f0ff, #ff00aa, #00f0ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-size: 200% auto;
-      animation: glow 4s linear infinite;
-    }
-    @keyframes glow { 0%,100% {background-position:0%} 50% {background-position:200%} }
+<script>
+async function fetchInfo() {
+  const uid = document.getElementById('uid').value.trim();
+  const result = document.getElementById('result');
 
-    .search-boxes {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .search-card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 1.5rem;
-      border: 1px solid rgba(0,240,255,0.15);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-    .search-card h3 {
-      color: var(--accent);
-      margin-bottom: 1rem;
-      font-size: 1.4rem;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 0.9rem;
-      border: 1px solid rgba(0,240,255,0.3);
-      border-radius: 8px;
-      background: rgba(255,255,255,0.05);
-      color: white;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-    }
-    input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(0,240,255,0.4); }
-    button {
-      background: linear-gradient(90deg, var(--accent), #0099cc);
-      border: none;
-      color: black;
-      padding: 0.9rem 1.5rem;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    button:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,240,255,0.6); }
+  if (!uid) {
+    result.innerHTML = '<span class="error">Введите UID!</span>';
+    return;
+  }
 
-    #result, #guildResult {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 1.5rem;
-      min-height: 200px;
-      border: 1px solid rgba(0,240,255,0.2);
-      white-space: pre-wrap;
-      font-family: monospace;
-      line-height: 1.6;
-    }
-    .loading { color: var(--accent); font-style: italic; }
-    .error { color: #ff3366; }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="logo">FFGarouX</div>
-    <nav>
-      <button><i class="fas fa-sync-alt"></i></button>
-      <button><i class="fas fa-cog"></i></button>
-    </nav>
-  </header>
+  result.textContent = 'Загрузка... ⏳';
 
-  <div class="container">
-    <h1>Free Fire Info Lookup</h1>
+  const API_URL = "https://danger-info-alpha.vercel.app/accinfo";
+  const API_KEY = "DANGERxINFO";
 
-    <div class="search-boxes">
-      <!-- Поиск по UID аккаунта -->
-      <div class="search-card">
-        <h3><i class="fas fa-user"></i> Поиск по Account UID</h3>
-        <input type="text" id="uidInput" placeholder="Введи UID (например: 2133907304)" />
-        <button onclick="searchAccount()">Искать аккаунт</button>
-        <div id="result" class="mt-3"></div>
-      </div>
+  try {
+    const res = await fetch(`${API_URL}?uid=${uid}&key=${API_KEY}`);
+    if (!res.ok) throw new Error("API недоступен");
 
-      <!-- Поиск по Guild ID -->
-      <div class="search-card">
-        <h3><i class="fas fa-shield-alt"></i> Поиск по Guild / Clan ID</h3>
-        <input type="text" id="guildInput" placeholder="Введи Guild ID (например: 3033195648)" />
-        <select id="regionSelect">
-          <option value="IND">IND (India)</option>
-          <option value="BR">BR (Brazil)</option>
-          <option value="VN">VN (Vietnam)</option>
-          <option value="ID">ID (Indonesia)</option>
-          <option value="TH">TH (Thailand)</option>
-          <option value="RU">RU</option>
-          <option value="ME">ME</option>
-          <option value="PK">PK</option>
-          <option value="BD">BD</option>
-        </select>
-        <button onclick="searchGuild()">Искать гильдию</button>
-        <div id="guildResult" class="mt-3"></div>
-      </div>
-    </div>
-  </div>
+    const data = await res.json();
+    if (!data.basicInfo) throw new Error("Игрок не найден");
 
-  <script>
-    const ACC_API = "https://free-ff-api-src-5plp.onrender.com/api/v1/account";
-    const GUILD_API = "https://free-ff-api-src-5plp.onrender.com/api/v1/guildInfo";
+    const b = data.basicInfo;
+    const s = data.socialInfo || {};
+    const c = data.clanBasicInfo || {};
+    const p = data.petInfo || {};
 
-    function formatTime(ts) {
-      if (!ts) return "Unknown";
-      const date = new Date(ts * 1000);
-      return date.toLocaleString('ru-RU', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
-    }
+    const text =
+`╔══ PLAYER PROFILE ══╗
 
-    async function fetchJson(url) {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
-      } catch (e) {
-        throw e;
-      }
-    }
+👤 Ник: ${b.nickname ?? '—'}
+🆔 UID: ${b.accountId ?? uid}
+🌍 Регион: ${b.region ?? '—'}
+🎖 Уровень: ${b.level ?? '—'}
+❤️ Лайки: ${b.liked ?? '—'}
 
-    async function searchAccount() {
-      const uid = document.getElementById('uidInput').value.trim();
-      const resultDiv = document.getElementById('result');
-      if (!uid) { resultDiv.innerHTML = '<p class="error">Введи UID!</p>'; return; }
+🏆 BR Rank: ${b.rank ?? '—'} (${b.rankingPoints ?? '—'} pts)
+🎯 CS Rank: ${b.csRank ?? '—'} (${b.csRankingPoints ?? '—'} pts)
 
-      resultDiv.innerHTML = '<p class="loading">Загрузка аккаунта... ⏳</p>';
-
-      try {
-        // Пробуем с region=IND по умолчанию, можно потом добавить выбор
-        const data = await fetchJson(`\( {ACC_API}?region=IND&uid= \){uid}`);
-        
-        if (!data || !data.basicInfo) {
-          resultDiv.innerHTML = '<p class="error">Игрок не найден ❌</p>';
-          return;
-        }
-
-        const b = data.basicInfo || {};
-        const c = data.clanBasicInfo || {};
-        const text = `
-👤 Ник: ${b.nickname || '—'}
-🆔 UID: ${b.accountId || uid}
-🌍 Регион: ${b.region || 'IND'}
-🎖 Уровень: ${b.level || '—'}
-❤️ Лайки: ${b.liked || '—'}
-
-🏆 BR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'} pts)
 📅 Создан: ${formatTime(b.createAt)}
 ⏰ Последний вход: ${formatTime(b.lastLoginAt)}
 
-🏰 Клан: ${c.clanName || 'Нет'}
-👥 Участников: \( {c.memberNum || '—'}/ \){c.capacity || '—'}
-        `.trim();
+🐾 Питомец: ${p.name ?? 'Нет'} (Lv ${p.level ?? '—'})
 
-        resultDiv.innerHTML = `<pre>${text}</pre>`;
-      } catch (err) {
-        resultDiv.innerHTML = `<p class="error">Ошибка: ${err.message}</p>`;
-      }
-    }
+🏰 Клан: ${c.clanName ?? 'Нет'}
+👥 Участников: ${c.memberNum ?? '—'}/${c.capacity ?? '—'}
 
-    async function searchGuild() {
-      const gid = document.getElementById('guildInput').value.trim();
-      const region = document.getElementById('regionSelect').value;
-      const resultDiv = document.getElementById('guildResult');
-      if (!gid) { resultDiv.innerHTML = '<p class="error">Введи Guild ID!</p>'; return; }
+🌐 Подпись: ${s.signature ?? 'Нет'}
+`;
 
-      resultDiv.innerHTML = '<p class="loading">Загрузка гильдии... ⏳</p>';
+    result.textContent = text;
 
-      try {
-        const data = await fetchJson(`\( {GUILD_API}?region= \){region}&guildID=${gid}`);
-        
-        if (!data || !data.clanName) {
-          resultDiv.innerHTML = '<p class="error">Гильдия не найдена ❌</p>';
-          return;
-        }
+  } catch (e) {
+    result.innerHTML = `<span class="error">Ошибка: ${e.message}</span>`;
+  }
+}
 
-        const text = `
-🏰 Клан: ${data.clanName}
-🆔 Guild ID: ${data.clanId || gid}
-📅 Создан: ${formatTime(data.createAt)}
-👑 Лидер: ${data.leaderName || '—'} (UID: ${data.leaderUid || '—'})
-👥 Участников: \( {data.memberNum || '—'}/ \){data.capacity || '—'}
-🏆 Уровень клана: ${data.clanLevel || '—'}
-        `.trim();
-
-        resultDiv.innerHTML = `<pre>${text}</pre>`;
-      } catch (err) {
-        resultDiv.innerHTML = `<p class="error">Ошибка: ${err.message} (попробуй другой регион)</p>`;
-      }
-    }
-  </script>
-</body>
-  </html>
+function formatTime(ts) {
+  if (!ts) return "Unknown";
+  const d = new Date(ts * 1000);
+  return d.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+</script>
