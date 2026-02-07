@@ -132,6 +132,31 @@
     .auth-toggle{text-align:center; margin:15px 0;}
     .auth-toggle a{color:#ff6a00; cursor:pointer; text-decoration:underline;}
 
+    /* REGISTRATION MODAL */
+    #regBox{
+      position:fixed;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      z-index:1000;
+      background:rgba(20,20,33,.9);
+      padding:30px;
+      border-radius:16px;
+      border:1px solid #ff4d4d;
+      display:none;
+      max-width:400px;
+      width:90%;
+    }
+    #regBox.active{display:block;}
+    #closeReg{
+      position:absolute;
+      top:10px;
+      right:10px;
+      color:#fff;
+      cursor:pointer;
+      font-size:20px;
+    }
+
     /* SECTIONS */
     .section{
       padding:80px 20px;
@@ -145,7 +170,7 @@
       color:#ff4d4d;
     }
 
-    /* REVIEWS + COMMENTS */
+    /* REVIEWS + CHAT-LIKE COMMENTS */
     .review{
       max-width:700px;
       margin:20px auto;
@@ -186,9 +211,9 @@
       background:#141421;
       padding:15px;
       border-radius:15px;
-      margin:15px auto;
-      max-width:600px;
+      margin:15px 0;
       text-align:left;
+      position:relative;
     }
     .comment .author{
       font-weight:700;
@@ -202,6 +227,22 @@
       font-size:14px;
       color:#888;
       cursor:pointer;
+    }
+    .comment .reply-box{
+      margin-top:10px;
+      display:none;
+    }
+    .comment .reply-box.active{display:block;}
+    .comment .replies{
+      margin-top:15px;
+      padding-left:20px;
+      border-left:2px solid #ff4d4d33;
+    }
+    .reply{
+      background:#1a1a2e;
+      padding:10px;
+      border-radius:10px;
+      margin:10px 0;
     }
 
     /* TELEGRAM */
@@ -258,19 +299,31 @@
   </div>
   <div>
     <span id="userStatus">Гость</span>
-    <button id="authBtn" class="btn" onclick="toggleAuth()">Войти / Регистрация</button>
+    <button id="authBtn" class="btn" onclick="toggleAuth()">Войти</button>
   </div>
 </header>
 
-<!-- AUTH BLOCK (скрытый) -->
+<!-- LOGIN BLOCK (скрытый) -->
 <div id="authBox" class="auth-box">
-  <h3 id="authTitle">Вход</h3>
-  <input id="username" placeholder="Ник / Логин" />
+  <h3>Вход</h3>
+  <input id="username" placeholder="Логин" />
   <input id="password" type="password" placeholder="Пароль" />
-  <button id="authActionBtn" class="btn" onclick="handleAuth()">Войти</button>
+  <button id="authActionBtn" class="btn" onclick="handleLogin()">Войти</button>
+  <div id="authMessage" style="color:#ff4d4d; text-align:center; margin-top:10px;"></div>
   <div class="auth-toggle">
-    <a id="toggleLink" onclick="toggleForm()">Нет аккаунта? Зарегистрироваться</a>
+    <a onclick="toggleReg()">Регистрация</a>
   </div>
+</div>
+
+<!-- REGISTRATION MODAL -->
+<div id="regBox">
+  <span id="closeReg" onclick="toggleReg()">×</span>
+  <h3>Регистрация</h3>
+  <input id="regUsername" placeholder="Логин" />
+  <input id="regPassword" type="password" placeholder="Пароль" />
+  <input id="regConfirmPassword" type="password" placeholder="Повторите пароль" />
+  <button class="btn" onclick="handleRegister()">Зарегистрироваться</button>
+  <div id="regMessage" style="color:#ff4d4d; text-align:center; margin-top:10px;"></div>
 </div>
 
 <section class="hero">
@@ -292,17 +345,17 @@
 </section>
 
 <section id="reviews" class="section dark">
-  <h2>Отзывы</h2>
+  <h2>Отзывы и Чат</h2>
   <p class="review">“FFGarouX вывел наш клан в ТОП-10 за 2 недели + удобный поиск по UID”</p>
 
   <div class="views">◉ Просмотров: <span id="views">0</span></div>
 
-  <h3>Комментарии</h3>
+  <h3>Комментарии (Чат)</h3>
 
   <div class="comment-box">
-    <input id="name" placeholder="Ваш ник">
+    <input id="name" placeholder="Ваш ник (опционально)">
     <textarea id="text" placeholder="Напишите комментарий..."></textarea>
-    <button onclick="addComment()">Отправить</button>
+    <button onclick="addComment(-1)">Отправить</button>
   </div>
 
   <div id="comments"></div>
@@ -341,61 +394,77 @@ views++;
 localStorage.setItem("views", views);
 document.getElementById("views").innerText = views;
 
-// Пользователь (имитация логина)
+// Пользователь
 let currentUser = localStorage.getItem("currentUser") || "Гость";
 document.getElementById("userStatus").innerText = currentUser;
 
-// Показ/скрытие auth
+// Показ/скрытие login
 function toggleAuth() {
   const box = document.getElementById("authBox");
   box.classList.toggle("active");
 }
 
-// Переключение Вход / Регистрация
-let isLogin = true;
-function toggleForm() {
-  isLogin = !isLogin;
-  document.getElementById("authTitle").innerText = isLogin ? "Вход" : "Регистрация";
-  document.getElementById("authActionBtn").innerText = isLogin ? "Войти" : "Зарегистрироваться";
-  document.getElementById("toggleLink").innerText = isLogin ? "Нет аккаунта? Зарегистрироваться" : "Уже есть аккаунт? Войти";
+// Показ/скрытие registration modal
+function toggleReg() {
+  const box = document.getElementById("regBox");
+  box.classList.toggle("active");
 }
 
-// Обработка входа/регистрации (localStorage)
-function handleAuth() {
+// Обработка входа
+function handleLogin() {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
+  const message = document.getElementById("authMessage");
 
   if (!username || !password) {
-    alert("Заполните логин и пароль!");
+    message.innerText = "Заполните логин и пароль!";
     return;
   }
 
   const users = JSON.parse(localStorage.getItem("users") || "{}");
 
-  if (isLogin) {
-    // Вход
-    if (users[username] && users[username] === password) {
-      localStorage.setItem("currentUser", username);
-      document.getElementById("userStatus").innerText = username;
-      alert("Вход успешен!");
-      toggleAuth();
-    } else {
-      alert("Неверный логин или пароль!");
-    }
+  if (users[username] && users[username] === password) {
+    localStorage.setItem("currentUser", username);
+    document.getElementById("userStatus").innerText = username;
+    message.innerText = "";
+    toggleAuth();
+    alert("Вход успешен!");
   } else {
-    // Регистрация
-    if (users[username]) {
-      alert("Такой пользователь уже существует!");
-    } else {
-      users[username] = password;
-      localStorage.setItem("users", JSON.stringify(users));
-      alert("Регистрация успешна! Теперь войдите.");
-      toggleForm(); // переключаем на вход
-    }
+    message.innerText = "Нет такого аккаунта или неверный пароль!";
   }
 }
 
-// Поиск по UID (рабочий API на февраль 2026)
+// Обработка регистрации
+function handleRegister() {
+  const username = document.getElementById("regUsername").value.trim();
+  const password = document.getElementById("regPassword").value.trim();
+  const confirmPassword = document.getElementById("regConfirmPassword").value.trim();
+  const message = document.getElementById("regMessage");
+
+  if (!username || !password || !confirmPassword) {
+    message.innerText = "Заполните все поля!";
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    message.innerText = "Пароли не совпадают!";
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem("users") || "{}");
+
+  if (users[username]) {
+    message.innerText = "Такой логин уже существует!";
+  } else {
+    users[username] = password;
+    localStorage.setItem("users", JSON.stringify(users));
+    message.innerText = "";
+    toggleReg();
+    alert("Регистрация успешна! Теперь войдите с помощью логина и пароля.");
+  }
+}
+
+// Поиск по UID (рабочий API)
 async function searchUID() {
   const uid = document.getElementById("uidInput").value.trim();
   const result = document.getElementById("result");
@@ -456,35 +525,75 @@ function formatTime(ts) {
   return date.toLocaleString('ru-RU', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-// Комментарии (как было)
+// Комментарии как чат (с ответами)
 let comments = JSON.parse(localStorage.getItem("comments") || "[]");
 
 function renderComments() {
   let box = document.getElementById("comments");
   box.innerHTML = "";
   comments.forEach((c, i) => {
+    let repliesHtml = '';
+    if (c.replies) {
+      repliesHtml = '<div class="replies">';
+      c.replies.forEach((r, j) => {
+        repliesHtml += `
+          <div class="reply">
+            <div class="author">${r.name}</div>
+            <div class="text">${r.text}</div>
+            <div class="actions" onclick="likeReply(\( {i}, \){j})">❤️ ${r.likes || 0}</div>
+          </div>`;
+      });
+      repliesHtml += '</div>';
+    }
+
     box.innerHTML += `
       <div class="comment">
         <div class="author">${c.name}</div>
         <div class="text">${c.text}</div>
-        <div class="actions" onclick="like(${i})">❤️ ${c.likes || 0}</div>
+        <div class="actions" onclick="like(${i})">❤️ \( {c.likes || 0} | <span onclick="toggleReply( \){i})">Ответить</span></div>
+        <div class="reply-box" id="replyBox${i}">
+          <input id="replyName${i}" placeholder="Ваш ник (опционально)">
+          <textarea id="replyText${i}" placeholder="Ваш ответ..."></textarea>
+          <button onclick="addReply(${i})">Отправить ответ</button>
+        </div>
+        ${repliesHtml}
       </div>`;
   });
 }
 
-function addComment() {
+function addComment(parentId) {
   let name = document.getElementById("name").value || "Гость";
   let text = document.getElementById("text").value;
   if (!text) return;
-  comments.unshift({ name, text, likes: 0 });
+  comments.unshift({ name, text, likes: 0, replies: [] });
   localStorage.setItem("comments", JSON.stringify(comments));
   document.getElementById("text").value = "";
   renderComments();
 }
 
+function toggleReply(i) {
+  document.getElementById(`replyBox${i}`).classList.toggle("active");
+}
+
+function addReply(i) {
+  let name = document.getElementById(`replyName${i}`).value || "Гость";
+  let text = document.getElementById(`replyText${i}`).value;
+  if (!text) return;
+  if (!comments[i].replies) comments[i].replies = [];
+  comments[i].replies.push({ name, text, likes: 0 });
+  localStorage.setItem("comments", JSON.stringify(comments));
+  document.getElementById(`replyText${i}`).value = "";
+  renderComments();
+}
+
 function like(i) {
-  if (!comments[i].likes) comments[i].likes = 0;
-  comments[i].likes++;
+  comments[i].likes = (comments[i].likes || 0) + 1;
+  localStorage.setItem("comments", JSON.stringify(comments));
+  renderComments();
+}
+
+function likeReply(i, j) {
+  comments[i].replies[j].likes = (comments[i].replies[j].likes || 0) + 1;
   localStorage.setItem("comments", JSON.stringify(comments));
   renderComments();
 }
