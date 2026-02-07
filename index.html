@@ -1,69 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>FFGarouX — Free Fire Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#05050d;
+color:#fff;
+}
+.section{
+max-width:900px;
+margin:30px auto;
+padding:25px;
+background:#0e1022;
+border-radius:16px;
+box-shadow:0 0 25px rgba(0,255,255,.08);
+}
+h1,h2{text-align:center;color:#00f0ff}
+input,button{
+width:100%;
+padding:14px;
+margin-top:10px;
+border-radius:10px;
+border:1px solid #00f0ff;
+background:#050517;
+color:#fff;
+}
+button{
+background:linear-gradient(90deg,#00f0ff,#0099ff);
+color:#000;
+font-weight:bold;
+cursor:pointer;
+}
+button:hover{opacity:.85}
+.hidden{display:none}
+pre{
+background:#000;
+padding:15px;
+border-radius:12px;
+white-space:pre-wrap;
+}
+.chat{
+height:200px;
+overflow:auto;
+background:#000;
+padding:10px;
+border-radius:12px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>FFGarouX Panel</h1>
+
+<!-- LOGIN -->
+<div class="section" id="loginBox">
+<h2>Вход</h2>
+<input id="loginUser" placeholder="Логин">
+<input id="loginPass" type="password" placeholder="Пароль">
+<button onclick="login()">Войти</button>
+<p id="loginMsg"></p>
+<hr>
+<h2>Регистрация</h2>
+<input id="regUser" placeholder="Логин">
+<input id="regPass" type="password" placeholder="Пароль">
+<button onclick="register()">Создать аккаунт</button>
+<p id="regMsg"></p>
+</div>
+
+<!-- PANEL -->
+<div class="section hidden" id="panel">
+<h2>Добро пожаловать, <span id="me"></span></h2>
+
+<h3>Поиск Free Fire UID</h3>
+<input id="uid" placeholder="UID">
+<button onclick="lookup()">Искать</button>
+<pre id="uidResult"></pre>
+
+<h3>💬 Онлайн чат</h3>
+<div class="chat" id="chatBox"></div>
+<input id="chatText" placeholder="Сообщение">
+<button onclick="sendChat()">Отправить</button>
+
+<button onclick="logout()" style="margin-top:20px;background:#ff3355;color:#fff">
+Выйти
+</button>
+</div>
+
 <script>
-async function fetchInfo() {
-  const uid = document.getElementById('uid').value.trim();
-  const result = document.getElementById('result');
+const API="http://ТВОЙ_IP:8000";
+let token=null;
+let username=null;
 
-  if (!uid) {
-    result.innerHTML = '<span class="error">Введите UID!</span>';
-    return;
-  }
-
-  result.textContent = 'Загрузка... ⏳';
-
-  const API_URL = "https://danger-info-alpha.vercel.app/accinfo";
-  const API_KEY = "DANGERxINFO";
-
-  try {
-    const res = await fetch(`${API_URL}?uid=${uid}&key=${API_KEY}`);
-    if (!res.ok) throw new Error("API недоступен");
-
-    const data = await res.json();
-    if (!data.basicInfo) throw new Error("Игрок не найден");
-
-    const b = data.basicInfo;
-    const s = data.socialInfo || {};
-    const c = data.clanBasicInfo || {};
-    const p = data.petInfo || {};
-
-    const text =
-`╔══ PLAYER PROFILE ══╗
-
-👤 Ник: ${b.nickname ?? '—'}
-🆔 UID: ${b.accountId ?? uid}
-🌍 Регион: ${b.region ?? '—'}
-🎖 Уровень: ${b.level ?? '—'}
-❤️ Лайки: ${b.liked ?? '—'}
-
-🏆 BR Rank: ${b.rank ?? '—'} (${b.rankingPoints ?? '—'} pts)
-🎯 CS Rank: ${b.csRank ?? '—'} (${b.csRankingPoints ?? '—'} pts)
-
-📅 Создан: ${formatTime(b.createAt)}
-⏰ Последний вход: ${formatTime(b.lastLoginAt)}
-
-🐾 Питомец: ${p.name ?? 'Нет'} (Lv ${p.level ?? '—'})
-
-🏰 Клан: ${c.clanName ?? 'Нет'}
-👥 Участников: ${c.memberNum ?? '—'}/${c.capacity ?? '—'}
-
-🌐 Подпись: ${s.signature ?? 'Нет'}
-`;
-
-    result.textContent = text;
-
-  } catch (e) {
-    result.innerHTML = `<span class="error">Ошибка: ${e.message}</span>`;
-  }
+/* AUTH */
+async function login(){
+const u=loginUser.value,p=loginPass.value;
+const r=await fetch(API+"/login",{method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({u,p})});
+const d=await r.json();
+if(d.ok){
+token=d.token;
+username=u;
+loginBox.classList.add("hidden");
+panel.classList.remove("hidden");
+me.textContent=u;
+loadChat();
+}else loginMsg.textContent=d.error;
 }
 
-function formatTime(ts) {
-  if (!ts) return "Unknown";
-  const d = new Date(ts * 1000);
-  return d.toLocaleString('ru-RU', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+async function register(){
+const u=regUser.value,p=regPass.value;
+const r=await fetch(API+"/register",{method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({u,p})});
+const d=await r.json();
+regMsg.textContent=d.ok?"Аккаунт создан":d.error;
 }
+
+function logout(){
+token=null;
+panel.classList.add("hidden");
+loginBox.classList.remove("hidden");
+}
+
+/* UID */
+async function lookup(){
+uidResult.textContent="Загрузка…";
+const r=await fetch(API+"/account/"+uid.value);
+const d=await r.json();
+uidResult.textContent=JSON.stringify(d,null,2);
+}
+
+/* CHAT */
+async function loadChat(){
+const r=await fetch(API+"/chat");
+const d=await r.json();
+chatBox.innerHTML=d.map(m=>`<div>[${m.user}] ${m.text}</div>`).join("");
+chatBox.scrollTop=99999;
+}
+
+async function sendChat(){
+await fetch(API+"/chat",{method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({user:username,text:chatText.value})});
+chatText.value="";
+loadChat();
+}
+setInterval(loadChat,3000);
 </script>
+
+</body>
+</html>
