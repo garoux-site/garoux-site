@@ -5,16 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FFGarouX</title>
   <style>
-    :root { --bg: #0d0d1a; --card: #1a1a2e; --accent: #00f0ff; --accent2: #ff00aa; --text: #e0e0ff; --red: #ff4d4d; }
+    :root { --bg: #0d0d1a; --card: #1a1a2e; --accent: #00f0ff; --accent2: #ff00aa; --text: #e0e0ff; --red: #ff4d4d; --green: #32cd32; --yellow: #ffd700; --pink: #ff69b4; --blue: #00bfff; }
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
     body { background:linear-gradient(135deg,var(--bg),#1a0033); color:var(--text); min-height:100vh; }
-    @keyframes glow { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
-    .glow { animation:glow 4s linear infinite; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent)); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    @keyframes glow { 0%,100% { text-shadow:0 0 10px var(--accent); } 50% { text-shadow:0 0 20px var(--accent2); } }
+    .glow { animation:glow 3s infinite; }
 
-    header { background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; position:fixed; top:0; width:100%; z-index:10; border-bottom:1px solid rgba(0,240,255,0.2); }
-    header .logo { font-size:2.2rem; font-weight:bold; }
+    header { background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); padding:1rem; display:flex; justify-content:space-between; align-items:center; position:fixed; top:0; width:100%; z-index:10; }
+    header .logo { font-size:1.8rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .menu-btn { background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer; }
+    .menu { display:none; position:absolute; top:3rem; right:1rem; background:var(--card); border-radius:12px; padding:1rem; border:1px solid rgba(0,240,255,0.2); box-shadow:0 0 20px rgba(0,0,0,0.5); }
+    .menu.active { display:block; }
+    .menu button { display:block; width:100%; background:none; border:none; color:var(--text); padding:0.5rem; text-align:left; cursor:pointer; }
+    .menu button:hover { color:var(--accent); }
 
-    #authPage { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:2rem; }
+    #authPage { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:2rem; background:var(--bg); }
+    #authPage .logo { font-size:3rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1rem; }
     #authPage h1 { font-size:2rem; margin-bottom:0.5rem; }
     #authPage p { color:#aaa; margin-bottom:2rem; }
     #authPage input { width:100%; max-width:400px; padding:1rem; margin:0.8rem 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--accent); color:white; font-size:1.1rem; }
@@ -22,41 +28,45 @@
     #authPage button:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,77,77,0.6); }
     .toggle { color:var(--accent); cursor:pointer; text-decoration:underline; margin:1rem 0; }
 
-    #dashboard { display:none; padding:5rem 1rem 4rem; }
+    #dashboard { display:none; padding:2rem; }
     .overview { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2rem; }
-    .card { background:var(--card); border-radius:12px; padding:1.5rem; text-align:center; border:1px solid rgba(0,240,255,0.2); }
+    .card { background:var(--card); border-radius:12px; padding:1rem; text-align:center; border:1px solid rgba(0,240,255,0.2); box-shadow:0 4px 16px rgba(0,0,0,0.5); }
     .card h3 { color:var(--accent); }
-    nav { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); display:flex; justify-content:space-around; padding:1rem 0; border-top:1px solid rgba(0,240,255,0.2); }
-    nav button { background:none; border:none; color:var(--text); font-size:1rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
-    nav button.active { color:var(--accent); }
-    .section { display:none; }
-    .section.active { display:block; }
+    .quick-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .action-btn { padding:1rem; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; transition:all 0.3s; }
+    .action-btn:hover { transform:scale(1.05); box-shadow:0 0 20px var(--accent); }
+    .upload { background:linear-gradient(90deg,#00bfff,#1e90ff); }
+    .deploy { background:linear-gradient(90deg,#32cd32,#228b22); }
+    .logs { background:linear-gradient(90deg,#ffd700,#ffa500); }
+    .stop { background:linear-gradient(90deg,#ff69b4,#ff1493); }
+
+    .section { padding:1rem; }
     .message { background:var(--card); padding:1rem; border-radius:12px; margin:0.5rem 0; border:1px solid rgba(0,240,255,0.2); }
   </style>
 </head>
 <body>
 
-<!-- Авторизация -->
+<!-- Логин -->
 <div id="authPage">
-  <div class="logo glow" style="font-size:3.5rem; margin-bottom:1rem;">FFGarouX</div>
+  <div class="logo glow">FFGarouX</div>
   <h1 class="glow">Welcome Back</h1>
-  <p>Войдите в панель FFGarouX</p>
+  <p>Sign in to FFGarouX panel</p>
 
   <div id="loginForm">
-    <input id="username" placeholder="Ник (username)" autocomplete="off">
+    <input id="username" placeholder="Ник (username)">
     <input id="password" placeholder="Пароль" type="password">
     <button onclick="signIn()">Sign In</button>
-    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
-    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Зарегистрироваться</div>
+    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
+    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Sign Up</div>
   </div>
 
   <div id="signUpForm" style="display:none;">
-    <input id="signUpUsername" placeholder="Ник (username)" autocomplete="off">
+    <input id="signUpUsername" placeholder="Ник (username)">
     <input id="signUpPassword" placeholder="Пароль" type="password">
-    <input id="signUpConfirm" placeholder="Повторите пароль" type="password">
+    <input id="signUpConfirm" placeholder="Confirm Password" type="password">
     <button onclick="signUp()">Sign Up</button>
-    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
-    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Войти</div>
+    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
+    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Sign In</div>
   </div>
 </div>
 
@@ -64,240 +74,85 @@
 <div id="dashboard">
   <header>
     <div class="logo glow">FFGarouX</div>
-    <button onclick="logout()">Выйти</button>
+    <button class="menu-btn" onclick="toggleMenu()">•••</button>
+    <div class="menu" id="menu">
+      <button onclick="showSection('guild')">Guild</button>
+      <button onclick="showSection('cheats')">Cheats</button>
+      <button onclick="showSection('reviews')">Reviews</button>
+      <button onclick="showSection('settings')">Settings</button>
+      <button onclick="logout()">Выйти из аккаунта</button>
+    </div>
   </header>
 
   <div class="overview">
-    <div class="card"><h3>Активно</h3><p>—</p></div>
-    <div class="card"><h3>Сообщений</h3><p>—</p></div>
+    <div class="card"><h3>Проекты</h3><p>5</p></div>
+    <div class="card"><h3>Запущено</h3><p>2</p></div>
+    <div class="card"><h3>Сервер лимит</h3><p>∞ Unlimited</p></div>
+    <div class="card"><h3>Disk Usage</h3><p>43%</p></div>
   </div>
 
-  <section id="guild" class="section active">
+  <div class="quick-actions">
+    <button class="action-btn upload">Upload</button>
+    <button class="action-btn deploy">Deploy</button>
+    <button class="action-btn logs">Logs</button>
+    <button class="action-btn stop">Stop</button>
+  </div>
+
+  <section id="guild" class="section">
     <h2>Гильдии</h2>
-    <p>Продажа и прокачка гильдий Free Fire. Автоматизация славы клана. Связь: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+    <p>Доминируйте в славе клана автоматически. Самая продвинутые система автоматизации клановой славы Free Fire. Слава ежедневно: 40M+. Время отработки: 101%. Пользователи: 50+.</p>
+    <p>Купить: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
   </section>
 
   <section id="cheats" class="section">
-    <h2>Читы DRIP CLIENT</h2>
-    <p>Android • Без бана</p>
+    <h2>Читы</h2>
+    <p>DRIP KLIENT🌟 Андроид 👑 БЕЗ БАНА👑</p>
     <ul>
       <li>Убийство при прицеливании</li>
-      <li>Тихое убийство</li>
+      <li>Тихое убийство при прицеливании</li>
       <li>Тихий аимбот</li>
       <li>Аимбот Rage / Legit</li>
+      <li>Таймер скорости</li>
       <li>Телепорт 8м</li>
+      <li>Поднять игрока</li>
       <li>Призрачный хак</li>
-      <li>ESP линия</li>
-      <li>Ранг CS/BR работает</li>
+      <li>Высота полёта</li>
+      <li>Скорость полёта</li>
+      <li>ESP линия местоположения</li>
+      <li>Ранг CS / BR работает</li>
     </ul>
-    <h3>Ключи</h3>
+    <h3>КЛЮЧИ 🔑</h3>
     <ul>
-      <li>1 день — 300₽ (\~3.89$)</li>
-      <li>7 дней — 600₽ (\~7.79$)</li>
-      <li>15 дней — 900₽ (\~11.68$)</li>
-      <li>30 дней — 1500₽ (\~19.47$)</li>
+      <li>1 день (day) - 300₽ (3.89$)</li>
+      <li>7 дней (day) -600₽ (7.79$)</li>
+      <li>15 дней (day) - 900₽ (11.68$)</li>
+      <li>30 дней (day) - 1500₽ (19.47$)</li>
     </ul>
     <p>Купить: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
   </section>
 
   <section id="reviews" class="section">
-    <h2>Отзывы & Чат</h2>
-    <input id="chatName" placeholder="Ваш ник" style="width:100%; padding:0.8rem; margin-bottom:0.5rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
-    <textarea id="chatText" placeholder="Сообщение..." style="width:100%; height:80px; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;"></textarea>
-    <button onclick="sendMessage()" style="width:100%; margin-top:0.5rem; padding:1rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#000; border:none; border-radius:8px; font-weight:bold;">Отправить</button>
-    <div id="chatMessages" style="margin-top:1rem; max-height:400px; overflow-y:auto;"></div>
+    <h2>Отзывы</h2>
+    <p>“FFGarouX вывел наш клан в ТОП-10 за 2 недели”</p>
+    <div class="views">◉ Просмотров: <span id="views">0</span></div>
 
-    <h2 style="margin-top:2rem;">Поиск по UID</h2>
-    <input id="uidInput" placeholder="UID игрока" style="width:100%; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
-    <button onclick="searchUID()" style="width:100%; margin-top:0.5rem; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px;">Искать</button>
-    <pre id="uidResult" style="margin-top:1rem; background:var(--card); padding:1rem; border-radius:8px; white-space:pre-wrap; font-size:0.95rem;"></pre>
+    <h3>Комментарии</h3>
+    <div class="comment-box">
+      <input id="name" placeholder="Ваш ник">
+      <textarea id="text" placeholder="Напишите комментарий..."></textarea>
+      <button onclick="addComment()">Отправить</button>
+    </div>
+    <div id="comments"></div>
+
+    <h2>Информация о аккаунте</h2>
+    <input id="uidInput" placeholder="Введите UID">
+    <button onclick="searchUID()" class="action-btn deploy">Искать</button>
+    <pre id="uidResult"></pre>
   </section>
 
   <section id="settings" class="section">
     <h2>Настройки</h2>
-    <p>FFGarouX — лучшая панель для гильдий и читов Free Fire.<br>Контакты: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram @garoux24</a></p>
-    <button onclick="logout()" style="width:100%; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px; margin-top:1rem;">Выйти из аккаунта</button>
+    <p>© FFGarouX — Clan Glory Bot. Telegram: <a href="https://t.me/garoux24" style="color:var(--accent);">@garoux24</a></p>
   </section>
-
-  <nav>
-    <button onclick="showSection('guild')" class="active">Guild</button>
-    <button onclick="showSection('cheats')">Cheats</button>
-    <button onclick="showSection('reviews')">Reviews</button>
-    <button onclick="showSection('settings')">Settings</button>
-  </nav>
-</div>
-
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-  import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
-    authDomain: "ffgaroux-a58e7.firebaseapp.com",
-    projectId: "ffgaroux-a58e7",
-    storageBucket: "ffgaroux-a58e7.firebasestorage.app",
-    messagingSenderId: "967486028392",
-    appId: "1:967486028392:web:3de0f014b77d0ac27659dd",
-    measurementId: "G-Y1VCLD1VKM",
-    databaseURL: "https://ffgaroux-a58e7-default-rtdb.europe-west1.firebasedatabase.app/"
-  };
-
-  console.log("Попытка подключения к Firebase...");
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getDatabase(app);
-  console.log("Firebase подключён успешно");
-
-  // Защита от null-элементов
-  function toggleElement(id, display) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.style.display = display;
-    } else {
-      console.error(`Элемент с id "${id}" не найден! Проверь HTML.`);
-    }
-  }
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("Пользователь вошёл:", user.uid);
-      toggleElement('authPage', 'none');
-      toggleElement('dashboard', 'block');
-      loadMessages();
-    } else {
-      console.log("Пользователь вышел или не авторизован");
-      toggleElement('authPage', 'flex');
-      toggleElement('dashboard', 'none');
-    }
-  });
-
-  window.signUp = function() {
-    console.log("Нажата кнопка Sign Up");
-    const username = document.getElementById('signUpUsername')?.value.trim();
-    const password = document.getElementById('signUpPassword')?.value.trim();
-    const confirm = document.getElementById('signUpConfirm')?.value.trim();
-
-    if (!username) {
-      document.getElementById('regMessage').innerText = 'Введите ник!';
-      return;
-    }
-    if (password !== confirm) {
-      document.getElementById('regMessage').innerText = 'Пароли не совпадают!';
-      return;
-    }
-
-    const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
-    console.log("Попытка регистрации:", fakeEmail);
-
-    createUserWithEmailAndPassword(auth, fakeEmail, password)
-      .then((userCredential) => {
-        console.log("Регистрация успешна:", userCredential.user.uid);
-        set(ref(db, 'users/' + userCredential.user.uid), { username });
-        alert('Регистрация успешна! Теперь войдите под ником: ' + username);
-        showLogin();
-      })
-      .catch((error) => {
-        console.error("Ошибка регистрации:", error.code, error.message);
-        if (error.code === 'auth/email-already-in-use') {
-          document.getElementById('regMessage').innerText = 'Этот ник уже занят!';
-        } else if (error.code === 'auth/weak-password') {
-          document.getElementById('regMessage').innerText = 'Пароль слишком слабый (минимум 6 символов)!';
-        } else {
-          document.getElementById('regMessage').innerText = 'Ошибка: ' + error.message;
-        }
-      });
-  };
-
-  window.signIn = function() {
-    console.log("Нажата кнопка Sign In");
-    const username = document.getElementById('username')?.value.trim();
-    const password = document.getElementById('password')?.value.trim();
-
-    if (!username) {
-      document.getElementById('authMessage').innerText = 'Введите ник!';
-      return;
-    }
-
-    const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
-    console.log("Попытка входа:", fakeEmail);
-
-    signInWithEmailAndPassword(auth, fakeEmail, password)
-      .then(() => {
-        console.log("Вход успешен");
-        alert('Вход успешен!');
-      })
-      .catch((error) => {
-        console.error("Ошибка входа:", error.code, error.message);
-        document.getElementById('authMessage').innerText = 'Нет такого аккаунта или неверный пароль!';
-      });
-  };
-
-  window.logout = function() {
-    signOut(auth).then(() => {
-      console.log("Выход выполнен");
-      alert('Вы вышли');
-    });
-  };
-
-  window.showSignUp = function() {
-    console.log("Переход на регистрацию");
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('signUpForm').style.display = 'block';
-    document.getElementById('authMessage').innerText = '';
-    document.getElementById('regMessage').innerText = '';
-  };
-
-  window.showLogin = function() {
-    console.log("Переход на вход");
-    document.getElementById('signUpForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('authMessage').innerText = '';
-    document.getElementById('regMessage').innerText = '';
-  };
-
-  function sendMessage() {
-    const name = document.getElementById('chatName').value || 'Гость';
-    const text = document.getElementById('chatText').value;
-    if (!text) return;
-    push(ref(db, 'messages'), { name, text, timestamp: Date.now() });
-    document.getElementById('chatText').value = '';
-  }
-
-  function loadMessages() {
-    onValue(ref(db, 'messages'), (snap) => {
-      const div = document.getElementById('chatMessages');
-      div.innerHTML = '';
-      snap.forEach(child => {
-        const msg = child.val();
-        div.innerHTML += `<div class="message"><strong>${msg.name}</strong>: ${msg.text}</div>`;
-      });
-      div.scrollTop = div.scrollHeight;
-    });
-  }
-
-  async function searchUID() {
-    const uid = document.getElementById('uidInput').value.trim();
-    const result = document.getElementById('uidResult');
-    if (!uid) return result.innerText = 'Введите UID!';
-    result.innerText = 'Загрузка...';
-    try {
-      const res = await fetch(`https://info-ob49.vercel.app/api/account/?uid=${uid}&region=ru`);
-      if (!res.ok) throw new Error('Ошибка API');
-      const data = await res.json();
-      if (!data.basicInfo) throw new Error('Игрок не найден');
-      const b = data.basicInfo, c = data.clanBasicInfo || {}, s = data.socialInfo || {};
-      result.innerText = `Ник: ${b.nickname || '—'}\nUID: ${b.accountId || uid}\nУровень: ${b.level || '—'}\nЛайки: ${b.liked || '—'}\nBR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'})\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
-    } catch (e) { result.innerText = `Ошибка: ${e.message}`; }
-  }
-
-  function showSection(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-  }
-</script>
 </body>
 </html>
