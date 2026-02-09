@@ -5,58 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FFGarouX</title>
   <style>
-    :root { --bg: #0d0d1a; --card: #1a1a2e; --accent: #00f0ff; --accent2: #ff00aa; --text: #e0e0ff; --red: #ff4d4d; }
+    :root {
+      --bg: #0d0d1a;
+      --card: #1a1a2e;
+      --accent: #00f0ff;
+      --accent2: #ff00aa;
+      --text: #e0e0ff;
+      --red: #ff4d4d;
+    }
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
     body { background:linear-gradient(135deg,var(--bg),#1a0033); color:var(--text); min-height:100vh; }
-    @keyframes glow { 0%,100% { text-shadow:0 0 10px var(--accent); } 50% { text-shadow:0 0 20px var(--accent2); } }
-    .glow { animation:glow 3s infinite; }
+    @keyframes glow { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
+    .glow { animation:glow 4s linear infinite; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent)); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 
-    #authPage { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:2rem; background:var(--bg); }
-    #authPage .logo { font-size:3rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1rem; }
+    header {
+      background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(10px);
+      padding:1rem 1.5rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:fixed;
+      top:0;
+      width:100%;
+      z-index:10;
+      border-bottom:1px solid rgba(0,240,255,0.2);
+    }
+    header .logo { font-size:2.2rem; font-weight:bold; }
+
+    #authPage {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      padding:2rem;
+    }
     #authPage h1 { font-size:2rem; margin-bottom:0.5rem; }
     #authPage p { color:#aaa; margin-bottom:2rem; }
-    #authPage input { width:100%; max-width:400px; padding:1rem; margin:0.8rem 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--accent); color:white; font-size:1.1rem; }
-    #authPage button { width:100%; max-width:400px; padding:1rem; border:none; border-radius:12px; background:linear-gradient(90deg,var(--red),#ff6a00); color:white; font-weight:bold; cursor:pointer; margin:0.8rem 0; transition:all 0.3s; }
+    #authPage input {
+      width:100%;
+      max-width:400px;
+      padding:1rem;
+      margin:0.8rem 0;
+      border-radius:12px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid var(--accent);
+      color:white;
+      font-size:1.1rem;
+    }
+    #authPage button {
+      width:100%;
+      max-width:400px;
+      padding:1rem;
+      border:none;
+      border-radius:12px;
+      background:linear-gradient(90deg,var(--red),#ff6a00);
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      margin:0.8rem 0;
+      transition:all 0.3s;
+    }
     #authPage button:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,77,77,0.6); }
     .toggle { color:var(--accent); cursor:pointer; text-decoration:underline; margin:1rem 0; }
-    .message { background:var(--card); padding:1rem; border-radius:12px; margin:0.5rem 0; border:1px solid rgba(0,240,255,0.2); }
 
-    #dashboard { display:none; padding:1rem; }
-    header { background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); padding:1rem; display:flex; justify-content:space-between; align-items:center; position:fixed; width:100%; z-index:10; }
-    header .logo { font-size:1.8rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .overview { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin:5rem 0 2rem; }
+    #dashboard { display:none; padding:5rem 1rem 4rem; }
+    .overview { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2rem; }
     .card { background:var(--card); border-radius:12px; padding:1.5rem; text-align:center; border:1px solid rgba(0,240,255,0.2); }
     .card h3 { color:var(--accent); }
-    nav { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); display:flex; justify-content:space-around; padding:1rem 0; }
-    nav button { background:none; border:none; color:var(--text); font-size:1rem; cursor:pointer; }
+    nav {
+      position:fixed;
+      bottom:0;
+      width:100%;
+      background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(10px);
+      display:flex;
+      justify-content:space-around;
+      padding:1rem 0;
+      border-top:1px solid rgba(0,240,255,0.2);
+    }
+    nav button {
+      background:none;
+      border:none;
+      color:var(--text);
+      font-size:1rem;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
     nav button.active { color:var(--accent); }
-    .section { display:none; padding:1rem; }
+    .section { display:none; }
     .section.active { display:block; }
+    .message { background:var(--card); padding:1rem; border-radius:12px; margin:0.5rem 0; border:1px solid rgba(0,240,255,0.2); }
   </style>
 </head>
 <body>
 
-<!-- Логин -->
+<!-- Авторизация -->
 <div id="authPage">
-  <div class="logo glow">FFGarouX</div>
+  <div class="logo glow" style="font-size:3.5rem; margin-bottom:1rem;">FFGarouX</div>
   <h1 class="glow">Welcome Back</h1>
-  <p>Sign in to FFGarouX panel</p>
+  <p>Войдите в панель FFGarouX</p>
 
   <div id="loginForm">
     <input id="username" placeholder="Ник (username)" autocomplete="off">
     <input id="password" placeholder="Пароль" type="password">
     <button onclick="signIn()">Sign In</button>
-    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
-    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Sign Up</div>
+    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
+    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Зарегистрироваться</div>
   </div>
 
   <div id="signUpForm" style="display:none;">
     <input id="signUpUsername" placeholder="Ник (username)" autocomplete="off">
     <input id="signUpPassword" placeholder="Пароль" type="password">
-    <input id="signUpConfirm" placeholder="Повтори пароль" type="password">
+    <input id="signUpConfirm" placeholder="Повторите пароль" type="password">
     <button onclick="signUp()">Sign Up</button>
-    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
-    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Sign In</div>
+    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
+    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Войти</div>
   </div>
 </div>
 
@@ -68,14 +135,13 @@
   </header>
 
   <div class="overview">
-    <div class="card"><h3>Активных пользователей</h3><p>—</p></div>
-    <div class="card"><h3>Сообщений в чате</h3><p>—</p></div>
+    <div class="card"><h3>Активно</h3><p>—</p></div>
+    <div class="card"><h3>Сообщений</h3><p>—</p></div>
   </div>
 
-  <!-- Секции -->
   <section id="guild" class="section active">
     <h2>Гильдии</h2>
-    <p>Продажа и прокачка гильдий в Free Fire. Автоматизация славы клана. Связь: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+    <p>Продажа и прокачка гильдий Free Fire. Автоматизация славы клана. Связь: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
   </section>
 
   <section id="cheats" class="section">
@@ -103,23 +169,21 @@
 
   <section id="reviews" class="section">
     <h2>Отзывы & Чат</h2>
-    <div>
-      <input id="chatName" placeholder="Ваш ник" style="width:100%; padding:0.8rem; margin-bottom:0.5rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
-      <textarea id="chatText" placeholder="Сообщение..." style="width:100%; height:80px; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;"></textarea>
-      <button onclick="sendMessage()" style="width:100%; margin-top:0.5rem; padding:1rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#000; border:none; border-radius:8px; font-weight:bold;">Отправить</button>
-    </div>
+    <input id="chatName" placeholder="Ваш ник" style="width:100%; padding:0.8rem; margin-bottom:0.5rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
+    <textarea id="chatText" placeholder="Сообщение..." style="width:100%; height:80px; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;"></textarea>
+    <button onclick="sendMessage()" style="width:100%; margin-top:0.5rem; padding:1rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#000; border:none; border-radius:8px; font-weight:bold;">Отправить</button>
     <div id="chatMessages" style="margin-top:1rem; max-height:400px; overflow-y:auto;"></div>
 
-    <h2>Поиск по UID</h2>
+    <h2 style="margin-top:2rem;">Поиск по UID</h2>
     <input id="uidInput" placeholder="UID игрока" style="width:100%; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
     <button onclick="searchUID()" style="width:100%; margin-top:0.5rem; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px;">Искать</button>
-    <pre id="uidResult" style="margin-top:1rem; background:var(--card); padding:1rem; border-radius:8px; white-space:pre-wrap;"></pre>
+    <pre id="uidResult" style="margin-top:1rem; background:var(--card); padding:1rem; border-radius:8px; white-space:pre-wrap; font-size:0.95rem;"></pre>
   </section>
 
   <section id="settings" class="section">
     <h2>Настройки</h2>
-    <p>FFGarouX — панель для гильдий и читов Free Fire. Связь: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
-    <button onclick="logout()" style="width:100%; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px; margin-top:1rem;">Выйти</button>
+    <p>FFGarouX — лучшая панель для гильдий и читов Free Fire.<br>Контакты: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram @garoux24</a></p>
+    <button onclick="logout()" style="width:100%; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px; margin-top:1rem;">Выйти из аккаунта</button>
   </section>
 
   <nav>
@@ -130,7 +194,7 @@
   </nav>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -151,7 +215,6 @@
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  // Проверка входа
   onAuthStateChanged(auth, (user) => {
     if (user) {
       document.getElementById('authPage').style.display = 'none';
@@ -163,27 +226,19 @@
     }
   });
 
-  // Регистрация
   function signUp() {
     const username = document.getElementById('signUpUsername').value.trim();
     const password = document.getElementById('signUpPassword').value.trim();
     const confirm = document.getElementById('signUpConfirm').value.trim();
 
-    if (!username) {
-      document.getElementById('regMessage').innerText = 'Введите ник!';
-      return;
-    }
-    if (password !== confirm) {
-      document.getElementById('regMessage').innerText = 'Пароли не совпадают!';
-      return;
-    }
+    if (!username) return document.getElementById('regMessage').innerText = 'Введите ник!';
+    if (password !== confirm) return document.getElementById('regMessage').innerText = 'Пароли не совпадают!';
 
     const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
 
     createUserWithEmailAndPassword(auth, fakeEmail, password)
       .then((userCredential) => {
         set(ref(db, 'users/' + userCredential.user.uid), { username });
-        document.getElementById('regMessage').innerText = '';
         alert('Регистрация успешна! Войдите под ником: ' + username);
         showLogin();
       })
@@ -196,34 +251,23 @@
       });
   }
 
-  // Вход с сообщением "Нет такого аккаунта"
   function signIn() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    if (!username) {
-      document.getElementById('authMessage').innerText = 'Введите ник!';
-      return;
-    }
+    if (!username) return document.getElementById('authMessage').innerText = 'Введите ник!';
 
     const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
 
     signInWithEmailAndPassword(auth, fakeEmail, password)
-      .then(() => {
-        document.getElementById('authMessage').innerText = '';
-        alert('Вход успешен!');
-      })
-      .catch((error) => {
-        document.getElementById('authMessage').innerText = 'Нет такого аккаунта или неверный пароль!';
-      });
+      .then(() => alert('Вход успешен!'))
+      .catch(() => document.getElementById('authMessage').innerText = 'Нет такого аккаунта или неверный пароль!');
   }
 
-  // Выход
   function logout() {
-    signOut(auth).then(() => alert('Вы вышли'));
+    signOut(auth);
   }
 
-  // Переключение форм
   function showSignUp() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('signUpForm').style.display = 'block';
@@ -238,7 +282,6 @@
     document.getElementById('regMessage').innerText = '';
   }
 
-  // Чат
   function sendMessage() {
     const name = document.getElementById('chatName').value || 'Гость';
     const text = document.getElementById('chatText').value;
@@ -249,17 +292,16 @@
 
   function loadMessages() {
     onValue(ref(db, 'messages'), (snap) => {
-      const messagesDiv = document.getElementById('chatMessages');
-      messagesDiv.innerHTML = '';
-      snap.forEach((child) => {
+      const div = document.getElementById('chatMessages');
+      div.innerHTML = '';
+      snap.forEach(child => {
         const msg = child.val();
-        messagesDiv.innerHTML += `<div class="message"><strong>${msg.name}</strong>: ${msg.text}</div>`;
+        div.innerHTML += `<div class="message"><strong>${msg.name}</strong>: ${msg.text}</div>`;
       });
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      div.scrollTop = div.scrollHeight;
     });
   }
 
-  // Поиск UID
   async function searchUID() {
     const uid = document.getElementById('uidInput').value.trim();
     const result = document.getElementById('uidResult');
@@ -270,12 +312,11 @@
       if (!res.ok) throw new Error('Ошибка API');
       const data = await res.json();
       if (!data.basicInfo) throw new Error('Игрок не найден');
-      const b = data.basicInfo, c = data.clanBasicInfo || {}, p = data.petInfo || {}, s = data.socialInfo || {};
-      result.innerText = `Ник: ${b.nickname || '—'}\nUID: ${b.accountId || uid}\nРегион: ${b.region || 'RU'}\nУровень: ${b.level || '—'}\nЛайки: ${b.liked || '—'}\nBR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'} pts)\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
+      const b = data.basicInfo, c = data.clanBasicInfo || {}, s = data.socialInfo || {};
+      result.innerText = `Ник: ${b.nickname || '—'}\nUID: ${b.accountId || uid}\nУровень: ${b.level || '—'}\nЛайки: ${b.liked || '—'}\nBR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'})\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
     } catch (e) { result.innerText = `Ошибка: ${e.message}`; }
   }
 
-  // Переключение секций
   function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
