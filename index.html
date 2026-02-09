@@ -104,7 +104,7 @@
   <section id="reviews" class="section">
     <h2>Отзывы & Чат</h2>
     <div>
-      <input id="chatName" placeholder="Ваш ник" value="" style="width:100%; padding:0.8rem; margin-bottom:0.5rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
+      <input id="chatName" placeholder="Ваш ник" style="width:100%; padding:0.8rem; margin-bottom:0.5rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
       <textarea id="chatText" placeholder="Сообщение..." style="width:100%; height:80px; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;"></textarea>
       <button onclick="sendMessage()" style="width:100%; margin-top:0.5rem; padding:1rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#000; border:none; border-radius:8px; font-weight:bold;">Отправить</button>
     </div>
@@ -157,22 +157,11 @@
       document.getElementById('authPage').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
       loadMessages();
-      loadUserNickname(user.uid);
     } else {
       document.getElementById('authPage').style.display = 'flex';
       document.getElementById('dashboard').style.display = 'none';
     }
   });
-
-  // Загрузка ника
-  function loadUserNickname(uid) {
-    onValue(ref(db, 'users/' + uid), (snap) => {
-      const data = snap.val();
-      if (data && data.username) {
-        // Можно отобразить ник в хедере
-      }
-    });
-  }
 
   // Регистрация
   function signUp() {
@@ -180,32 +169,53 @@
     const password = document.getElementById('signUpPassword').value.trim();
     const confirm = document.getElementById('signUpConfirm').value.trim();
 
-    if (!username) return alert('Введите ник!');
-    if (password !== confirm) return alert('Пароли не совпадают!');
+    if (!username) {
+      document.getElementById('regMessage').innerText = 'Введите ник!';
+      return;
+    }
+    if (password !== confirm) {
+      document.getElementById('regMessage').innerText = 'Пароли не совпадают!';
+      return;
+    }
 
     const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
 
     createUserWithEmailAndPassword(auth, fakeEmail, password)
       .then((userCredential) => {
         set(ref(db, 'users/' + userCredential.user.uid), { username });
-        alert('Регистрация успешна! Войдите.');
+        document.getElementById('regMessage').innerText = '';
+        alert('Регистрация успешна! Войдите под ником: ' + username);
         showLogin();
       })
-      .catch((error) => alert(error.message));
+      .catch((error) => {
+        if (error.code === 'auth/email-already-in-use') {
+          document.getElementById('regMessage').innerText = 'Этот ник уже занят!';
+        } else {
+          document.getElementById('regMessage').innerText = error.message;
+        }
+      });
   }
 
-  // Вход
+  // Вход с сообщением "Нет такого аккаунта"
   function signIn() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    if (!username) return alert('Введите ник!');
+    if (!username) {
+      document.getElementById('authMessage').innerText = 'Введите ник!';
+      return;
+    }
 
     const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
 
     signInWithEmailAndPassword(auth, fakeEmail, password)
-      .then(() => alert('Вход успешен!'))
-      .catch((error) => alert('Неверный ник или пароль!'));
+      .then(() => {
+        document.getElementById('authMessage').innerText = '';
+        alert('Вход успешен!');
+      })
+      .catch((error) => {
+        document.getElementById('authMessage').innerText = 'Нет такого аккаунта или неверный пароль!';
+      });
   }
 
   // Выход
@@ -214,8 +224,19 @@
   }
 
   // Переключение форм
-  function showSignUp() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('signUpForm').style.display = 'block'; }
-  function showLogin() { document.getElementById('signUpForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; }
+  function showSignUp() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signUpForm').style.display = 'block';
+    document.getElementById('authMessage').innerText = '';
+    document.getElementById('regMessage').innerText = '';
+  }
+
+  function showLogin() {
+    document.getElementById('signUpForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('authMessage').innerText = '';
+    document.getElementById('regMessage').innerText = '';
+  }
 
   // Чат
   function sendMessage() {
@@ -246,11 +267,11 @@
     result.innerText = 'Загрузка...';
     try {
       const res = await fetch(`https://info-ob49.vercel.app/api/account/?uid=${uid}&region=ru`);
-      if (!res.ok) throw new Error('Ошибка');
+      if (!res.ok) throw new Error('Ошибка API');
       const data = await res.json();
-      if (!data.basicInfo) throw new Error('Не найдено');
+      if (!data.basicInfo) throw new Error('Игрок не найден');
       const b = data.basicInfo, c = data.clanBasicInfo || {}, p = data.petInfo || {}, s = data.socialInfo || {};
-      result.innerText = `Ник: ${b.nickname}\nUID: ${b.accountId}\nУровень: ${b.level}\nЛайки: ${b.liked}\nBR Rank: \( {b.rank} ( \){b.rankingPoints})\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
+      result.innerText = `Ник: ${b.nickname || '—'}\nUID: ${b.accountId || uid}\nРегион: ${b.region || 'RU'}\nУровень: ${b.level || '—'}\nЛайки: ${b.liked || '—'}\nBR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'} pts)\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
     } catch (e) { result.innerText = `Ошибка: ${e.message}`; }
   }
 
