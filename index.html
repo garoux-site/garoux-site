@@ -7,154 +7,168 @@
     :root{
       --bg:#05050d;
       --card:#0e1022;
-      --accent1:#ff3c3c;
-      --accent2:#00e0ff;
+      --accent1:#ff9f0a;
+      --accent2:#ff3c3c;
       --text:#ffffff;
-      --muted:#9aa0c3;
+      --muted:#a0a4d9;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family:Inter,Arial,sans-serif;
-      background:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.9)),url('bg.jpg') center/cover no-repeat fixed;
+      background:#05050d;
       color:var(--text);
+      overflow-x:hidden;
     }
-    .hidden{display:none}
-    .container{
-      max-width:480px;
-      margin:40px auto 90px;
-      padding:20px;
-      background:rgba(14,16,34,.9);
-      border-radius:16px;
-      box-shadow:0 20px 40px rgba(0,0,0,.5);
-    }
-    h1,h2,h3{margin:0 0 10px}
-    p{color:var(--muted);line-height:1.5}
-    input,textarea,button,select{
-      width:100%;
-      margin:8px 0;
-      padding:12px;
-      border-radius:10px;
-      border:none;
-      font-size:14px;
-    }
-    textarea{resize:none;min-height:90px}
-    button{
-      cursor:pointer;
-      background:linear-gradient(90deg,var(--accent1),var(--accent2));
-      color:#fff;
-      font-weight:700;
-    }
-    .logo{
-      text-align:center;
-      margin-bottom:20px;
-    }
-    .logo h1{
-      background:linear-gradient(90deg,var(--accent1),var(--accent2));
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      font-size:28px;
-    }
-    /* bottom menu */
-    .bottom-nav{
-      position:fixed;
-      left:0;right:0;bottom:0;
-      background:#0b0d1a;
-      display:flex;
-      border-top:1px solid #1a1c33;
-    }
-    .bottom-nav button{
-      flex:1;
-      border-radius:0;
-      background:none;
-      color:#cfd3ff;
-      padding:14px 0;
-      font-weight:600;
-    }
-    .bottom-nav button.active{
-      color:#fff;
-      background:linear-gradient(180deg,rgba(255,60,60,.2),rgba(0,224,255,.15));
-    }
-    .stat-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-      margin:15px 0;
-    }
-    .stat{
-      background:#1a1c33;
-      border-radius:12px;
-      padding:12px;
-      text-align:center;
-    }
-    .reviews .review{
-      background:#1a1c33;
-      border-radius:10px;
-      padding:10px;
-      margin-bottom:8px;
-    }
-    .review small{color:#8c92c9}
-    .price{
-      background:#1a1c33;
-      border-radius:12px;
-      padding:12px;
-      margin-bottom:10px;
-    }
-    .logout{background:#ff4c4c}
+    .hidden{display:none}/* HEADER */
+header{
+  position:fixed;
+  top:0;left:0;right:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 16px;
+  background:rgba(5,5,13,.85);
+  backdrop-filter:blur(10px);
+  z-index:10;
+}
+header img{
+  width:36px;height:36px;border-radius:50%;
+}
+header h1{
+  font-size:18px;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.page{
+  padding:90px 16px 110px;
+  max-width:900px;
+  margin:auto;
+}
+
+.hero{
+  background:radial-gradient(circle at top,rgba(255,60,60,.15),transparent 60%);
+  padding:30px 20px;
+  border-radius:20px;
+  animation:fadeUp 1s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1}}
+
+.hero h2{font-size:26px;margin-bottom:10px}
+.hero p{color:var(--muted);line-height:1.6}
+
+.btn{
+  margin-top:14px;
+  padding:14px;
+  border-radius:14px;
+  text-align:center;
+  font-weight:700;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  color:#fff;
+  text-decoration:none;
+  display:block;
+  box-shadow:0 0 25px rgba(255,60,60,.4);
+}
+
+.scroll-box{
+  margin-top:20px;
+  max-height:220px;
+  overflow-y:auto;
+  padding-right:6px;
+}
+.scroll-box::-webkit-scrollbar{width:4px}
+.scroll-box::-webkit-scrollbar-thumb{background:var(--accent2)}
+
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:16px;
+  animation:fadeUp .8s ease;
+}
+
+/* bottom nav */
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  display:flex;
+  background:#0b0d1a;
+  border-top:1px solid #1a1c33;
+}
+.bottom-nav button{
+  flex:1;
+  padding:14px 0;
+  background:none;
+  border:none;
+  color:#cfd3ff;
+  font-weight:600;
+}
+.bottom-nav button.active{
+  color:#fff;
+  background:linear-gradient(180deg,rgba(255,60,60,.25),rgba(255,159,10,.15));
+}
+
+small{color:#8c92c9}
+
   </style>
 </head>
-<body><!-- AUTH --><div class="container" id="auth">
-  <div class="logo"><h1>FFGarouX</h1><p>Вход или регистрация</p></div>
-  <input id="nick" placeholder="Никнейм" />
-  <input id="pass" type="password" placeholder="Пароль" />
-  <button onclick="register()">Регистрация</button>
-  <button onclick="login()">Войти</button>
-  <p id="authMsg"></p>
-</div><!-- APP --><div class="container hidden" id="app">  <!-- GUILD -->  <div id="tab-guild">
-    <h2>Гильдия FFGarouX</h2>
-    <p>Доминируйте в рейтингах кланов Free Fire с помощью самой продвинутой системы автоматизации славы.</p>
-    <div class="stat-grid">
-      <div class="stat"><h3>40M+</h3><p>Славы в день</p></div>
-      <div class="stat"><h3>24/7</h3><p>Работа ботов</p></div>
-      <div class="stat"><h3>100%</h3><p>Безопасность</p></div>
-      <div class="stat"><h3>50+</h3><p>Активных клиентов</p></div>
-    </div>
-    <h3>Как это работает</h3>
-    <p>1. Покупаете ботов<br>2. Открываете гильдию<br>3. Отправляете Clan ID и чек<br>4. Смотрите, как растёт слава</p>
-  </div>  <!-- DRIP -->  <div id="tab-drip" class="hidden">
-    <h2>DRIP Client</h2>
-    <p>Мощный Android‑клиент с расширенными игровыми возможностями.</p>
-    <ul>
-      <li>Silent Aim / Rage / Legit</li>
-      <li>ESP, телепорт, полёт</li>
-      <li>Работает в CS / BR</li>
-    </ul>
-    <h3>Ключи доступа</h3>
-    <div class="price">1 день — 300₽ (~$3.3)</div>
-    <div class="price">7 дней — 600₽ (~$6.6)</div>
-    <div class="price">15 дней — 900₽ (~$9.9)</div>
-    <div class="price">30 дней — 1500₽ (~$16.5)</div>
-  </div>  <!-- REVIEWS -->  <div id="tab-reviews" class="hidden">
-    <h2>Отзывы</h2>
-    <textarea id="reviewText" placeholder="Ваш отзыв..."></textarea>
-    <button onclick="sendReview()">Отправить</button>
-    <div class="reviews" id="reviews"></div>
-  </div>  <!-- SETTINGS -->  <div id="tab-settings" class="hidden">
+<body><header>
+  <img src="bg.jpg" alt="logo" />
+  <h1>FFGarouX</h1>
+</header><div class="page" id="tab-guild">
+  <div class="hero">
+    <h2>Доминируйте в славе клана</h2>
+    <p>Самая продвинутая система автоматизации клановой славы Free Fire. Поднимайте рейтинг клана даже когда вы офлайн.</p>
+    <a class="btn" href="https://t.me/garoux24" target="_blank">Купить / Написать в Telegram</a>
+  </div>  <div class="card scroll-box">
+    <p><b>40M+</b> славы ежедневно</p>
+    <p><b>24/7</b> активные боты</p>
+    <p><b>100%</b> безопасность аккаунта</p>
+    <p><b>Live‑статистика</b> и мониторинг</p>
+    <p><b>Мульти‑регион</b> + поддержка Telegram</p>
+    <p><b>Умная автоматизация</b> с минимальными рисками</p>
+    <p><b>Просто:</b> покупка → Clan ID → рост славы</p>
+  </div>
+</div><div class="page hidden" id="tab-drip">
+  <div class="card">
+    <h2>DRIP Client 🌟</h2>
+    <p>Android‑клиент без банов с расширенными возможностями.</p>
+    <p>Silent Aim • Rage / Legit • ESP • Teleport • Fly • CS / BR</p>
+    <a class="btn" href="https://t.me/garoux24" target="_blank">Купить ключ</a>
+  </div>
+  <div class="card">
+    <p>1 день — 300₽ (~$3.3)</p>
+    <p>7 дней — 600₽ (~$6.6)</p>
+    <p>15 дней — 900₽ (~$9.9)</p>
+    <p>30 дней — 1500₽ (~$16.5)</p>
+  </div>
+</div><div class="page hidden" id="tab-reviews">
+  <div class="card">
+    <h2>Отзывы игроков</h2>
+    <p>«FFGarouX вывел наш клан в ТОП‑10 за 2 недели»</p>
+    <small>GD GarouX · 12.01.2026</small>
+  </div>
+</div><div class="page hidden" id="tab-settings">
+  <div class="card">
     <h2>Настройки</h2>
-    <select><option>Русский</option><option>English</option></select>
+    <p>Язык: Русский</p>
     <p>Telegram: @garoux24</p>
-    <button class="logout" onclick="logout()">Выйти</button>
-  </div></div><!-- NAV --><div class="bottom-nav hidden" id="nav">
+  </div>
+</div><div class="bottom-nav">
   <button class="active" onclick="openTab('guild')">Гильдия</button>
   <button onclick="openTab('drip')">Drip</button>
   <button onclick="openTab('reviews')">Отзывы</button>
   <button onclick="openTab('settings')">Настройки</button>
 </div><script>
-let user=null;
-function register(){authMsg.textContent='Регистрация демо выполнена'}
-function login(){user=nick.value;auth.classList.add('hidden');app.classList.remove('hidden');nav.classList.remove('hidden')}
-function logout(){location.reload()}
-function openTab(t){['guild','drip','reviews','settings'].forEach(x=>{document.getElementById('tab-'+x).classList.add('hidden')});document.getElementById('tab-'+t).classList.remove('hidden');document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active')}
-function sendReview(){if(!reviewText.value)return;const d=document.createElement('div');d.className='review';d.innerHTML='<b>'+user+'</b><br>'+reviewText.value+'<br><small>'+new Date().toLocaleString()+'</small>';reviews.prepend(d);reviewText.value=''}
+function openTab(t){
+  ['guild','drip','reviews','settings'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.add('hidden')
+  })
+  document.getElementById('tab-'+t).classList.remove('hidden')
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'))
+  event.target.classList.add('active')
+}
 </script></body>
 </html>
