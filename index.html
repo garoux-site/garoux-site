@@ -1,134 +1,182 @@
-<!DOCTYPE html><html lang="ru">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FFGarouX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-:root{
-  --bg:#0b0d1a;
-  --card:#151a33;
-  --accent:#ff2d55;
-  --accent2:#00e5ff;
-  --text:#eaeaff;
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:radial-gradient(circle at top,#0f1230,#05050d);
+  color:#fff;
 }
-*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial}
-body{margin:0;background:linear-gradient(180deg,#05060f,#0b0d1a);color:var(--text)}
-.hidden{display:none}
-header{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(0,0,0,.55);backdrop-filter:blur(12px)}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800}
-.logo img{width:36px;height:36px;border-radius:50%}
-.menu-btn{background:none;border:none;color:white;font-size:22px}
-.menu{position:absolute;right:16px;top:60px;background:var(--card);border-radius:18px;padding:10px;width:190px;box-shadow:0 20px 40px rgba(0,0,0,.6)}
-.menu button{width:100%;padding:12px;border-radius:14px;border:none;background:none;color:white;text-align:left}
-.menu button:hover{background:rgba(255,255,255,.08)}
-.section{min-height:100vh;padding:90px 16px 120px}
-.card{background:var(--card);border-radius:22px;padding:18px;margin:14px 0}
-.action{display:block;margin:24px auto;padding:16px 26px;border:none;border-radius:999px;font-size:17px;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--accent2));color:white}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:9;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(0,0,0,.6);backdrop-filter:blur(12px);padding:10px}
-nav button{background:none;border:none;color:#aaa;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:4px}
-nav button.active{color:white}
-#auth{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px}
-#auth input,#auth button{width:100%;max-width:360px;padding:14px;margin:8px 0;border-radius:16px;border:none}
-#auth input{background:#101428;color:white}
-#auth button{background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;font-weight:700}
-.toggle{color:var(--accent2);margin-top:10px}
-.comment{background:#0f1329;padding:12px;border-radius:14px;margin:10px 0}
-.comment b{color:var(--accent2)}
+.center{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.card{
+  width:320px;
+  background:rgba(20,25,60,.75);
+  backdrop-filter:blur(12px);
+  border-radius:22px;
+  padding:25px;
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
+}
+.logo{
+  text-align:center;
+  margin-bottom:20px;
+}
+.logo img{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+}
+input{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border:none;
+  border-radius:14px;
+  outline:none;
+  background:#0b0f2a;
+  color:#fff;
+}
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:18px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:10px;
+}
+.btn-login{
+  background:linear-gradient(90deg,#ff3b6a,#28e0ff);
+  color:#fff;
+}
+.btn-reg{
+  background:#1a1f4d;
+  color:#ccc;
+}
+#app{
+  display:none;
+  padding:20px;
+  max-width:500px;
+  margin:auto;
+}
+.review{
+  background:#0e1235;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:10px;
+}
+.review b{color:#4fdcff}
 </style>
 </head>
-<body><!-- AUTH --><div id="auth">
-  <div class="logo"><img src="bg.jpg">FFGarouX</div>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Пароль">
-  <button onclick="login()">Войти / Регистрация</button>
-  <div id="authMsg"></div>
-</div><!-- APP --><div id="app" class="hidden">
-<header>
-  <div class="logo"><img src="bg.jpg">FFGarouX</div>
-  <button class="menu-btn" onclick="menu.classList.toggle('hidden')">⋮</button>
-  <div id="menu" class="menu hidden">
-    <button onclick="openTab('home')">Guild</button>
-    <button onclick="openTab('cheats')">Cheats</button>
-    <button onclick="openTab('reviews')">Reviews</button>
-    <button onclick="openTab('settings')">Settings</button>
-    <button onclick="logout()">Выйти</button>
-  </div>
-</header><section id="home" class="section">
-  <h1>Доминируйте в славе клана</h1>
-  <p>Автоматизация клановой славы Free Fire.</p>
-  <div class="card">40M+ славы ежедневно</div>
-  <div class="card">24/7 работа ботов</div>
-  <button class="action">Начните своё путешествие прямо сейчас</button>
-</section><section id="cheats" class="section hidden">
-  <h1>Читы DRIP CLIENT</h1>
-  <div class="card">Android • Без бана</div>
-  <div class="card">Aimbot • ESP • Teleport</div>
-  <div class="card">1д–300₽ • 7д–600₽ • 30д–1500₽</div>
-  <button class="action" onclick="window.open('https://t.me/garoux24')">Купить: Telegram</button>
-</section><section id="reviews" class="section hidden">
-  <h1>Отзывы</h1>
-  <input id="reviewText" placeholder="Ваш отзыв">
-  <button class="action" onclick="addReview()">Отправить</button>
-  <div id="reviewsList"></div>
-</section><section id="settings" class="section hidden">
-  <h1>Настройки</h1>
-  <div class="card">FFGarouX — лучшая панель для гильдий и читов Free Fire</div>
-  <div class="card">Контакты: Telegram @garoux24</div>
-  <button class="action" onclick="logout()">Выйти</button>
-</section><nav>
-  <button class="active" onclick="openTab('home')">Guild</button>
-  <button onclick="openTab('cheats')">Cheats</button>
-  <button onclick="openTab('reviews')">Reviews</button>
-  <button onclick="openTab('settings')">Settings</button>
-</nav>
-</div><script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
+<body>
+
+<!-- AUTH -->
+<div class="center" id="auth">
+  <div class="card">
+    <div class="logo">
+      <img src="bg.jpg">
+      <h3>FFGarouX</h3>
+    </div>
+    <input id="nick" placeholder="Никнейм">
+    <input id="pass" type="password" placeholder="Пароль">
+    <button class="btn-login" id="loginBtn">Войти</button>
+    <button class="btn-reg" id="regBtn">Регистрация</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <h2>Отзывы</h2>
+  <div id="reviews"></div>
+  <input id="reviewText" placeholder="Написать отзыв">
+  <button class="btn-login" id="sendReview">Отправить</button>
+  <br><br>
+  <button class="btn-reg" id="logout">Выйти</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* 🔥 ТВОЙ FIREBASE CONFIG — УЖЕ ВСТАВЛЕН 🔥 */
 const firebaseConfig = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_AUTH_DOMAIN",
-  databaseURL: "PASTE_DB_URL",
-  projectId: "PASTE_PROJECT_ID",
+  apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
+  authDomain: "ffgaroux-a58e7.firebaseapp.com",
+  projectId: "ffgaroux-a58e7",
+  storageBucket: "ffgaroux-a58e7.firebasestorage.app",
+  messagingSenderId: "967486028392",
+  appId: "1:967486028392:web:3de0f014b77d0ac27659dd"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getDatabase(app);
+const db = getFirestore(app);
 
-window.login = async()=>{
-  const e=email.value,p=password.value;
-  try{await signInWithEmailAndPassword(auth,e,p)}
-  catch{await createUserWithEmailAndPassword(auth,e,p)}
+const authBox = document.getElementById("auth");
+const appBox = document.getElementById("app");
+
+function nickToEmail(nick){
+  return nick.toLowerCase().replace(/\s+/g,'') + "@ffgaroux.app";
 }
 
-window.logout=()=>signOut(auth);
+loginBtn.onclick = () => {
+  if(!nick.value || !pass.value) return alert("Заполни все поля");
+  signInWithEmailAndPassword(auth, nickToEmail(nick.value), pass.value)
+    .catch(()=>alert("Неверный ник или пароль"));
+};
 
-onAuthStateChanged(auth,u=>{
-  if(u){auth.style.display='none';app.classList.remove('hidden');loadReviews()}
-  else{auth.style.display='flex';app.classList.add('hidden')}
-})
+regBtn.onclick = () => {
+  if(nick.value.length < 3) return alert("Ник минимум 3 символа");
+  if(pass.value.length < 6) return alert("Пароль минимум 6 символов");
+  createUserWithEmailAndPassword(auth, nickToEmail(nick.value), pass.value)
+    .catch(()=>alert("Ник уже занят или ошибка"));
+};
 
-window.addReview=()=>{
-  if(!reviewText.value)return;
-  push(ref(db,'reviews'),{text:reviewText.value,uid:auth.currentUser.email,time:Date.now()});
-  reviewText.value='';
+logout.onclick = () => signOut(auth);
+
+sendReview.onclick = async () => {
+  if(!reviewText.value) return;
+  await addDoc(collection(db,"reviews"),{
+    nick:nick.value,
+    text:reviewText.value,
+    time:serverTimestamp()
+  });
+  reviewText.value="";
+  loadReviews();
+};
+
+async function loadReviews(){
+  reviews.innerHTML="";
+  const q = query(collection(db,"reviews"), orderBy("time","desc"));
+  const snap = await getDocs(q);
+  snap.forEach(d=>{
+    const r=d.data();
+    reviews.innerHTML += `<div class="review"><b>${r.nick}</b><br>${r.text}</div>`;
+  });
 }
 
-function loadReviews(){
-  onValue(ref(db,'reviews'),s=>{
-    reviewsList.innerHTML='';
-    s.forEach(c=>{
-      const d=c.val();
-      reviewsList.innerHTML+=`<div class='comment'><b>${d.uid}</b><br>${d.text}</div>`;
-    })
-  })
-}
+onAuthStateChanged(auth,user=>{
+  if(user){
+    authBox.style.display="none";
+    appBox.style.display="block";
+    loadReviews();
+  }else{
+    authBox.style.display="flex";
+    appBox.style.display="none";
+  }
+});
+</script>
 
-window.openTab=id=>{
-  document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-}
-</script></body>
+</body>
 </html>
