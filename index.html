@@ -5,69 +5,238 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FFGarouX Panel</title>
 <style>
-  body { margin:0; font-family:'Segoe UI',sans-serif; background:#1a0000; color:#fff; }
-  header { display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; background:rgba(50,0,0,0.8); backdrop-filter:blur(5px); position:fixed; width:100%; top:0; z-index:10; }
-  .logo { font-size:2rem; font-weight:bold; background:linear-gradient(90deg,#ff0000,#ff5555); -webkit-background-clip:text; -webkit-text-fill-color:transparent; display:flex; align-items:center; gap:10px; }
-  .logo img { width:40px; height:40px; border-radius:8px; }
-  .menu-btn { font-size:2rem; cursor:pointer; background:none; border:none; color:#fff; }
-  .menu { display:none; position:absolute; top:3.5rem; right:1rem; background:#330000; padding:1rem; border-radius:12px; border:1px solid rgba(255,0,0,0.5); }
-  .menu button { display:block; width:100%; background:none; border:none; color:#fff; padding:0.8rem; text-align:left; cursor:pointer; border-radius:8px; margin-bottom:5px; transition:0.2s; }
-  .menu button:hover { background:rgba(255,0,0,0.2); color:#ff5555; }
-  section { display:none; padding:6rem 2rem 2rem; max-width:800px; margin:0 auto; }
+  /* ==========================
+     Базовый стиль и фон Aurora
+  ========================== */
+  body {
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    color:#fff;
+    min-height:100vh;
+    background: linear-gradient(120deg,#0b0b0b,#1a0000,#2a0000);
+    background-size:400% 400%;
+    animation: aurora 20s ease infinite;
+    overflow-x:hidden;
+  }
+  @keyframes aurora {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  /* ==========================
+     Заголовки и свечение
+  ========================== */
+  h1,h2,h3 {
+    color:#ff3b3b;
+    text-shadow:0 0 10px #ff3b3b,0 0 20px #ff5555,0 0 30px #ff7777;
+    animation: glow 3s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100%{text-shadow:0 0 10px #ff3b3b,0 0 20px #ff5555,0 0 30px #ff7777;}
+    50%{text-shadow:0 0 20px #ff7b7b,0 0 30px #ff5555,0 0 40px #ff9999;}
+  }
+
+  /* ==========================
+     Header с логотипом
+  ========================== */
+  header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:1rem 2rem;
+    background:rgba(0,0,0,0.8);
+    backdrop-filter:blur(8px);
+    position:fixed;
+    width:100%;
+    top:0;
+    z-index:10;
+    box-shadow:0 2px 15px rgba(255,0,0,0.4);
+  }
+  .logo {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:2rem;
+    font-weight:bold;
+    background:linear-gradient(90deg,#ff0000,#ff5555,#ff33aa);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .logo img {
+    width:50px;
+    height:50px;
+    border-radius:10px;
+    box-shadow:0 0 15px rgba(255,0,0,0.6);
+  }
+  .settings-btn {
+    background:none;
+    border:none;
+    color:#fff;
+    font-size:1.5rem;
+    cursor:pointer;
+    padding:0.5rem 1rem;
+    border-radius:12px;
+    transition:0.3s;
+  }
+  .settings-btn:hover {
+    background:rgba(255,0,0,0.3);
+    box-shadow:0 0 15px rgba(255,0,0,0.6);
+  }
+
+  /* ==========================
+     Auth / Login
+  ========================== */
+  #auth-container {
+    max-width:400px;
+    margin:8rem auto 2rem;
+    padding:25px;
+    background:rgba(30,0,0,0.9);
+    border-radius:15px;
+    box-shadow:0 0 25px rgba(255,0,0,0.5);
+    text-align:center;
+  }
+  #auth-container input {
+    width:100%;
+    margin:0.5rem 0;
+    padding:1rem;
+    border-radius:12px;
+    border:1px solid #ff0000;
+    background:rgba(30,0,0,0.8);
+    color:#fff;
+  }
+  #auth-container button {
+    width:100%;
+    padding:1rem;
+    margin:0.8rem 0;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    cursor:pointer;
+    background:linear-gradient(90deg,#ff0000,#ff5555);
+    color:#fff;
+    font-size:1.1rem;
+    transition:0.3s;
+  }
+  #auth-container button:hover {
+    transform:scale(1.05);
+    box-shadow:0 0 20px rgba(255,0,0,0.7);
+  }
+  #auth-message {color:#ff6666; min-height:1.2rem; margin-top:0.5rem;}
+
+  /* ==========================
+     Разделы
+  ========================== */
+  section {
+    display:none;
+    padding:7rem 2rem 3rem;
+    max-width:900px;
+    margin:0 auto;
+  }
   section.active { display:block; }
-  h1,h2,h3 { color:#ff5555; }
-  button.action { padding:1rem 2rem; border-radius:12px; border:none; font-weight:bold; cursor:pointer; margin:1rem 0; background:linear-gradient(90deg,#ff0000,#ff5555); transition:0.3s; }
-  button.action:hover { transform:scale(1.05); }
-  ul { list-style:none; padding:0; }
-  li { padding:0.8rem; margin:0.5rem 0; background:#330000; border-radius:8px; border:1px solid rgba(255,0,0,0.3); }
-  input, textarea { width:100%; margin:0.5rem 0; padding:0.8rem; border-radius:8px; border:1px solid #ff0000; background:#330000; color:#fff; }
-  textarea { resize:none; }
-  .reviews { max-height:300px; overflow-y:auto; margin-top:1rem; }
-  .review { padding:10px; margin-bottom:10px; background:#440000; border-radius:8px; transition:0.3s; }
-  .review:hover { background:#550000; }
-  nav { position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:rgba(50,0,0,0.8); backdrop-filter:blur(5px); padding:1rem 0; border-top:1px solid rgba(255,0,0,0.5); }
-  nav button { background:none; border:none; color:#fff; display:flex; flex-direction:column; align-items:center; padding:0.5rem; border-radius:8px; transition:0.3s; cursor:pointer; }
-  nav button.active { background:rgba(255,0,0,0.2); color:#ff5555; box-shadow:0 0 15px rgba(255,0,0,0.5); }
-  .toggle { cursor:pointer; color:#ff5555; text-decoration:underline; margin-top:0.5rem; display:inline-block; }
-  #auth-container { max-width:400px; margin:6rem auto 2rem; padding:20px; background:#330000; border-radius:12px; box-shadow:0 0 20px rgba(255,0,0,0.4); }
-  #auth-container h2 { text-align:center; margin-bottom:20px; }
-  #auth-message { text-align:center; color:#ff6666; min-height:1.2rem; }
+  .card {
+    background:rgba(30,0,0,0.9);
+    border-radius:15px;
+    padding:1rem;
+    margin:1rem 0;
+    box-shadow:0 0 15px rgba(255,0,0,0.4);
+    transition:0.3s;
+  }
+  .card:hover { box-shadow:0 0 25px rgba(255,0,0,0.7); transform:translateY(-3px); }
+
+  button.action {
+    padding:1rem 2rem;
+    border-radius:15px;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+    margin:1rem 0;
+    background:linear-gradient(90deg,#ff0000,#ff5555,#ff33aa);
+    color:#fff;
+    font-size:1.1rem;
+    transition:0.3s;
+    box-shadow:0 0 15px rgba(255,0,0,0.5);
+  }
+  button.action:hover {
+    transform:scale(1.05);
+    box-shadow:0 0 25px rgba(255,0,0,0.8);
+  }
+
+  input, textarea {
+    width:100%;
+    margin:0.5rem 0;
+    padding:0.8rem;
+    border-radius:10px;
+    border:1px solid #ff0000;
+    background:rgba(30,0,0,0.8);
+    color:#fff;
+  }
+  textarea {resize:none;}
+
+  /* ==========================
+     Нижнее меню
+  ========================== */
+  nav {
+    position:fixed;
+    bottom:0;
+    width:100%;
+    display:flex;
+    justify-content:space-around;
+    background:rgba(20,0,0,0.85);
+    backdrop-filter:blur(8px);
+    padding:1rem 0;
+    border-top:1px solid rgba(255,0,0,0.5);
+  }
+  nav button {
+    background:none;
+    border:none;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0.5rem;
+    border-radius:12px;
+    cursor:pointer;
+    transition:0.3s;
+    font-weight:bold;
+  }
+  nav button.active {
+    background:rgba(255,0,0,0.2);
+    box-shadow:0 0 15px rgba(255,0,0,0.5);
+    color:#ff5555;
+  }
+  nav button span {
+    margin-top:0.2rem;
+    font-size:0.9rem;
+  }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo"><img src="bg.jpg" alt="Logo">FFGarouX</div>
-  <button class="menu-btn" onclick="toggleMenu()">•••</button>
-  <div class="menu" id="menu">
-    <button onclick="showSection('guild')">Guild</button>
-    <button onclick="showSection('cheats')">Cheats</button>
-    <button onclick="showSection('reviews')">Reviews</button>
-    <button onclick="showSection('settings')">Settings</button>
-    <button onclick="logout()">Выйти</button>
-  </div>
+  <button class="settings-btn" onclick="showSection('settings')">Настройки ⚙️</button>
 </header>
 
-<!-- Login / Register -->
+<!-- Auth -->
 <div id="auth-container">
   <h2>Вход / Регистрация</h2>
   <input type="text" id="nickname" placeholder="Ваш ник">
   <input type="password" id="password" placeholder="Пароль">
-  <button id="register-btn" class="action">Регистрация</button>
-  <button id="login-btn" class="action">Войти</button>
+  <button id="register-btn">Регистрация</button>
+  <button id="login-btn">Войти</button>
   <p id="auth-message"></p>
 </div>
 
 <!-- Guild -->
 <section id="guild">
   <h1>Доминируйте в славе клана</h1>
-  <p>Самая продвинутая система автоматизации клановой славы Free Fire. Поднимите рейтинг клана, пока спите.</p>
+  <p>Самая продвинутая система автоматизации клановой славы Free Fire.</p>
   <ul>
-    <li>Умная автоматизация — боты работают круглосуточно</li>
-    <li>Панель управления в реальном времени</li>
+    <li>Круглосуточные боты</li>
+    <li>Панель в реальном времени</li>
     <li>Многорегиональная поддержка</li>
     <li>100% безопасность</li>
-    <li>Круглосуточная поддержка</li>
   </ul>
   <button class="action">Начните своё путешествие прямо сейчас</button>
 </section>
@@ -77,12 +246,8 @@
   <h1>Читы DRIP CLIENT</h1>
   <p>Android • Без бана</p>
   <ul>
-    <li>Убийство при прицеливании</li>
-    <li>Тихий аимбот</li>
-    <li>Rage/Legit</li>
-    <li>ESP линии</li>
-    <li>Телепорт 8м</li>
-    <li>Скорость полёта</li>
+    <li>Тихий аимбот / Rage / Legit</li>
+    <li>ESP линии / Телепорт / Скорость полёта</li>
   </ul>
   <h3>Ключи 🔑</h3>
   <ul>
@@ -111,11 +276,12 @@
   <button class="action" onclick="logout()">Выйти из аккаунта</button>
 </section>
 
+<!-- Нижнее меню -->
 <nav>
-  <button onclick="showSection('guild')" class="active">Guild</button>
-  <button onclick="showSection('cheats')">Cheats</button>
-  <button onclick="showSection('reviews')">Reviews</button>
-  <button onclick="showSection('settings')">Settings</button>
+  <button onclick="showSection('guild')" class="active">🏰<span>Guild</span></button>
+  <button onclick="showSection('cheats')">🛠<span>Cheats</span></button>
+  <button onclick="showSection('reviews')">💬<span>Reviews</span></button>
+  <button onclick="showSection('settings')">⚙️<span>Settings</span></button>
 </nav>
 
 <script type="module">
@@ -174,10 +340,6 @@ function showSection(id){
 }
 window.showSection=showSection;
 
-// 🔴 Меню
-function toggleMenu(){ document.getElementById("menu").classList.toggle("active"); }
-window.toggleMenu=toggleMenu;
-
 // 🔴 Отзывы
 const reviewText = document.getElementById("review-text");
 const reviewsList = document.getElementById("reviews-list");
@@ -193,11 +355,13 @@ async function loadReviews(){
   snapshot.forEach(doc=>{
     const d=doc.data();
     const div=document.createElement("div");
-    div.className="review";
+    div.className="card";
     div.textContent=`[${new Date(d.time).toLocaleString()}] ${d.nickname}: ${d.text}`;
     reviewsList.appendChild(div);
   });
 }
+loadReviews();
+
 window.changeLanguage=()=>{ alert("Смена языка пока демо"); };
 
 // 🔴 Выход
