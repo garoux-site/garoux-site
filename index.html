@@ -5,68 +5,173 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FFGarouX</title>
   <style>
-    :root { --bg: #0d0d1a; --card: #1a1a2e; --accent: #00f0ff; --accent2: #ff00aa; --text: #e0e0ff; --red: #ff4d4d; --green: #32cd32; --yellow: #ffd700; --pink: #ff69b4; --blue: #00bfff; }
+    :root {
+      --bg: #0d0d1a;
+      --card: #1a1a2e;
+      --accent: #00f0ff;
+      --accent2: #ff00aa;
+      --text: #e0e0ff;
+      --red: #ff4d4d;
+      --green: #32cd32;
+      --yellow: #ffd700;
+      --pink: #ff69b4;
+      --blue: #00bfff;
+    }
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
     body { background:linear-gradient(135deg,var(--bg),#1a0033); color:var(--text); min-height:100vh; }
     @keyframes glow { 0%,100% { text-shadow:0 0 10px var(--accent); } 50% { text-shadow:0 0 20px var(--accent2); } }
     .glow { animation:glow 3s infinite; }
-
-    header { background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); padding:1rem; display:flex; justify-content:space-between; align-items:center; position:fixed; top:0; width:100%; z-index:10; }
-    header .logo { font-size:1.8rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .menu-btn { background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer; }
-    .menu { display:none; position:absolute; top:3rem; right:1rem; background:var(--card); border-radius:12px; padding:1rem; border:1px solid rgba(0,240,255,0.2); box-shadow:0 0 20px rgba(0,0,0,0.5); }
+    header {
+      background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(10px);
+      padding:1rem 1.5rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:fixed;
+      top:0;
+      width:100%;
+      z-index:10;
+      border-bottom:1px solid rgba(0,240,255,0.2);
+    }
+    .logo { font-size:2.2rem; font-weight:bold; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .menu-btn { background:none; border:none; color:var(--text); font-size:1.8rem; cursor:pointer; }
+    .menu {
+      display:none;
+      position:absolute;
+      top:3.5rem;
+      right:1rem;
+      background:var(--card);
+      border-radius:12px;
+      padding:1rem;
+      border:1px solid rgba(0,240,255,0.3);
+      box-shadow:0 0 20px rgba(0,0,0,0.6);
+      min-width:180px;
+    }
     .menu.active { display:block; }
-    .menu button { display:block; width:100%; background:none; border:none; color:var(--text); padding:0.5rem; text-align:left; cursor:pointer; }
-    .menu button:hover { color:var(--accent); }
+    .menu button {
+      display:block;
+      width:100%;
+      background:none;
+      border:none;
+      color:var(--text);
+      padding:0.8rem;
+      text-align:left;
+      cursor:pointer;
+      border-radius:8px;
+      transition:all 0.2s;
+    }
+    .menu button:hover { background:rgba(0,240,255,0.15); color:var(--accent); }
 
-    #authPage { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:2rem; background:var(--bg); }
-    #authPage .logo { font-size:3rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1rem; }
-    #authPage h1 { font-size:2rem; margin-bottom:0.5rem; }
+    #authPage {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      padding:2rem;
+    }
+    #authPage h1 { font-size:2.5rem; margin-bottom:0.5rem; }
     #authPage p { color:#aaa; margin-bottom:2rem; }
-    #authPage input { width:100%; max-width:400px; padding:1rem; margin:0.8rem 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--accent); color:white; font-size:1.1rem; }
-    #authPage button { width:100%; max-width:400px; padding:1rem; border:none; border-radius:12px; background:linear-gradient(90deg,var(--red),#ff6a00); color:white; font-weight:bold; cursor:pointer; margin:0.8rem 0; transition:all 0.3s; }
+    #authPage input {
+      width:100%;
+      max-width:400px;
+      padding:1rem;
+      margin:0.8rem 0;
+      border-radius:12px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid var(--accent);
+      color:white;
+      font-size:1.1rem;
+    }
+    #authPage button {
+      width:100%;
+      max-width:400px;
+      padding:1rem;
+      border:none;
+      border-radius:12px;
+      background:linear-gradient(90deg,var(--red),#ff6a00);
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      margin:0.8rem 0;
+      transition:all 0.3s;
+    }
     #authPage button:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,77,77,0.6); }
     .toggle { color:var(--accent); cursor:pointer; text-decoration:underline; margin:1rem 0; }
 
-    #dashboard { display:none; padding:2rem; }
+    #dashboard { display:none; padding:5rem 1rem 5rem; }
     .overview { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2rem; }
-    .card { background:var(--card); border-radius:12px; padding:1rem; text-align:center; border:1px solid rgba(0,240,255,0.2); box-shadow:0 4px 16px rgba(0,0,0,0.5); }
-    .card h3 { color:var(--accent); }
-    .quick-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2rem; }
-    .action-btn { padding:1rem; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; transition:all 0.3s; }
-    .action-btn:hover { transform:scale(1.05); box-shadow:0 0 20px var(--accent); }
-    .upload { background:linear-gradient(90deg,#00bfff,#1e90ff); }
-    .deploy { background:linear-gradient(90deg,#32cd32,#228b22); }
-    .logs { background:linear-gradient(90deg,#ffd700,#ffa500); }
-    .stop { background:linear-gradient(90deg,#ff69b4,#ff1493); }
+    .card {
+      background:var(--card);
+      border-radius:16px;
+      padding:1.5rem;
+      text-align:center;
+      border:1px solid rgba(0,240,255,0.2);
+      box-shadow:0 8px 20px rgba(0,0,0,0.5);
+      transition:all 0.3s;
+    }
+    .card:hover { transform:translateY(-5px); box-shadow:0 12px 30px rgba(0,240,255,0.3); }
+    .card h2 { margin:0; color:var(--accent); font-size:2.5rem; }
+    .card span { color:#aaa; font-size:0.9rem; }
 
     .section { padding:1rem; }
-    .message { background:var(--card); padding:1rem; border-radius:12px; margin:0.5rem 0; border:1px solid rgba(0,240,255,0.2); }
+    .section h1, .section h2 { margin-bottom:1rem; text-align:center; }
+    .section ul { list-style:none; padding:0; }
+    .section li { margin:0.5rem 0; background:var(--card); padding:0.8rem; border-radius:8px; border:1px solid rgba(0,240,255,0.1); }
+    .price-list li { font-size:1.2rem; font-weight:bold; }
+
+    nav {
+      position:fixed;
+      bottom:0;
+      width:100%;
+      background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(10px);
+      display:flex;
+      justify-content:space-around;
+      padding:1rem 0;
+      border-top:1px solid rgba(0,240,255,0.2);
+      z-index:9;
+    }
+    nav button {
+      background:none;
+      border:none;
+      color:var(--text);
+      font-size:0.9rem;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:0.5rem;
+      border-radius:8px;
+      transition:all 0.3s;
+    }
+    nav button.active { background:rgba(0,240,255,0.15); color:var(--accent); box-shadow:0 0 15px rgba(0,240,255,0.4); }
   </style>
 </head>
 <body>
 
-<!-- Логин -->
+<!-- Авторизация -->
 <div id="authPage">
-  <div class="logo glow">FFGarouX</div>
+  <div class="logo glow" style="font-size:3.5rem; margin-bottom:1rem;">FFGarouX</div>
   <h1 class="glow">Welcome Back</h1>
-  <p>Sign in to FFGarouX panel</p>
+  <p>Войдите в панель FFGarouX</p>
 
   <div id="loginForm">
-    <input id="username" placeholder="Ник (username)">
+    <input id="username" placeholder="Ник (username)" autocomplete="off">
     <input id="password" placeholder="Пароль" type="password">
     <button onclick="signIn()">Sign In</button>
-    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
-    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Sign Up</div>
+    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
+    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Зарегистрироваться</div>
   </div>
 
   <div id="signUpForm" style="display:none;">
-    <input id="signUpUsername" placeholder="Ник (username)">
+    <input id="signUpUsername" placeholder="Ник (username)" autocomplete="off">
     <input id="signUpPassword" placeholder="Пароль" type="password">
-    <input id="signUpConfirm" placeholder="Confirm Password" type="password">
+    <input id="signUpConfirm" placeholder="Повторите пароль" type="password">
     <button onclick="signUp()">Sign Up</button>
-    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
-    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Sign In</div>
+    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
+    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Войти</div>
   </div>
 </div>
 
@@ -84,24 +189,63 @@
     </div>
   </header>
 
-  <div class="overview">
-    <div class="card"><h3>Проекты</h3><p>5</p></div>
-    <div class="card"><h3>Запущено</h3><p>2</p></div>
-    <div class="card"><h3>Сервер лимит</h3><p>∞ Unlimited</p></div>
-    <div class="card"><h3>Disk Usage</h3><p>43%</p></div>
-  </div>
+  <section id="guild" class="section active">
+    <h1 class="glow">Доминируйте в славе клана автоматически</h1>
+    <p style="text-align:center; max-width:800px; margin:1rem auto; color:#ccc;">Самая продвинутая система автоматизации клановой славы Free Fire. Поднимите рейтинг клана, пока спите, с помощью нашей интеллектуальной технологии ботов.</p>
 
-  <div class="quick-actions">
-    <button class="action-btn upload">Upload</button>
-    <button class="action-btn deploy">Deploy</button>
-    <button class="action-btn logs">Logs</button>
-    <button class="action-btn stop">Stop</button>
-  </div>
+    <div class="overview" style="margin:2rem 0;">
+      <div class="card"><h2>40M+</h2><span>Слава, заслуженная ежедневно</span></div>
+      <div class="card"><h2>101%</h2><span>Время отработки</span></div>
+      <div class="card"><h2>50+</h2><span>Активные пользователи</span></div>
+    </div>
 
-  <section id="guild" class="section">
-    <h2>Гильдии</h2>
-    <p>Доминируйте в славе клана автоматически. Самая продвинутые система автоматизации клановой славы Free Fire. Слава ежедневно: 40M+. Время отработки: 101%. Пользователи: 50+.</p>
-    <p>Купить: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+    <button class="action-btn" style="background:linear-gradient(90deg,var(--blue),var(--accent)); margin:2rem auto; display:block; width:fit-content; padding:1.2rem 2rem; font-size:1.2rem;">Начните сейчас</button>
+
+    <h2>Как это работает</h2>
+    <p style="text-align:center; color:#ccc;">Статистика Live Glory • Мониторинг в реальном времени • Ежедневный прогресс</p>
+    <div class="overview">
+      <div class="card"><h2>78%</h2><span>+12 M</span></div>
+      <div class="card"><h2>4</h2><span>Активные боты</span></div>
+      <div class="card"><h2>24/7</h2><span>Без остановок</span></div>
+    </div>
+
+    <h2>Особенности</h2>
+    <p>Почему выбрали FFGarouX?</p>
+    <ul>
+      <li>Умная автоматизация — боты работают круглосуточно с оптимизированными стратегиями</li>
+      <li>Панель управления в реальном времени — отслеживайте прогресс, статус и прибыль</li>
+      <li>Многорегиональная поддержка — играйте из любой точки мира</li>
+      <li>100% безопасность — зашифрованные соединения и защищённая аутентификация</li>
+      <li>Круглосуточная поддержка — команда всегда на связи</li>
+    </ul>
+
+    <h2>Процесс</h2>
+    <ol style="padding-left:1.5rem; color:#ccc;">
+      <li>Купить ботов</li>
+      <li>Подключить гильдию (открытый клан)</li>
+      <li>Встречайте Clan ID — отправьте нам с чеком оплаты</li>
+      <li>Смотрите, как растёт слава — расслабьтесь!</li>
+    </ol>
+
+    <h2>Цены</h2>
+    <ul class="price-list">
+      <li>Плюс — 1000₽ (1 отряд бот с 3 игроками)</li>
+    </ul>
+    <button class="action-btn" style="background:linear-gradient(90deg,var(--green),#228b22); margin:2rem auto; display:block; width:fit-content; padding:1.2rem 2rem;">Начать</button>
+
+    <h2>Отзывы</h2>
+    <div class="card" style="margin:1rem 0;">
+      <p>«FFGarouX Бот полностью изменил ранг нашего клана. Мы перешли из Топ-100 в Топ-10 всего за две недели. Автоматизация безупречна!»</p>
+      <p><strong>GD GarouX</strong><br>Глава клана — Grand-City</p>
+    </div>
+    <div class="card" style="margin:1rem 0;">
+      <p>«Простота в использовании, отличная панель управления и стабильные результаты. Мы используем FFGarouX уже месяц и не могли бы быть счастливее от результата.»</p>
+      <p><strong>KYRGYZ</strong><br>Офицер клана — Grand-City</p>
+    </div>
+
+    <h2 style="margin-top:3rem;">Готовы занять лидерские таблицы?</h2>
+    <p style="text-align:center;">Присоединяйтесь к тысячам лидеров кланов, которые уже используют FFGarouX.</p>
+    <button class="action-btn" style="background:linear-gradient(90deg,var(--pink),var(--accent2)); margin:2rem auto; display:block; width:fit-content; padding:1.2rem 2rem; font-size:1.3rem;">Начните своё путешествие прямо сейчас</button>
   </section>
 
   <section id="cheats" class="section">
@@ -123,10 +267,10 @@
     </ul>
     <h3>КЛЮЧИ 🔑</h3>
     <ul>
-      <li>1 день (day) - 300₽ (3.89$)</li>
-      <li>7 дней (day) -600₽ (7.79$)</li>
-      <li>15 дней (day) - 900₽ (11.68$)</li>
-      <li>30 дней (day) - 1500₽ (19.47$)</li>
+      <li>1 день (day) - 300₽ (\~3.89$)</li>
+      <li>7 дней (day) - 600₽ (\~7.79$)</li>
+      <li>15 дней (day) - 900₽ (\~11.68$)</li>
+      <li>30 дней (day) - 1500₽ (\~19.47$)</li>
     </ul>
     <p>Купить: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
   </section>
@@ -146,13 +290,98 @@
 
     <h2>Информация о аккаунте</h2>
     <input id="uidInput" placeholder="Введите UID">
-    <button onclick="searchUID()" class="action-btn deploy">Искать</button>
+    <button onclick="searchUID()">Искать</button>
     <pre id="uidResult"></pre>
   </section>
 
   <section id="settings" class="section">
     <h2>Настройки</h2>
-    <p>© FFGarouX — Clan Glory Bot. Telegram: <a href="https://t.me/garoux24" style="color:var(--accent);">@garoux24</a></p>
+    <p>FFGarouX — лучшая панель для гильдий и читов Free Fire.<br>Контакты: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram @garoux24</a></p>
   </section>
+
+  <nav>
+    <button onclick="showSection('guild')" class="active">Guild</button>
+    <button onclick="showSection('cheats')">Cheats</button>
+    <button onclick="showSection('reviews')">Reviews</button>
+    <button onclick="showSection('settings')">Settings</button>
+  </nav>
+</div>
+
+<script>
+// Просмотры
+let views = localStorage.getItem("views") || 0;
+views++;
+localStorage.setItem("views", views);
+document.getElementById("views").innerText = views;
+
+// Комментарии (локальные)
+let comments = JSON.parse(localStorage.getItem("comments") || "[]");
+
+function renderComments() {
+  let box = document.getElementById("comments");
+  box.innerHTML = "";
+  comments.forEach((c, i) => {
+    box.innerHTML += `
+      <div class="message">
+        <strong>${c.name}</strong>
+        <p>${c.text}</p>
+        <div style="color:var(--accent); cursor:pointer;" onclick="like(${i})">❤️ ${c.likes || 0}</div>
+      </div>`;
+  });
+}
+
+function addComment() {
+  let name = document.getElementById("name").value || "Гость";
+  let text = document.getElementById("text").value;
+  if (!text) return;
+  comments.unshift({ name, text, likes: 0 });
+  localStorage.setItem("comments", JSON.stringify(comments));
+  document.getElementById("text").value = "";
+  renderComments();
+}
+
+function like(i) {
+  comments[i].likes = (comments[i].likes || 0) + 1;
+  localStorage.setItem("comments", JSON.stringify(comments));
+  renderComments();
+}
+
+renderComments();
+
+// Меню (три точки)
+function toggleMenu() {
+  document.getElementById("menu").classList.toggle("active");
+}
+
+// Переключение секций
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`nav button[onclick="showSection('${id}')"]`).classList.add('active');
+  document.getElementById("menu").classList.remove("active"); // закрываем меню
+}
+
+// Поиск UID (как раньше)
+async function searchUID() {
+  const uid = document.getElementById('uidInput').value.trim();
+  const result = document.getElementById('uidResult');
+  if (!uid) return result.innerText = 'Введите UID!';
+  result.innerText = 'Загрузка...';
+  try {
+    const res = await fetch(`https://info-ob49.vercel.app/api/account/?uid=${uid}&region=ru`);
+    if (!res.ok) throw new Error('Ошибка API');
+    const data = await res.json();
+    if (!data.basicInfo) throw new Error('Игрок не найден');
+    const b = data.basicInfo, c = data.clanBasicInfo || {}, s = data.socialInfo || {};
+    result.innerText = `Ник: ${b.nickname || '—'}\nUID: ${b.accountId || uid}\nУровень: ${b.level || '—'}\nЛайки: ${b.liked || '—'}\nBR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'})\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
+  } catch (e) { result.innerText = `Ошибка: ${e.message}`; }
+}
+
+// Заглушки для авторизации (если нужно добавить Firebase позже)
+function signIn() { alert('Вход (заглушка) — добавь Firebase для реальной авторизации'); }
+function signUp() { alert('Регистрация (заглушка) — добавь Firebase для реальной авторизации'); }
+function logout() { alert('Выход выполнен'); }
+</script>
 </body>
 </html>
