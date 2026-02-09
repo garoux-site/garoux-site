@@ -2,604 +2,265 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>FFGarouX — Clan Glory Bot & UID Lookup</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="bg.jpg"> <!-- если есть bg.jpg — оставь, иначе удали -->
-
+  <title>FFGarouX</title>
   <style>
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Arial,Helvetica,sans-serif;
-      background:#07070c;
-      color:#fff;
-      overflow-x:hidden;
-    }
+    :root { --bg: #0d0d1a; --card: #1a1a2e; --accent: #00f0ff; --accent2: #ff00aa; --text: #e0e0ff; --red: #ff4d4d; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+    body { background:linear-gradient(135deg,var(--bg),#1a0033); color:var(--text); min-height:100vh; }
+    @keyframes glow { 0%,100% { text-shadow:0 0 10px var(--accent); } 50% { text-shadow:0 0 20px var(--accent2); } }
+    .glow { animation:glow 3s infinite; }
 
-    /* HEADER */
-    header{
-      position:fixed;
-      top:0;
-      width:100%;
-      z-index:999;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:15px 30px;
-      background:rgba(0,0,0,.6);
-      backdrop-filter:blur(10px);
-    }
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:700;
-    }
-    .logo img{
-      width:40px;
-      height:40px;
-      border-radius:50%;
-    }
-    nav a{
-      margin:0 12px;
-      text-decoration:none;
-      color:#aaa;
-      transition:.3s;
-    }
-    nav a:hover{color:#fff}
+    #authPage { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:2rem; background:var(--bg); }
+    #authPage .logo { font-size:3rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1rem; }
+    #authPage h1 { font-size:2rem; margin-bottom:0.5rem; }
+    #authPage p { color:#aaa; margin-bottom:2rem; }
+    #authPage input { width:100%; max-width:400px; padding:1rem; margin:0.8rem 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--accent); color:white; font-size:1.1rem; }
+    #authPage button { width:100%; max-width:400px; padding:1rem; border:none; border-radius:12px; background:linear-gradient(90deg,var(--red),#ff6a00); color:white; font-weight:bold; cursor:pointer; margin:0.8rem 0; transition:all 0.3s; }
+    #authPage button:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,77,77,0.6); }
+    .toggle { color:var(--accent); cursor:pointer; text-decoration:underline; margin:1rem 0; }
+    .message { background:var(--card); padding:1rem; border-radius:12px; margin:0.5rem 0; border:1px solid rgba(0,240,255,0.2); }
 
-    .btn{
-      padding:10px 22px;
-      border-radius:30px;
-      background:linear-gradient(90deg,#ff0000,#ff6a00);
-      color:#fff;
-      text-decoration:none;
-      box-shadow:0 0 15px rgba(255,0,0,.6);
-      cursor:pointer;
-    }
-
-    /* HERO + SEARCH */
-    .hero{
-      padding:130px 20px 60px;
-      text-align:center;
-      background:radial-gradient(circle at top,#1a1a30,#05050a);
-    }
-    .hero h1{
-      font-size:36px;
-      max-width:900px;
-      margin:auto;
-    }
-    .hero p{
-      color:#aaa;
-      max-width:700px;
-      margin:20px auto;
-    }
-
-    .search-box{
-      max-width:500px;
-      margin:30px auto;
-      background:rgba(20,20,33,.7);
-      padding:25px;
-      border-radius:16px;
-      border:1px solid #ff4d4d33;
-    }
-    .search-box input{
-      width:100%;
-      padding:14px;
-      margin:10px 0;
-      border-radius:10px;
-      border:none;
-      background:#141421;
-      color:#fff;
-      font-size:16px;
-    }
-    .search-box button{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:30px;
-      background:linear-gradient(90deg,#ff0000,#ff6a00);
-      color:#fff;
-      font-weight:bold;
-      cursor:pointer;
-      margin-top:10px;
-    }
-
-    #result{
-      margin-top:25px;
-      background:#0f0f1a;
-      padding:20px;
-      border-radius:12px;
-      white-space:pre-wrap;
-      font-family:monospace;
-      line-height:1.5;
-      min-height:150px;
-      text-align:left;
-    }
-
-    /* AUTH */
-    .auth-box{
-      max-width:400px;
-      margin:20px auto;
-      background:rgba(20,20,33,.7);
-      padding:25px;
-      border-radius:16px;
-      border:1px solid #ff4d4d33;
-      display:none;
-    }
-    .auth-box.active{display:block;}
-    .auth-box h3{text-align:center; color:#ff4d4d;}
-    .auth-toggle{text-align:center; margin:15px 0;}
-    .auth-toggle a{color:#ff6a00; cursor:pointer; text-decoration:underline;}
-
-    /* REGISTRATION MODAL */
-    #regBox{
-      position:fixed;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      z-index:1000;
-      background:rgba(20,20,33,.9);
-      padding:30px;
-      border-radius:16px;
-      border:1px solid #ff4d4d;
-      display:none;
-      max-width:400px;
-      width:90%;
-    }
-    #regBox.active{display:block;}
-    #closeReg{
-      position:absolute;
-      top:10px;
-      right:10px;
-      color:#fff;
-      cursor:pointer;
-      font-size:20px;
-    }
-
-    /* SECTIONS */
-    .section{
-      padding:80px 20px;
-      text-align:center;
-    }
-    .dark{background:#0c0c14}
-
-    /* PRICE */
-    .price{
-      font-size:40px;
-      color:#ff4d4d;
-    }
-
-    /* REVIEWS + CHAT-LIKE COMMENTS */
-    .review{
-      max-width:700px;
-      margin:20px auto;
-      color:#ddd;
-    }
-    .views{
-      margin:20px 0;
-      color:#888;
-      font-size:14px;
-    }
-
-    .comment-box{
-      max-width:600px;
-      margin:30px auto;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .comment-box input,
-    .comment-box textarea{
-      padding:12px;
-      border-radius:12px;
-      border:none;
-      outline:none;
-      background:#141421;
-      color:#fff;
-    }
-    .comment-box button{
-      padding:12px;
-      border:none;
-      border-radius:20px;
-      background:linear-gradient(90deg,#ff0000,#ff6a00);
-      color:#fff;
-      cursor:pointer;
-    }
-
-    .comment{
-      background:#141421;
-      padding:15px;
-      border-radius:15px;
-      margin:15px 0;
-      text-align:left;
-      position:relative;
-    }
-    .comment .author{
-      font-weight:700;
-      color:#ff4d4d;
-    }
-    .comment .text{
-      margin:8px 0;
-      color:#ddd;
-    }
-    .comment .actions{
-      font-size:14px;
-      color:#888;
-      cursor:pointer;
-    }
-    .comment .reply-box{
-      margin-top:10px;
-      display:none;
-    }
-    .comment .reply-box.active{display:block;}
-    .comment .replies{
-      margin-top:15px;
-      padding-left:20px;
-      border-left:2px solid #ff4d4d33;
-    }
-    .reply{
-      background:#1a1a2e;
-      padding:10px;
-      border-radius:10px;
-      margin:10px 0;
-    }
-
-    /* TELEGRAM */
-    .tg{
-      display:flex;
-      justify-content:center;
-      gap:20px;
-      flex-wrap:wrap;
-    }
-    .tg a{
-      width:100px;
-      height:100px;
-      border-radius:50%;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      background:#111;
-      color:#fff;
-      text-decoration:none;
-      box-shadow:0 0 15px #000;
-      transition:.3s;
-    }
-    .tg a:hover{
-      transform:scale(1.1);
-    }
-    .tg-icon{
-      font-size:28px;
-      font-weight:bold;
-    }
-
-    /* FOOTER */
-    footer{
-      padding:30px;
-      background:#05050a;
-      color:#666;
-      text-align:center;
-    }
-
-    @media(max-width:768px){
-      .hero h1{font-size:28px}
-      nav{display:none}
-    }
+    #dashboard { display:none; padding:1rem; }
+    header { background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); padding:1rem; display:flex; justify-content:space-between; align-items:center; position:fixed; width:100%; z-index:10; }
+    header .logo { font-size:1.8rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .overview { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin:5rem 0 2rem; }
+    .card { background:var(--card); border-radius:12px; padding:1.5rem; text-align:center; border:1px solid rgba(0,240,255,0.2); }
+    .card h3 { color:var(--accent); }
+    nav { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); display:flex; justify-content:space-around; padding:1rem 0; }
+    nav button { background:none; border:none; color:var(--text); font-size:1rem; cursor:pointer; }
+    nav button.active { color:var(--accent); }
+    .section { display:none; padding:1rem; }
+    .section.active { display:block; }
   </style>
 </head>
-
 <body>
 
-<header>
-  <div class="logo">
-    <img src="bg.jpg" alt=""> <!-- если нет картинки — удали <img> -->
-    FFGarouX
-  </div>
-  <div>
-    <span id="userStatus">Гость</span>
-    <button id="authBtn" class="btn" onclick="toggleAuth()">Войти</button>
-  </div>
-</header>
+<!-- Логин -->
+<div id="authPage">
+  <div class="logo glow">FFGarouX</div>
+  <h1 class="glow">Welcome Back</h1>
+  <p>Sign in to FFGarouX panel</p>
 
-<!-- LOGIN BLOCK (скрытый) -->
-<div id="authBox" class="auth-box">
-  <h3>Вход</h3>
-  <input id="username" placeholder="Логин" />
-  <input id="password" type="password" placeholder="Пароль" />
-  <button id="authActionBtn" class="btn" onclick="handleLogin()">Войти</button>
-  <div id="authMessage" style="color:#ff4d4d; text-align:center; margin-top:10px;"></div>
-  <div class="auth-toggle">
-    <a onclick="toggleReg()">Регистрация</a>
+  <div id="loginForm">
+    <input id="username" placeholder="Ник (username)" autocomplete="off">
+    <input id="password" placeholder="Пароль" type="password">
+    <button onclick="signIn()">Sign In</button>
+    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
+    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Sign Up</div>
+  </div>
+
+  <div id="signUpForm" style="display:none;">
+    <input id="signUpUsername" placeholder="Ник (username)" autocomplete="off">
+    <input id="signUpPassword" placeholder="Пароль" type="password">
+    <input id="signUpConfirm" placeholder="Повтори пароль" type="password">
+    <button onclick="signUp()">Sign Up</button>
+    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem;"></div>
+    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Sign In</div>
   </div>
 </div>
 
-<!-- REGISTRATION MODAL -->
-<div id="regBox">
-  <span id="closeReg" onclick="toggleReg()">×</span>
-  <h3>Регистрация</h3>
-  <input id="regUsername" placeholder="Логин" />
-  <input id="regPassword" type="password" placeholder="Пароль" />
-  <input id="regConfirmPassword" type="password" placeholder="Повторите пароль" />
-  <button class="btn" onclick="handleRegister()">Зарегистрироваться</button>
-  <div id="regMessage" style="color:#ff4d4d; text-align:center; margin-top:10px;"></div>
+<!-- Дашборд -->
+<div id="dashboard">
+  <header>
+    <div class="logo glow">FFGarouX</div>
+    <button onclick="logout()">Выйти</button>
+  </header>
+
+  <div class="overview">
+    <div class="card"><h3>Активных пользователей</h3><p>—</p></div>
+    <div class="card"><h3>Сообщений в чате</h3><p>—</p></div>
+  </div>
+
+  <!-- Секции -->
+  <section id="guild" class="section active">
+    <h2>Гильдии</h2>
+    <p>Продажа и прокачка гильдий в Free Fire. Автоматизация славы клана. Связь: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+  </section>
+
+  <section id="cheats" class="section">
+    <h2>Читы DRIP CLIENT</h2>
+    <p>Android • Без бана</p>
+    <ul>
+      <li>Убийство при прицеливании</li>
+      <li>Тихое убийство</li>
+      <li>Тихий аимбот</li>
+      <li>Аимбот Rage / Legit</li>
+      <li>Телепорт 8м</li>
+      <li>Призрачный хак</li>
+      <li>ESP линия</li>
+      <li>Ранг CS/BR работает</li>
+    </ul>
+    <h3>Ключи</h3>
+    <ul>
+      <li>1 день — 300₽ (\~3.89$)</li>
+      <li>7 дней — 600₽ (\~7.79$)</li>
+      <li>15 дней — 900₽ (\~11.68$)</li>
+      <li>30 дней — 1500₽ (\~19.47$)</li>
+    </ul>
+    <p>Купить: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+  </section>
+
+  <section id="reviews" class="section">
+    <h2>Отзывы & Чат</h2>
+    <div>
+      <input id="chatName" placeholder="Ваш ник" value="" style="width:100%; padding:0.8rem; margin-bottom:0.5rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
+      <textarea id="chatText" placeholder="Сообщение..." style="width:100%; height:80px; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;"></textarea>
+      <button onclick="sendMessage()" style="width:100%; margin-top:0.5rem; padding:1rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#000; border:none; border-radius:8px; font-weight:bold;">Отправить</button>
+    </div>
+    <div id="chatMessages" style="margin-top:1rem; max-height:400px; overflow-y:auto;"></div>
+
+    <h2>Поиск по UID</h2>
+    <input id="uidInput" placeholder="UID игрока" style="width:100%; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
+    <button onclick="searchUID()" style="width:100%; margin-top:0.5rem; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px;">Искать</button>
+    <pre id="uidResult" style="margin-top:1rem; background:var(--card); padding:1rem; border-radius:8px; white-space:pre-wrap;"></pre>
+  </section>
+
+  <section id="settings" class="section">
+    <h2>Настройки</h2>
+    <p>FFGarouX — панель для гильдий и читов Free Fire. Связь: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+    <button onclick="logout()" style="width:100%; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px; margin-top:1rem;">Выйти</button>
+  </section>
+
+  <nav>
+    <button onclick="showSection('guild')" class="active">Guild</button>
+    <button onclick="showSection('cheats')">Cheats</button>
+    <button onclick="showSection('reviews')">Reviews</button>
+    <button onclick="showSection('settings')">Settings</button>
+  </nav>
 </div>
 
-<section class="hero">
-  <h1>Доминируйте в славе клана автоматически + Поиск по UID</h1>
-  <p>Самая продвинутая система автоматизации клановой славы Free Fire + мгновенная проверка профиля по UID</p>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-  <!-- ПОИСК ПО UID -->
-  <div class="search-box">
-    <input id="uidInput" placeholder="Введите UID игрока (например 990000055554)" />
-    <button onclick="searchUID()">Проверить профиль</button>
-    <div id="result">Результат появится здесь...</div>
-  </div>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
+    authDomain: "ffgaroux-a58e7.firebaseapp.com",
+    projectId: "ffgaroux-a58e7",
+    storageBucket: "ffgaroux-a58e7.firebasestorage.app",
+    messagingSenderId: "967486028392",
+    appId: "1:967486028392:web:3de0f014b77d0ac27659dd",
+    measurementId: "G-Y1VCLD1VKM",
+    databaseURL: "https://ffgaroux-a58e7-default-rtdb.europe-west1.firebasedatabase.app/"
+  };
 
-  <div class="stats">
-    <div class="stat"><h2>40M+</h2><span>Слава ежедневно</span></div>
-    <div class="stat"><h2>101%</h2><span>Время отработки</span></div>
-    <div class="stat"><h2>50+</h2><span>Пользователи</span></div>
-  </div>
-</section>
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
 
-<section id="reviews" class="section dark">
-  <h2>Отзывы и Чат</h2>
-  <p class="review">“FFGarouX вывел наш клан в ТОП-10 за 2 недели + удобный поиск по UID”</p>
-
-  <div class="views">◉ Просмотров: <span id="views">0</span></div>
-
-  <h3>Комментарии (Чат)</h3>
-
-  <div class="comment-box">
-    <input id="name" placeholder="Ваш ник (опционально)">
-    <textarea id="text" placeholder="Напишите комментарий..."></textarea>
-    <button onclick="addComment(-1)">Отправить</button>
-  </div>
-
-  <div id="comments"></div>
-</section>
-
-<section id="buy" class="section">
-  <h2>Telegram</h2>
-  <div class="tg">
-    <a href="https://t.me/garoux24" target="_blank">
-      <div class="tg-icon">1</div>
-      <small>@garoux24</small>
-    </a>
-    <a href="https://t.me/scromnyi_modz" target="_blank">
-      <div class="tg-icon">2</div>
-      <small>@scromnyi_modz</small>
-    </a>
-    <a href="https://t.me/er1anovdas_07" target="_blank">
-      <div class="tg-icon">3</div>
-      <small>@er1anovdas_07</small>
-    </a>
-    <a href="https://t.me/garouxbot" target="_blank">
-      <div class="tg-icon">🖥️</div>
-      <small>@garouxbot</small>
-    </a>
-  </div>
-</section>
-
-<footer>
-  © FFGarouX — Clan Glory Bot & UID Checker — 2026
-</footer>
-
-<script>
-// Просмотры
-let views = localStorage.getItem("views") || 0;
-views++;
-localStorage.setItem("views", views);
-document.getElementById("views").innerText = views;
-
-// Пользователь
-let currentUser = localStorage.getItem("currentUser") || "Гость";
-document.getElementById("userStatus").innerText = currentUser;
-
-// Показ/скрытие login
-function toggleAuth() {
-  const box = document.getElementById("authBox");
-  box.classList.toggle("active");
-}
-
-// Показ/скрытие registration modal
-function toggleReg() {
-  const box = document.getElementById("regBox");
-  box.classList.toggle("active");
-}
-
-// Обработка входа
-function handleLogin() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const message = document.getElementById("authMessage");
-
-  if (!username || !password) {
-    message.innerText = "Заполните логин и пароль!";
-    return;
-  }
-
-  const users = JSON.parse(localStorage.getItem("users") || "{}");
-
-  if (users[username] && users[username] === password) {
-    localStorage.setItem("currentUser", username);
-    document.getElementById("userStatus").innerText = username;
-    message.innerText = "";
-    toggleAuth();
-    alert("Вход успешен!");
-  } else {
-    message.innerText = "Нет такого аккаунта или неверный пароль!";
-  }
-}
-
-// Обработка регистрации
-function handleRegister() {
-  const username = document.getElementById("regUsername").value.trim();
-  const password = document.getElementById("regPassword").value.trim();
-  const confirmPassword = document.getElementById("regConfirmPassword").value.trim();
-  const message = document.getElementById("regMessage");
-
-  if (!username || !password || !confirmPassword) {
-    message.innerText = "Заполните все поля!";
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    message.innerText = "Пароли не совпадают!";
-    return;
-  }
-
-  const users = JSON.parse(localStorage.getItem("users") || "{}");
-
-  if (users[username]) {
-    message.innerText = "Такой логин уже существует!";
-  } else {
-    users[username] = password;
-    localStorage.setItem("users", JSON.stringify(users));
-    message.innerText = "";
-    toggleReg();
-    alert("Регистрация успешна! Теперь войдите с помощью логина и пароля.");
-  }
-}
-
-// Поиск по UID (рабочий API)
-async function searchUID() {
-  const uid = document.getElementById("uidInput").value.trim();
-  const result = document.getElementById("result");
-
-  if (!uid || isNaN(uid)) {
-    result.innerHTML = '<span style="color:#ff4d4d;">Введите правильный UID (только цифры)!</span>';
-    return;
-  }
-
-  result.innerHTML = 'Загрузка информации... ⏳';
-
-  try {
-    const response = await fetch(`https://info-ob49.vercel.app/api/account/?uid=${uid}&region=ru`);
-    if (!response.ok) throw new Error(`Ошибка сервера: ${response.status}`);
-
-    const data = await response.json();
-
-    if (!data.basicInfo) {
-      result.innerHTML = '<span style="color:#ff4d4d;">Игрок не найден или ошибка API ❌</span>';
-      return;
+  // Проверка входа
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById('authPage').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadMessages();
+      loadUserNickname(user.uid);
+    } else {
+      document.getElementById('authPage').style.display = 'flex';
+      document.getElementById('dashboard').style.display = 'none';
     }
-
-    const b = data.basicInfo;
-    const c = data.clanBasicInfo || {};
-    const p = data.petInfo || {};
-    const s = data.socialInfo || {};
-
-    const text = `
-👤 Ник: ${b.nickname || '—'}
-🆔 UID: ${b.accountId || uid}
-🌍 Регион: ${b.region || 'RU'}
-🎖 Уровень: ${b.level || '—'}
-❤️ Лайки: ${b.liked || '—'}
-
-🏆 BR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'} pts)
-🎯 CS Rank: \( {b.csRank || '—'} ( \){b.csRankingPoints || '—'} pts)
-
-📅 Создан: ${formatTime(b.createAt)}
-⏰ Последний вход: ${formatTime(b.lastLoginAt)}
-
-🐾 Питомец: ${p.name || 'Нет'} (Lv ${p.level || '—'})
-
-🏰 Клан: ${c.clanName || 'Нет'}
-👥 Участников: \( {c.memberNum || '—'}/ \){c.capacity || '—'}
-
-🌐 Подпись: ${s.signature || '—'}
-    `.trim();
-
-    result.innerHTML = `<pre>${text}</pre>`;
-  } catch (err) {
-    result.innerHTML = `<span style="color:#ff4d4d;">Ошибка: ${err.message} (попробуйте позже или другой UID)</span>`;
-  }
-}
-
-function formatTime(ts) {
-  if (!ts) return 'Unknown';
-  const date = new Date(Number(ts) * 1000);
-  return date.toLocaleString('ru-RU', { dateStyle: 'medium', timeStyle: 'short' });
-}
-
-// Комментарии как чат (с ответами)
-let comments = JSON.parse(localStorage.getItem("comments") || "[]");
-
-function renderComments() {
-  let box = document.getElementById("comments");
-  box.innerHTML = "";
-  comments.forEach((c, i) => {
-    let repliesHtml = '';
-    if (c.replies) {
-      repliesHtml = '<div class="replies">';
-      c.replies.forEach((r, j) => {
-        repliesHtml += `
-          <div class="reply">
-            <div class="author">${r.name}</div>
-            <div class="text">${r.text}</div>
-            <div class="actions" onclick="likeReply(\( {i}, \){j})">❤️ ${r.likes || 0}</div>
-          </div>`;
-      });
-      repliesHtml += '</div>';
-    }
-
-    box.innerHTML += `
-      <div class="comment">
-        <div class="author">${c.name}</div>
-        <div class="text">${c.text}</div>
-        <div class="actions" onclick="like(${i})">❤️ \( {c.likes || 0} | <span onclick="toggleReply( \){i})">Ответить</span></div>
-        <div class="reply-box" id="replyBox${i}">
-          <input id="replyName${i}" placeholder="Ваш ник (опционально)">
-          <textarea id="replyText${i}" placeholder="Ваш ответ..."></textarea>
-          <button onclick="addReply(${i})">Отправить ответ</button>
-        </div>
-        ${repliesHtml}
-      </div>`;
   });
-}
 
-function addComment(parentId) {
-  let name = document.getElementById("name").value || "Гость";
-  let text = document.getElementById("text").value;
-  if (!text) return;
-  comments.unshift({ name, text, likes: 0, replies: [] });
-  localStorage.setItem("comments", JSON.stringify(comments));
-  document.getElementById("text").value = "";
-  renderComments();
-}
+  // Загрузка ника
+  function loadUserNickname(uid) {
+    onValue(ref(db, 'users/' + uid), (snap) => {
+      const data = snap.val();
+      if (data && data.username) {
+        // Можно отобразить ник в хедере
+      }
+    });
+  }
 
-function toggleReply(i) {
-  document.getElementById(`replyBox${i}`).classList.toggle("active");
-}
+  // Регистрация
+  function signUp() {
+    const username = document.getElementById('signUpUsername').value.trim();
+    const password = document.getElementById('signUpPassword').value.trim();
+    const confirm = document.getElementById('signUpConfirm').value.trim();
 
-function addReply(i) {
-  let name = document.getElementById(`replyName${i}`).value || "Гость";
-  let text = document.getElementById(`replyText${i}`).value;
-  if (!text) return;
-  if (!comments[i].replies) comments[i].replies = [];
-  comments[i].replies.push({ name, text, likes: 0 });
-  localStorage.setItem("comments", JSON.stringify(comments));
-  document.getElementById(`replyText${i}`).value = "";
-  renderComments();
-}
+    if (!username) return alert('Введите ник!');
+    if (password !== confirm) return alert('Пароли не совпадают!');
 
-function like(i) {
-  comments[i].likes = (comments[i].likes || 0) + 1;
-  localStorage.setItem("comments", JSON.stringify(comments));
-  renderComments();
-}
+    const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
 
-function likeReply(i, j) {
-  comments[i].replies[j].likes = (comments[i].replies[j].likes || 0) + 1;
-  localStorage.setItem("comments", JSON.stringify(comments));
-  renderComments();
-}
+    createUserWithEmailAndPassword(auth, fakeEmail, password)
+      .then((userCredential) => {
+        set(ref(db, 'users/' + userCredential.user.uid), { username });
+        alert('Регистрация успешна! Войдите.');
+        showLogin();
+      })
+      .catch((error) => alert(error.message));
+  }
 
-renderComments();
+  // Вход
+  function signIn() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!username) return alert('Введите ник!');
+
+    const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
+
+    signInWithEmailAndPassword(auth, fakeEmail, password)
+      .then(() => alert('Вход успешен!'))
+      .catch((error) => alert('Неверный ник или пароль!'));
+  }
+
+  // Выход
+  function logout() {
+    signOut(auth).then(() => alert('Вы вышли'));
+  }
+
+  // Переключение форм
+  function showSignUp() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('signUpForm').style.display = 'block'; }
+  function showLogin() { document.getElementById('signUpForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; }
+
+  // Чат
+  function sendMessage() {
+    const name = document.getElementById('chatName').value || 'Гость';
+    const text = document.getElementById('chatText').value;
+    if (!text) return;
+    push(ref(db, 'messages'), { name, text, timestamp: Date.now() });
+    document.getElementById('chatText').value = '';
+  }
+
+  function loadMessages() {
+    onValue(ref(db, 'messages'), (snap) => {
+      const messagesDiv = document.getElementById('chatMessages');
+      messagesDiv.innerHTML = '';
+      snap.forEach((child) => {
+        const msg = child.val();
+        messagesDiv.innerHTML += `<div class="message"><strong>${msg.name}</strong>: ${msg.text}</div>`;
+      });
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+  }
+
+  // Поиск UID
+  async function searchUID() {
+    const uid = document.getElementById('uidInput').value.trim();
+    const result = document.getElementById('uidResult');
+    if (!uid) return result.innerText = 'Введите UID!';
+    result.innerText = 'Загрузка...';
+    try {
+      const res = await fetch(`https://info-ob49.vercel.app/api/account/?uid=${uid}&region=ru`);
+      if (!res.ok) throw new Error('Ошибка');
+      const data = await res.json();
+      if (!data.basicInfo) throw new Error('Не найдено');
+      const b = data.basicInfo, c = data.clanBasicInfo || {}, p = data.petInfo || {}, s = data.socialInfo || {};
+      result.innerText = `Ник: ${b.nickname}\nUID: ${b.accountId}\nУровень: ${b.level}\nЛайки: ${b.liked}\nBR Rank: \( {b.rank} ( \){b.rankingPoints})\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
+    } catch (e) { result.innerText = `Ошибка: ${e.message}`; }
+  }
+
+  // Переключение секций
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
 </script>
-
 </body>
-  </html>
+</html>
