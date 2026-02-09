@@ -7,8 +7,8 @@
 <style>
 body {
   margin:0;
-  font-family:Arial, sans-serif;
-  background:#05050d;
+  font-family: Arial, sans-serif;
+  background:#1a0f00; /* темный оранжевый фон */
   color:#fff;
 }
 
@@ -17,9 +17,10 @@ body {
   max-width:400px;
   margin:80px auto;
   padding:25px;
-  background:#0e1022;
+  background:#2a1200;
   border-radius:12px;
   text-align:center;
+  box-shadow:0 0 20px #ff6600;
 }
 #auth-container input,
 #auth-container button {
@@ -30,12 +31,16 @@ body {
   border-radius:6px;
 }
 #auth-container button {
-  background:linear-gradient(90deg,#ff3c3c,#00e0ff);
+  background:linear-gradient(90deg,#ff6600,#ff9f00);
   color:#fff;
   font-weight:bold;
   cursor:pointer;
+  transition:0.3s;
 }
-#auth-message { color:#ff6b6b; }
+#auth-container button:hover {
+  opacity:0.8;
+}
+#auth-message { color:#ff8a50; }
 
 /* APP */
 #app { display:none; }
@@ -44,13 +49,14 @@ header {
   align-items:center;
   gap:10px;
   padding:15px;
-  background:#0e1022;
+  background:#2a1200;
   position:sticky;
   top:0;
   z-index:10;
+  box-shadow:0 2px 10px #ff6600;
 }
 header img { width:40px; height:40px; border-radius:8px; }
-header h1 { margin:0; font-size:18px; }
+header h1 { margin:0; font-size:18px; color:#ff9f00; }
 
 /* SECTIONS */
 section {
@@ -68,22 +74,23 @@ section.active { display:block; }
   gap:15px;
 }
 .stat {
-  background:#1a1c33;
+  background:#3a1f00;
   padding:15px;
   border-radius:10px;
   text-align:center;
+  box-shadow:0 0 10px #ff6600;
 }
 
 /* REVIEWS */
 .review {
-  background:#1a1c33;
+  background:#3a1f00;
   padding:10px;
   border-radius:8px;
   margin-bottom:10px;
 }
 .review small {
   display:block;
-  color:#aaa;
+  color:#ffb380;
   font-size:11px;
 }
 
@@ -93,19 +100,21 @@ nav {
   bottom:0;
   left:0;
   right:0;
-  background:#0e1022;
+  background:#2a1200;
   display:flex;
   justify-content:space-around;
   padding:10px 0;
+  box-shadow:0 -2px 10px #ff6600;
 }
 nav button {
   background:none;
   border:none;
-  color:#aaa;
+  color:#ffb380;
   font-size:12px;
   cursor:pointer;
+  transition:0.3s;
 }
-nav button.active { color:#00e0ff; }
+nav button.active { color:#ff9f00; }
 
 textarea {
   width:100%;
@@ -119,20 +128,22 @@ textarea {
   display:inline-block;
   padding:10px 15px;
   margin:10px 0;
-  background:linear-gradient(90deg,#ff3c3c,#00e0ff);
+  background:linear-gradient(90deg,#ff6600,#ff9f00);
   border-radius:8px;
   color:#fff;
   text-decoration:none;
   font-weight:bold;
   cursor:pointer;
+  transition:0.3s;
 }
+.btn:hover { opacity:0.8; }
 </style>
 </head>
 <body>
 
 <!-- AUTH -->
 <div id="auth-container">
-  <h2>FFGarouX</h2>
+  <h2 style="color:#ff9f00;">FFGarouX</h2>
   <input type="text" id="nickname" placeholder="Ваш ник">
   <input type="password" id="password" placeholder="Пароль">
   <button id="register-btn">Регистрация</button>
@@ -149,8 +160,8 @@ textarea {
 
 <!-- Гильдия -->
 <section id="guild" class="active">
-  <h2>Доминируйте в славе клана автоматически</h2>
-  <p>Самая продвинутая система автоматизации клановой славы Free Fire. Поднимите рейтинг клана, пока спите, с помощью нашей интеллектуальной технологии ботов.</p>
+  <h2>Доминируйте в славе клана</h2>
+  <p>Самая продвинутая система автоматизации клановой славы Free Fire. Поднимите рейтинг клана, пока спите, с помощью наших интеллектуальных ботов.</p>
 
   <div class="stats">
     <div class="stat"><b>40M+</b><br>Слава ежедневно</div>
@@ -180,8 +191,7 @@ textarea {
 <li>🎚 ESP линия местоположения</li>
 <li>🎚 Ранг CS / BR работает</li>
 </ul>
-<p>
-КЛЮЧИ 🔑<br>
+<p>КЛЮЧИ 🔑<br>
 1 день — 300₽ (~$3.3)<br>
 7 дней — 600₽ (~$6.6)<br>
 15 дней — 900₽ (~$10)<br>
@@ -227,8 +237,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let currentUser=null;
-
-// DOM
 const authContainer=document.getElementById("auth-container");
 const appContainer=document.getElementById("app");
 const nicknameInput=document.getElementById("nickname");
@@ -237,7 +245,6 @@ const authMessage=document.getElementById("auth-message");
 const reviewsList=document.getElementById("reviews-list");
 const reviewText=document.getElementById("review-text");
 
-// REGISTER
 document.getElementById("register-btn").onclick=async()=>{
 const nick=nicknameInput.value.trim();
 const pass=passwordInput.value.trim();
@@ -246,7 +253,6 @@ await addDoc(collection(db,"users"),{nickname:nick,password:pass});
 authMessage.textContent="Регистрация успешна! Теперь войдите.";
 };
 
-// LOGIN
 document.getElementById("login-btn").onclick=async()=>{
 const nick=nicknameInput.value.trim();
 const pass=passwordInput.value.trim();
@@ -260,7 +266,6 @@ appContainer.style.display="block";
 loadReviews();
 };
 
-// SEND REVIEW
 document.getElementById("send-review").onclick=async()=>{
 if(!reviewText.value.trim()) return;
 await addDoc(collection(db,"reviews"),{nickname:currentUser,text:reviewText.value,time:Date.now()});
@@ -268,7 +273,6 @@ reviewText.value="";
 loadReviews();
 };
 
-// LOAD REVIEWS
 async function loadReviews(){
 reviewsList.innerHTML="";
 const q=query(collection(db,"reviews"),orderBy("time","desc"));
@@ -282,14 +286,12 @@ reviewsList.appendChild(div);
 });
 }
 
-// LOGOUT
 document.getElementById("logout-btn").onclick=()=>{
 currentUser=null;
 appContainer.style.display="none";
 authContainer.style.display="block";
 };
 
-// SHOW SECTIONS
 function show(id){
 document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
@@ -297,5 +299,6 @@ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"))
 event.target.classList.add("active");
 }
 </script>
+
 </body>
 </html>
