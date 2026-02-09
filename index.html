@@ -249,8 +249,8 @@
   </section>
 
   <section id="cheats" class="section">
-    <h2>Читы</h2>
-    <p>DRIP KLIENT🌟 Андроид 👑 БЕЗ БАНА👑</p>
+    <h2>Читы DRIP CLIENT</h2>
+    <p>Android • Без бана</p>
     <ul>
       <li>Убийство при прицеливании</li>
       <li>Тихое убийство при прицеливании</li>
@@ -307,81 +307,168 @@
   </nav>
 </div>
 
-<script>
-// Просмотры
-let views = localStorage.getItem("views") || 0;
-views++;
-localStorage.setItem("views", views);
-document.getElementById("views").innerText = views;
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-// Комментарии (локальные)
-let comments = JSON.parse(localStorage.getItem("comments") || "[]");
+  const firebaseConfig = {
+    apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
+    authDomain: "ffgaroux-a58e7.firebaseapp.com",
+    projectId: "ffgaroux-a58e7",
+    storageBucket: "ffgaroux-a58e7.firebasestorage.app",
+    messagingSenderId: "967486028392",
+    appId: "1:967486028392:web:3de0f014b77d0ac27659dd",
+    measurementId: "G-Y1VCLD1VKM",
+    databaseURL: "https://ffgaroux-a58e7-default-rtdb.europe-west1.firebasedatabase.app/"
+  };
 
-function renderComments() {
-  let box = document.getElementById("comments");
-  box.innerHTML = "";
-  comments.forEach((c, i) => {
-    box.innerHTML += `
-      <div class="message">
-        <strong>${c.name}</strong>
-        <p>${c.text}</p>
-        <div style="color:var(--accent); cursor:pointer;" onclick="like(${i})">❤️ ${c.likes || 0}</div>
-      </div>`;
+  console.log("Попытка подключения к Firebase...");
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  console.log("Firebase подключён успешно");
+
+  function toggleElement(id, display) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = display;
+    else console.error(`Элемент с id "${id}" не найден!`);
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("Пользователь вошёл:", user.uid);
+      toggleElement('authPage', 'none');
+      toggleElement('dashboard', 'block');
+      loadMessages();
+    } else {
+      console.log("Пользователь вышел или не авторизован");
+      toggleElement('authPage', 'flex');
+      toggleElement('dashboard', 'none');
+    }
   });
-}
 
-function addComment() {
-  let name = document.getElementById("name").value || "Гость";
-  let text = document.getElementById("text").value;
-  if (!text) return;
-  comments.unshift({ name, text, likes: 0 });
-  localStorage.setItem("comments", JSON.stringify(comments));
-  document.getElementById("text").value = "";
-  renderComments();
-}
+  window.signUp = function() {
+    console.log("Нажата кнопка Sign Up");
+    const username = document.getElementById('signUpUsername')?.value.trim();
+    const password = document.getElementById('signUpPassword')?.value.trim();
+    const confirm = document.getElementById('signUpConfirm')?.value.trim();
 
-function like(i) {
-  comments[i].likes = (comments[i].likes || 0) + 1;
-  localStorage.setItem("comments", JSON.stringify(comments));
-  renderComments();
-}
+    if (!username) return document.getElementById('regMessage').innerText = 'Введите ник!';
+    if (password !== confirm) return document.getElementById('regMessage').innerText = 'Пароли не совпадают!';
 
-renderComments();
+    const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
+    console.log("Попытка регистрации:", fakeEmail);
 
-// Меню (три точки)
-function toggleMenu() {
-  document.getElementById("menu").classList.toggle("active");
-}
+    createUserWithEmailAndPassword(auth, fakeEmail, password)
+      .then((userCredential) => {
+        console.log("Регистрация успешна:", userCredential.user.uid);
+        set(ref(db, 'users/' + userCredential.user.uid), { username });
+        alert('Регистрация успешна! Теперь войдите под ником: ' + username);
+        showLogin();
+      })
+      .catch((error) => {
+        console.error("Ошибка:", error.code, error.message);
+        if (error.code === 'auth/email-already-in-use') {
+          document.getElementById('regMessage').innerText = 'Этот ник уже занят!';
+        } else if (error.code === 'auth/weak-password') {
+          document.getElementById('regMessage').innerText = 'Пароль слишком слабый (минимум 6 символов)!';
+        } else {
+          document.getElementById('regMessage').innerText = 'Ошибка: ' + error.message;
+        }
+      });
+  };
 
-// Переключение секций
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.querySelector(`nav button[onclick="showSection('${id}')"]`).classList.add('active');
-  document.getElementById("menu").classList.remove("active"); // закрываем меню
-}
+  window.signIn = function() {
+    console.log("Нажата кнопка Sign In");
+    const username = document.getElementById('username')?.value.trim();
+    const password = document.getElementById('password')?.value.trim();
 
-// Поиск UID (как раньше)
-async function searchUID() {
-  const uid = document.getElementById('uidInput').value.trim();
-  const result = document.getElementById('uidResult');
-  if (!uid) return result.innerText = 'Введите UID!';
-  result.innerText = 'Загрузка...';
-  try {
-    const res = await fetch(`https://info-ob49.vercel.app/api/account/?uid=${uid}&region=ru`);
-    if (!res.ok) throw new Error('Ошибка API');
-    const data = await res.json();
-    if (!data.basicInfo) throw new Error('Игрок не найден');
-    const b = data.basicInfo, c = data.clanBasicInfo || {}, s = data.socialInfo || {};
-    result.innerText = `Ник: ${b.nickname || '—'}\nUID: ${b.accountId || uid}\nУровень: ${b.level || '—'}\nЛайки: ${b.liked || '—'}\nBR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'})\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
-  } catch (e) { result.innerText = `Ошибка: ${e.message}`; }
-}
+    if (!username) return document.getElementById('authMessage').innerText = 'Введите ник!';
 
-// Заглушки для авторизации (если нужно добавить Firebase позже)
-function signIn() { alert('Вход (заглушка) — добавь Firebase для реальной авторизации'); }
-function signUp() { alert('Регистрация (заглушка) — добавь Firebase для реальной авторизации'); }
-function logout() { alert('Выход выполнен'); }
+    const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
+    console.log("Попытка входа:", fakeEmail);
+
+    signInWithEmailAndPassword(auth, fakeEmail, password)
+      .then(() => {
+        console.log("Вход успешен");
+        alert('Вход успешен!');
+      })
+      .catch((error) => {
+        console.error("Ошибка:", error.code, error.message);
+        document.getElementById('authMessage').innerText = 'Нет такого аккаунта или неверный пароль!';
+      });
+  };
+
+  window.logout = function() {
+    signOut(auth).then(() => {
+      console.log("Выход выполнен");
+      alert('Вы вышли');
+    });
+  };
+
+  window.showSignUp = function() {
+    console.log("Переход на регистрацию");
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signUpForm').style.display = 'block';
+    document.getElementById('authMessage').innerText = '';
+    document.getElementById('regMessage').innerText = '';
+  };
+
+  window.showLogin = function() {
+    console.log("Переход на вход");
+    document.getElementById('signUpForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('authMessage').innerText = '';
+    document.getElementById('regMessage').innerText = '';
+  };
+
+  function toggleMenu() {
+    document.getElementById("menu").classList.toggle("active");
+  }
+
+  function sendMessage() {
+    const name = document.getElementById('chatName').value || 'Гость';
+    const text = document.getElementById('chatText').value;
+    if (!text) return;
+    push(ref(db, 'messages'), { name, text, timestamp: Date.now() });
+    document.getElementById('chatText').value = '';
+  }
+
+  function loadMessages() {
+    onValue(ref(db, 'messages'), (snap) => {
+      const div = document.getElementById('chatMessages');
+      div.innerHTML = '';
+      snap.forEach(child => {
+        const msg = child.val();
+        div.innerHTML += `<div class="message"><strong>${msg.name}</strong>: ${msg.text}</div>`;
+      });
+      div.scrollTop = div.scrollHeight;
+    });
+  }
+
+  async function searchUID() {
+    const uid = document.getElementById('uidInput').value.trim();
+    const result = document.getElementById('uidResult');
+    if (!uid) return result.innerText = 'Введите UID!';
+    result.innerText = 'Загрузка...';
+    try {
+      const res = await fetch(`https://info.ob49.vercel.app/api/account/?uid=${uid}&region=ru`);
+      if (!res.ok) throw new Error('Ошибка API');
+      const data = await res.json();
+      if (!data.basicInfo) throw new Error('Игрок не найден');
+      const b = data.basicInfo, c = data.clanBasicInfo || {}, s = data.socialInfo || {};
+      result.innerText = `Ник: ${b.nickname || '—'}\nUID: ${b.accountId || uid}\nУровень: ${b.level || '—'}\nЛайки: ${b.liked || '—'}\nBR Rank: \( {b.rank || '—'} ( \){b.rankingPoints || '—'})\nКлан: ${c.clanName || 'Нет'}\nПодпись: ${s.signature || '—'}`;
+    } catch (e) { result.innerText = `Ошибка: ${e.message}`; }
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.querySelector(`nav button[onclick="showSection('${id}')"]`).classList.add('active');
+    document.getElementById("menu").classList.remove("active");
+  }
 </script>
 </body>
 </html>
