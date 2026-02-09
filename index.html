@@ -1,201 +1,289 @@
-<!DOCTYPE html><html lang="ru">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FFGarouX</title><script type="module">
+<title>FFGarouX</title>
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#05050d;
+  color:#fff;
+}
+
+/* ---------- AUTH ---------- */
+#auth-container {
+  max-width:400px;
+  margin:80px auto;
+  background:#0e1022;
+  padding:25px;
+  border-radius:12px;
+  text-align:center;
+}
+#auth-container input, #auth-container button {
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border:none;
+  border-radius:6px;
+}
+#auth-container button {
+  background:linear-gradient(90deg,#ff3c3c,#00e0ff);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+#auth-message { color:#ff7070; }
+
+/* ---------- APP ---------- */
+#app { display:none; }
+
+/* HEADER */
+header {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:15px;
+  background:#0e1022;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header img {
+  width:40px;
+  height:40px;
+  border-radius:8px;
+}
+header h1 {
+  font-size:18px;
+  margin:0;
+}
+
+/* SECTIONS */
+section {
+  display:none;
+  padding:20px;
+  animation: fade .4s ease;
+}
+section.active { display:block; }
+
+@keyframes fade {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:none; }
+}
+
+/* BUTTONS */
+.btn {
+  display:inline-block;
+  padding:12px 16px;
+  margin:10px 0;
+  background:linear-gradient(90deg,#ff3c3c,#00e0ff);
+  border-radius:8px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:bold;
+  text-align:center;
+}
+
+/* STATS */
+.stats {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+.stat {
+  background:#1a1c33;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+}
+
+/* REVIEWS */
+.review {
+  background:#1a1c33;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+.review small {
+  display:block;
+  color:#aaa;
+  font-size:11px;
+}
+
+/* BOTTOM MENU */
+nav {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#0e1022;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+}
+nav button {
+  background:none;
+  border:none;
+  color:#aaa;
+  font-size:12px;
+  cursor:pointer;
+}
+nav button.active { color:#00e0ff; }
+
+textarea {
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:none;
+  resize:none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUTH -->
+<div id="auth-container">
+  <h2>FFGarouX</h2>
+  <input id="nickname" placeholder="Ваш ник">
+  <input id="password" type="password" placeholder="Пароль">
+  <button id="register-btn">Регистрация</button>
+  <button id="login-btn">Войти</button>
+  <p id="auth-message"></p>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<header>
+  <img src="bg.jpg">
+  <h1>FFGarouX</h1>
+</header>
+
+<section id="guild" class="active">
+  <h2>Доминируйте в славе клана автоматически</h2>
+  <p>Самая продвинутая система автоматизации клановой славы Free Fire.</p>
+
+  <div class="stats">
+    <div class="stat"><b>40M+</b><br>Слава ежедневно</div>
+    <div class="stat"><b>50+</b><br>Активные пользователи</div>
+    <div class="stat"><b>24/7</b><br>Работа</div>
+    <div class="stat"><b>100%</b><br>Безопасно</div>
+  </div>
+
+  <a class="btn" href="https://t.me/garoux24" target="_blank">Купить / Telegram</a>
+</section>
+
+<section id="drip">
+  <h2>DRIP CLIENT 🌟</h2>
+  <p>Андроид 👑 БЕЗ БАНА</p>
+  <ul>
+    <li>🎚 Убийство при прицеливании</li>
+    <li>🎚 Тихое убийство</li>
+    <li>🎚 Тихий аимбот</li>
+    <li>🎚 Rage / Legit</li>
+    <li>🎚 Телепорт 8м</li>
+    <li>🎚 ESP линии</li>
+    <li>🎚 Ранг CS / BR</li>
+  </ul>
+  <p>
+    1 день — 300₽ (~$3.3)<br>
+    7 дней — 600₽ (~$6.6)<br>
+    15 дней — 900₽ (~$10)<br>
+    30 дней — 1500₽ (~$16)
+  </p>
+</section>
+
+<section id="reviews">
+  <h2>Отзывы</h2>
+  <textarea id="review-text" placeholder="Напишите отзыв..."></textarea>
+  <button class="btn" id="send-review">Отправить</button>
+  <div id="reviews-list"></div>
+</section>
+
+<section id="settings">
+  <h2>Настройки</h2>
+  <p>Telegram: <b>@garoux24</b></p>
+  <button class="btn" id="logout-btn">Выйти</button>
+</section>
+
+<nav>
+  <button class="active" onclick="show('guild')">Гильдия</button>
+  <button onclick="show('drip')">Drip</button>
+  <button onclick="show('reviews')">Отзывы</button>
+  <button onclick="show('settings')">Настройки</button>
+</nav>
+
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
   authDomain: "ffgaroux-a58e7.firebaseapp.com",
-  projectId: "ffgaroux-a58e7",
+  projectId: "ffgaroux-a58e7"
+});
+const db = getFirestore(app);
+let currentUser = null;
+
+login-btn.onclick = async () => {
+  const snap = await getDocs(collection(db,"users"));
+  snap.forEach(d=>{
+    const u=d.data();
+    if(u.nickname===nickname.value && u.password===password.value){
+      currentUser=u.nickname;
+      auth-container.style.display="none";
+      app.style.display="block";
+      loadReviews();
+    }
+  });
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-window.db = db;
-</script><style>
-:root{
---bg:#05050d;--card:#0e1022;--accent:#ff9f0a;--accent2:#ff3c3c;--text:#fff;--muted:#9aa0d1}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,Arial;background:linear-gradient(180deg,#05050d,#0b0d1a);color:var(--text)}
-.hidden{display:none}
+register-btn.onclick = async () => {
+  await addDoc(collection(db,"users"),{nickname:nickname.value,password:password.value});
+  auth-message.textContent="Регистрация успешна";
+};
 
-header{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(5,5,13,.9);backdrop-filter:blur(10px);z-index:10}
-header img{width:38px;height:38px;border-radius:50%}
-header h1{font-size:18px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-
-section{padding:90px 16px 40px;max-width:1100px;margin:auto}
-.hero{padding:34px;border-radius:26px;background:radial-gradient(circle at top,rgba(255,60,60,.25),transparent 60%)}
-.hero h2{font-size:28px}
-.hero p{color:var(--muted);line-height:1.7}
-
-.btn{display:inline-block;margin-top:16px;padding:14px 24px;border-radius:16px;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;box-shadow:0 0 25px rgba(255,60,60,.45)}
-
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:26px 0}
-.card{background:var(--card);padding:20px;border-radius:22px}
-.card h3{margin:0 0 6px}
-.list p{margin:8px 0;color:var(--muted)}
-
-.bottom-nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0e1022;border-radius:26px;display:flex;gap:6px;padding:6px;box-shadow:0 10px 40px rgba(0,0,0,.7)}
-.bottom-nav button{background:none;border:none;color:#cfd3ff;padding:14px 18px;border-radius:18px;font-weight:600}
-.bottom-nav button.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
-
-.auth{max-width:420px;margin:120px auto;background:var(--card);padding:24px;border-radius:26px}
-input,textarea,select{width:100%;margin:8px 0;padding:12px;border-radius:14px;border:none}
-.review{background:#1a1c33;padding:14px;border-radius:14px;margin-bottom:10px}
-small{color:#8c92c9}
-</style></head>
-<body><header>
-<img src="bg.jpg">
-<h1>FFGarouX</h1>
-</header><!-- AUTH --><div class="auth" id="auth">
-<h2>Вход / Регистрация</h2>
-<input id="nick" placeholder="Ник">
-<input id="pass" type="password" placeholder="Пароль">
-<button class="btn" onclick="register()">Регистрация</button>
-<button class="btn" onclick="login()">Войти</button>
-<p id="authMsg"></p>
-</div><!-- GUILD --><section id="guild" class="hidden">
-<div class="hero">
-<h2>Доминируйте в славе клана автоматически</h2>
-<p>Самая продвинутая система автоматизации клановой славы Free Fire. Поднимите рейтинг клана, пока спите, с помощью нашей интеллектуальной технологии ботов.</p>
-<a class="btn" href="https://t.me/garoux24" target="_blank">Начните сейчас</a>
-</div><div class="grid">
-<div class="card"><h3>40M+</h3><p>Слава, заслуженная ежедневно</p></div>
-<div class="card"><h3>101%</h3><p>Время отработки</p></div>
-<div class="card"><h3>50+</h3><p>Активные пользователи</p></div>
-<div class="card"><h3>+200k</h3><p>Славы в час</p></div>
-</div><div class="card">
-<h3>Почему выбрали FFGarouX?</h3>
-<div class="list">
-<p>Умная автоматизация — боты работают 24/7</p>
-<p>Панель управления в реальном времени</p>
-<p>Многорегиональная поддержка и Telegram</p>
-<p>Продвинутая безопасность аккаунта</p>
-<p>Круглосуточная поддержка</p>
-</div>
-</div><div class="card">
-<h3>Как это работает</h3>
-<div class="list">
-<p>01 — Купить ботов</p>
-<p>02 — Открыть гильдию</p>
-<p>03 — Отправить Clan ID и чек</p>
-<p>04 — Смотреть, как растёт слава</p>
-</div>
-</div><div class="card">
-<h3>Цены</h3>
-<p><b>1000₽</b> — 1 отряд ботов (3 игрока)</p>
-<a class="btn" href="https://t.me/garoux24" target="_blank">Купить</a>
-</div></section><!-- DRIP --><section id="drip" class="hidden">
-<div class="hero">
-<h2>DRIP KLIENT 🌟</h2>
-<p>Читы без бана • Android 👑 • БЕЗ БАНА 👑</p>
-<a class="btn" href="https://t.me/garoux24" target="_blank">Купить ключ</a>
-</div>
-<div class="card list">
-<p>🎚 Убийство при прицеливании</p>
-<p>🎚 Тихое убийство при прицеливании</p>
-<p>🎚 Тихий аимбот</p>
-<p>🎚 Аимбот Rage / Legit</p>
-<p>🎚 Таймер скорости</p>
-<p>🎚 Телепорт 8м</p>
-<p>🎚 Поднять игрока</p>
-<p>🎚 Призрачный хак</p>
-<p>🎚 Высота полёта</p>
-<p>🎚 Скорость полёта</p>
-<p>🎚 ESP линия местоположения</p>
-<p>🎚 Ранг CS / BR работает</p>
-</div>
-<div class="card">
-<p>1 день — 300₽ (~$3.3)</p>
-<p>7 дней — 600₽ (~$6.6)</p>
-<p>15 дней — 900₽ (~$9.9)</p>
-<p>30 дней — 1500₽ (~$16.5)</p>
-</div>
-</section><!-- REVIEWS --><section id="reviews" class="hidden">
-<h2>Отзывы</h2>
-<textarea id="reviewText" placeholder="Ваш отзыв..."></textarea>
-<button class="btn" onclick="sendReview()">Отправить</button>
-<div id="reviewsList"></div>
-</section><!-- SETTINGS --><section id="settings" class="hidden">
-<div class="card">
-<h2>Настройки</h2>
-<select><option>Русский</option><option>English</option><option>العربية</option></select>
-<p>Telegram: @garoux24</p>
-<button class="btn" onclick="logout()">Выйти</button>
-</div>
-</section><div class="bottom-nav" id="nav" style="display:none">
-<button class="active" onclick="openTab('guild')">Гильдия</button>
-<button onclick="openTab('drip')">Drip</button>
-<button onclick="openTab('reviews')">Отзывы</button>
-<button onclick="openTab('settings')">⚙</button>
-</div><script>
-let currentUser=null;
-
-async function register(){
- if(!nick.value||!pass.value){authMsg.textContent='Введите ник и пароль';return}
- const s=await getDocs(collection(window.db,'users'));
- let exists=false;
- s.forEach(d=>{if(d.data().nick===nick.value)exists=true});
- if(exists){authMsg.textContent='Такой ник уже существует';return}
- await addDoc(collection(window.db,'users'),{nick:nick.value,pass:pass.value});
- authMsg.textContent='Регистрация успешна. Теперь войдите.';
-});
- authMsg.textContent='Регистрация успешна, войдите';
-}
-
-async function login(){
- const s=await getDocs(collection(window.db,'users'));
- let ok=false;
- s.forEach(d=>{
-  if(d.data().nick===nick.value && d.data().pass===pass.value){ok=true}
- });
- if(!ok){authMsg.textContent='Неверный логин или пароль';return}
- currentUser=nick.value;
- document.getElementById('auth').style.display='none';
- document.getElementById('guild').classList.remove('hidden');
- document.getElementById('nav').style.display='flex';
- loadReviews();
-});
- if(!ok)return authMsg.textContent='Неверные данные';
- currentUser=nick.value;
- auth.classList.add('hidden');
- guild.classList.remove('hidden');
- nav.classList.remove('hidden');
- loadReviews();
-}
-
-function logout(){location.reload()}
-
-function openTab(t){['guild','drip','reviews','settings'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(t).classList.remove('hidden');document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active')}
-
-async function sendReview(){
- if(!currentUser){alert('Сначала войдите');return}
- if(!reviewText.value)return;
- await addDoc(collection(window.db,'reviews'),{
-  user:currentUser,
-  text:reviewText.value,
-  time:Date.now()
- });
- reviewText.value='';
- loadReviews();
-});
- reviewText.value='';
- loadReviews();
-}
+send-review.onclick = async ()=>{
+  if(!currentUser) return;
+  await addDoc(collection(db,"reviews"),{
+    nickname:currentUser,
+    text:review-text.value,
+    time:Date.now()
+  });
+  review-text.value="";
+  loadReviews();
+};
 
 async function loadReviews(){
- reviewsList.innerHTML='';
- const s=await getDocs(collection(window.db,'reviews'));
- s.forEach(d=>{
-  const r=document.createElement('div');
-  r.className='review';
-  r.innerHTML='<b>'+d.data().user+'</b><br>'+d.data().text+'<br><small>'+new Date(d.data().time).toLocaleString()+'</small>';
-  reviewsList.appendChild(r);
- });
-})
+  reviews-list.innerHTML="";
+  const q=query(collection(db,"reviews"),orderBy("time","desc"));
+  const s=await getDocs(q);
+  s.forEach(d=>{
+    const r=d.data();
+    reviews-list.innerHTML+=`<div class="review"><b>${r.nickname}</b><small>${new Date(r.time).toLocaleString()}</small>${r.text}</div>`;
+  });
 }
-</script></body>
+
+logout-btn.onclick=()=>{
+  app.style.display="none";
+  auth-container.style.display="block";
+};
+
+window.show=id=>{
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+}
+</script>
+
+</body>
 </html>
