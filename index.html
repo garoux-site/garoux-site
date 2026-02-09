@@ -194,7 +194,7 @@
   </nav>
 </div>
 
-<!-- Firebase -->
+<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -211,64 +211,100 @@
     databaseURL: "https://ffgaroux-a58e7-default-rtdb.europe-west1.firebasedatabase.app/"
   };
 
+  console.log("Попытка подключения к Firebase...");
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
+  console.log("Firebase подключён успешно");
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
+      console.log("Пользователь вошёл:", user.uid);
       document.getElementById('authPage').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
       loadMessages();
     } else {
+      console.log("Пользователь вышел или не авторизован");
       document.getElementById('authPage').style.display = 'flex';
       document.getElementById('dashboard').style.display = 'none';
     }
   });
 
   function signUp() {
+    console.log("Нажата кнопка Sign Up");
     const username = document.getElementById('signUpUsername').value.trim();
     const password = document.getElementById('signUpPassword').value.trim();
     const confirm = document.getElementById('signUpConfirm').value.trim();
 
-    if (!username) return document.getElementById('regMessage').innerText = 'Введите ник!';
-    if (password !== confirm) return document.getElementById('regMessage').innerText = 'Пароли не совпадают!';
+    if (!username) {
+      document.getElementById('regMessage').innerText = 'Введите ник!';
+      console.log("Ошибка: ник пустой");
+      return;
+    }
+    if (password !== confirm) {
+      document.getElementById('regMessage').innerText = 'Пароли не совпадают!';
+      console.log("Ошибка: пароли не совпадают");
+      return;
+    }
 
     const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
+    console.log("Попытка регистрации:", fakeEmail);
 
     createUserWithEmailAndPassword(auth, fakeEmail, password)
       .then((userCredential) => {
+        console.log("Регистрация успешна:", userCredential.user.uid);
         set(ref(db, 'users/' + userCredential.user.uid), { username });
-        alert('Регистрация успешна! Войдите под ником: ' + username);
+        document.getElementById('regMessage').innerText = '';
+        alert('Регистрация успешна! Теперь войдите под ником: ' + username);
         showLogin();
       })
       .catch((error) => {
+        console.error("Ошибка регистрации:", error.code, error.message);
         if (error.code === 'auth/email-already-in-use') {
           document.getElementById('regMessage').innerText = 'Этот ник уже занят!';
+        } else if (error.code === 'auth/weak-password') {
+          document.getElementById('regMessage').innerText = 'Пароль слишком слабый (минимум 6 символов)!';
         } else {
-          document.getElementById('regMessage').innerText = error.message;
+          document.getElementById('regMessage').innerText = 'Ошибка: ' + error.message;
         }
       });
   }
 
   function signIn() {
+    console.log("Нажата кнопка Sign In");
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    if (!username) return document.getElementById('authMessage').innerText = 'Введите ник!';
+    if (!username) {
+      document.getElementById('authMessage').innerText = 'Введите ник!';
+      console.log("Ошибка: ник пустой");
+      return;
+    }
 
     const fakeEmail = `${username.toLowerCase()}@fake.ffgaroux.com`;
+    console.log("Попытка входа:", fakeEmail);
 
     signInWithEmailAndPassword(auth, fakeEmail, password)
-      .then(() => alert('Вход успешен!'))
-      .catch(() => document.getElementById('authMessage').innerText = 'Нет такого аккаунта или неверный пароль!');
+      .then(() => {
+        console.log("Вход успешен");
+        document.getElementById('authMessage').innerText = '';
+        alert('Вход успешен!');
+      })
+      .catch((error) => {
+        console.error("Ошибка входа:", error.code, error.message);
+        document.getElementById('authMessage').innerText = 'Нет такого аккаунта или неверный пароль!';
+      });
   }
 
   function logout() {
-    signOut(auth);
+    signOut(auth).then(() => {
+      console.log("Выход выполнен");
+      alert('Вы вышли');
+    });
   }
 
   function showSignUp() {
+    console.log("Переход на регистрацию");
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('signUpForm').style.display = 'block';
     document.getElementById('authMessage').innerText = '';
@@ -276,6 +312,7 @@
   }
 
   function showLogin() {
+    console.log("Переход на вход");
     document.getElementById('signUpForm').style.display = 'none';
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('authMessage').innerText = '';
