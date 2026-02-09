@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FFGarouX</title>
-
 <style>
 body {
   margin:0;
-  font-family: Arial, sans-serif;
+  font-family:Arial, sans-serif;
   background:#05050d;
   color:#fff;
 }
@@ -19,10 +18,9 @@ body {
   margin:80px auto;
   padding:25px;
   background:#0e1022;
-  border-radius:10px;
+  border-radius:12px;
   text-align:center;
 }
-
 #auth-container input,
 #auth-container button {
   width:100%;
@@ -31,27 +29,83 @@ body {
   border:none;
   border-radius:6px;
 }
-
 #auth-container button {
   background:linear-gradient(90deg,#ff3c3c,#00e0ff);
   color:#fff;
   font-weight:bold;
   cursor:pointer;
 }
-
-#auth-message {
-  color:#ff6b6b;
-}
+#auth-message { color:#ff6b6b; }
 
 /* APP */
-#reviews-container {
-  display:none;
-  max-width:600px;
-  margin:40px auto;
-  padding:20px;
+#app { display:none; }
+header {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:15px;
   background:#0e1022;
-  border-radius:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
 }
+header img { width:40px; height:40px; border-radius:8px; }
+header h1 { margin:0; font-size:18px; }
+
+/* SECTIONS */
+section {
+  display:none;
+  padding:20px;
+  overflow-y:auto;
+  max-height:calc(100vh - 120px);
+}
+section.active { display:block; }
+
+/* STATS */
+.stats {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+.stat {
+  background:#1a1c33;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+}
+
+/* REVIEWS */
+.review {
+  background:#1a1c33;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+.review small {
+  display:block;
+  color:#aaa;
+  font-size:11px;
+}
+
+/* BOTTOM MENU */
+nav {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#0e1022;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+}
+nav button {
+  background:none;
+  border:none;
+  color:#aaa;
+  font-size:12px;
+  cursor:pointer;
+}
+nav button.active { color:#00e0ff; }
 
 textarea {
   width:100%;
@@ -61,165 +115,187 @@ textarea {
   resize:none;
 }
 
-.review {
-  background:#1a1c33;
-  padding:10px;
-  border-radius:6px;
-  margin-top:10px;
-}
-
-.review small {
-  display:block;
-  color:#aaa;
-  font-size:11px;
+.btn {
+  display:inline-block;
+  padding:10px 15px;
+  margin:10px 0;
+  background:linear-gradient(90deg,#ff3c3c,#00e0ff);
+  border-radius:8px;
+  color:#fff;
+  text-decoration:none;
+  font-weight:bold;
+  cursor:pointer;
 }
 </style>
 </head>
-
 <body>
 
-<!-- LOGIN / REGISTER -->
+<!-- AUTH -->
 <div id="auth-container">
   <h2>FFGarouX</h2>
-
   <input type="text" id="nickname" placeholder="Ваш ник">
   <input type="password" id="password" placeholder="Пароль">
-
   <button id="register-btn">Регистрация</button>
   <button id="login-btn">Войти</button>
-
   <p id="auth-message"></p>
 </div>
 
 <!-- APP -->
-<div id="reviews-container">
-  <h2>Отзывы</h2>
+<div id="app">
+<header>
+  <img src="bg.jpg" alt="Логотип">
+  <h1>FFGarouX</h1>
+</header>
 
-  <textarea id="review-text" placeholder="Напишите отзыв..."></textarea>
-  <button id="send-review">Отправить</button>
+<!-- Гильдия -->
+<section id="guild" class="active">
+  <h2>Доминируйте в славе клана автоматически</h2>
+  <p>Самая продвинутая система автоматизации клановой славы Free Fire. Поднимите рейтинг клана, пока спите, с помощью нашей интеллектуальной технологии ботов.</p>
 
-  <div id="reviews-list"></div>
+  <div class="stats">
+    <div class="stat"><b>40M+</b><br>Слава ежедневно</div>
+    <div class="stat"><b>101%</b><br>Время отработки</div>
+    <div class="stat"><b>50+</b><br>Активные пользователи</div>
+    <div class="stat"><b>100%</b><br>Безопасно</div>
+  </div>
 
-  <button id="logout-btn" style="margin-top:15px;background:#ff4c4c;color:#fff;border:none;padding:10px;border-radius:6px;">
-    Выйти
-  </button>
+  <a class="btn" href="https://t.me/garoux24" target="_blank">Начать / Telegram</a>
+</section>
+
+<!-- Drip Client -->
+<section id="drip">
+<h2>DRIP CLIENT 🌟</h2>
+<p>Андроид 👑 БЕЗ БАНА</p>
+<ul>
+<li>🎚 Убийство при прицеливании</li>
+<li>🎚 Тихое убийство при</li>
+<li>🎚 Тихий аимбот</li>
+<li>🎚 Аимбот Rage / Legit</li>
+<li>🎚 Таймер скорости</li>
+<li>🎚 Телепорт 8м</li>
+<li>🎚 Поднять игрока</li>
+<li>🎚 Призрачный хак</li>
+<li>🎚 Высота полёта</li>
+<li>🎚 Скорость полёта</li>
+<li>🎚 ESP линия местоположения</li>
+<li>🎚 Ранг CS / BR работает</li>
+</ul>
+<p>
+КЛЮЧИ 🔑<br>
+1 день — 300₽ (~$3.3)<br>
+7 дней — 600₽ (~$6.6)<br>
+15 дней — 900₽ (~$10)<br>
+30 дней — 1500₽ (~$16)
+</p>
+</section>
+
+<!-- Отзывы -->
+<section id="reviews">
+<h2>Отзывы</h2>
+<textarea id="review-text" placeholder="Напишите отзыв..."></textarea>
+<button id="send-review">Отправить</button>
+<div id="reviews-list"></div>
+</section>
+
+<!-- Настройки -->
+<section id="settings">
+<h2>Настройки</h2>
+<p>Telegram: <b>@garoux24</b></p>
+<button id="logout-btn" class="btn">Выйти</button>
+</section>
+
+<!-- Нижнее меню -->
+<nav>
+<button class="active" onclick="show('guild')">Гильдия</button>
+<button onclick="show('drip')">Drip</button>
+<button onclick="show('reviews')">Отзывы</button>
+<button onclick="show('settings')">Настройки</button>
+</nav>
 </div>
 
-<!-- FIREBASE -->
+<!-- FIREBASE JS -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
-  authDomain: "ffgaroux-a58e7.firebaseapp.com",
-  projectId: "ffgaroux-a58e7"
+apiKey:"AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
+authDomain:"ffgaroux-a58e7.firebaseapp.com",
+projectId:"ffgaroux-a58e7"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let currentUser = null;
+let currentUser=null;
 
 // DOM
-const authContainer = document.getElementById("auth-container");
-const reviewsContainer = document.getElementById("reviews-container");
-const nicknameInput = document.getElementById("nickname");
-const passwordInput = document.getElementById("password");
-const authMessage = document.getElementById("auth-message");
-const reviewsList = document.getElementById("reviews-list");
-const reviewText = document.getElementById("review-text");
+const authContainer=document.getElementById("auth-container");
+const appContainer=document.getElementById("app");
+const nicknameInput=document.getElementById("nickname");
+const passwordInput=document.getElementById("password");
+const authMessage=document.getElementById("auth-message");
+const reviewsList=document.getElementById("reviews-list");
+const reviewText=document.getElementById("review-text");
 
 // REGISTER
-document.getElementById("register-btn").onclick = async () => {
-  const nick = nicknameInput.value.trim();
-  const pass = passwordInput.value.trim();
-  if (!nick || !pass) {
-    authMessage.textContent = "Заполните оба поля";
-    return;
-  }
-
-  await addDoc(collection(db, "users"), {
-    nickname: nick,
-    password: pass
-  });
-
-  authMessage.textContent = "Регистрация успешна. Теперь войдите.";
+document.getElementById("register-btn").onclick=async()=>{
+const nick=nicknameInput.value.trim();
+const pass=passwordInput.value.trim();
+if(!nick||!pass){authMessage.textContent="Заполните оба поля"; return;}
+await addDoc(collection(db,"users"),{nickname:nick,password:pass});
+authMessage.textContent="Регистрация успешна! Теперь войдите.";
 };
 
 // LOGIN
-document.getElementById("login-btn").onclick = async () => {
-  const nick = nicknameInput.value.trim();
-  const pass = passwordInput.value.trim();
-
-  const snap = await getDocs(collection(db, "users"));
-  let found = false;
-
-  snap.forEach(doc => {
-    const u = doc.data();
-    if (u.nickname === nick && u.password === pass) {
-      found = true;
-    }
-  });
-
-  if (!found) {
-    authMessage.textContent = "Неверный ник или пароль";
-    return;
-  }
-
-  currentUser = nick;
-  authContainer.style.display = "none";
-  reviewsContainer.style.display = "block";
-  loadReviews();
+document.getElementById("login-btn").onclick=async()=>{
+const nick=nicknameInput.value.trim();
+const pass=passwordInput.value.trim();
+const snap=await getDocs(collection(db,"users"));
+let found=false;
+snap.forEach(doc=>{const u=doc.data(); if(u.nickname===nick && u.password===pass) found=true;});
+if(!found){authMessage.textContent="Неверный ник или пароль"; return;}
+currentUser=nick;
+authContainer.style.display="none";
+appContainer.style.display="block";
+loadReviews();
 };
 
 // SEND REVIEW
-document.getElementById("send-review").onclick = async () => {
-  if (!reviewText.value.trim()) return;
-
-  await addDoc(collection(db, "reviews"), {
-    nickname: currentUser,
-    text: reviewText.value,
-    time: Date.now()
-  });
-
-  reviewText.value = "";
-  loadReviews();
+document.getElementById("send-review").onclick=async()=>{
+if(!reviewText.value.trim()) return;
+await addDoc(collection(db,"reviews"),{nickname:currentUser,text:reviewText.value,time:Date.now()});
+reviewText.value="";
+loadReviews();
 };
 
 // LOAD REVIEWS
-async function loadReviews() {
-  reviewsList.innerHTML = "";
-  const q = query(collection(db, "reviews"), orderBy("time", "desc"));
-  const snap = await getDocs(q);
-
-  snap.forEach(doc => {
-    const r = doc.data();
-    const div = document.createElement("div");
-    div.className = "review";
-    div.innerHTML = `
-      <b>${r.nickname}</b>
-      <small>${new Date(r.time).toLocaleString()}</small>
-      <div>${r.text}</div>
-    `;
-    reviewsList.appendChild(div);
-  });
+async function loadReviews(){
+reviewsList.innerHTML="";
+const q=query(collection(db,"reviews"),orderBy("time","desc"));
+const snap=await getDocs(q);
+snap.forEach(doc=>{
+const r=doc.data();
+const div=document.createElement("div");
+div.className="review";
+div.innerHTML=`<b>${r.nickname}</b><small>${new Date(r.time).toLocaleString()}</small><div>${r.text}</div>`;
+reviewsList.appendChild(div);
+});
 }
 
 // LOGOUT
-document.getElementById("logout-btn").onclick = () => {
-  currentUser = null;
-  reviewsContainer.style.display = "none";
-  authContainer.style.display = "block";
+document.getElementById("logout-btn").onclick=()=>{
+currentUser=null;
+appContainer.style.display="none";
+authContainer.style.display="block";
 };
-</script>
 
+// SHOW SECTIONS
+function show(id){
+document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+event.target.classList.add("active");
+}
+</script>
 </body>
 </html>
