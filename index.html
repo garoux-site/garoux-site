@@ -126,7 +126,7 @@ small{color:#8c92c9}
 <p>Telegram: @garoux24</p>
 <button class="btn" onclick="logout()">Выйти</button>
 </div>
-</section><div class="bottom-nav hidden" id="nav">
+</section><div class="bottom-nav" id="nav" style="display:none">
 <button class="active" onclick="openTab('guild')">Гильдия</button>
 <button onclick="openTab('drip')">Drip</button>
 <button onclick="openTab('reviews')">Отзывы</button>
@@ -135,15 +135,30 @@ small{color:#8c92c9}
 let currentUser=null;
 
 async function register(){
- if(!nick.value||!pass.value)return authMsg.textContent='Введите ник и пароль';
+ if(!nick.value||!pass.value){authMsg.textContent='Введите ник и пароль';return}
+ const s=await getDocs(collection(window.db,'users'));
+ let exists=false;
+ s.forEach(d=>{if(d.data().nick===nick.value)exists=true});
+ if(exists){authMsg.textContent='Такой ник уже существует';return}
  await addDoc(collection(window.db,'users'),{nick:nick.value,pass:pass.value});
+ authMsg.textContent='Регистрация успешна. Теперь войдите.';
+});
  authMsg.textContent='Регистрация успешна, войдите';
 }
 
 async function login(){
  const s=await getDocs(collection(window.db,'users'));
  let ok=false;
- s.forEach(d=>{if(d.data().nick===nick.value&&d.data().pass===pass.value)ok=true});
+ s.forEach(d=>{
+  if(d.data().nick===nick.value && d.data().pass===pass.value){ok=true}
+ });
+ if(!ok){authMsg.textContent='Неверный логин или пароль';return}
+ currentUser=nick.value;
+ document.getElementById('auth').style.display='none';
+ document.getElementById('guild').classList.remove('hidden');
+ document.getElementById('nav').style.display='flex';
+ loadReviews();
+});
  if(!ok)return authMsg.textContent='Неверные данные';
  currentUser=nick.value;
  auth.classList.add('hidden');
@@ -157,22 +172,30 @@ function logout(){location.reload()}
 function openTab(t){['guild','drip','reviews','settings'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(t).classList.remove('hidden');document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active')}
 
 async function sendReview(){
+ if(!currentUser){alert('Сначала войдите');return}
  if(!reviewText.value)return;
- await addDoc(collection(window.db,'reviews'),{user:currentUser,text:reviewText.value,time:new Date().toISOString()});
+ await addDoc(collection(window.db,'reviews'),{
+  user:currentUser,
+  text:reviewText.value,
+  time:Date.now()
+ });
+ reviewText.value='';
+ loadReviews();
+});
  reviewText.value='';
  loadReviews();
 }
 
 async function loadReviews(){
  reviewsList.innerHTML='';
- const q=query(collection(window.db,'reviews'),orderBy('time','desc'));
- const s=await getDocs(q);
+ const s=await getDocs(collection(window.db,'reviews'));
  s.forEach(d=>{
   const r=document.createElement('div');
   r.className='review';
   r.innerHTML='<b>'+d.data().user+'</b><br>'+d.data().text+'<br><small>'+new Date(d.data().time).toLocaleString()+'</small>';
   reviewsList.appendChild(r);
- })
+ });
+})
 }
 </script></body>
 </html>
