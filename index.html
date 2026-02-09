@@ -2,181 +2,146 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FFGarouX</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:radial-gradient(circle at top,#0f1230,#05050d);
-  color:#fff;
-}
-.center{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.card{
-  width:320px;
-  background:rgba(20,25,60,.75);
-  backdrop-filter:blur(12px);
-  border-radius:22px;
-  padding:25px;
-  box-shadow:0 20px 50px rgba(0,0,0,.6);
-}
-.logo{
-  text-align:center;
-  margin-bottom:20px;
-}
-.logo img{
-  width:72px;
-  height:72px;
-  border-radius:50%;
-}
-input{
-  width:100%;
-  padding:14px;
-  margin:10px 0;
-  border:none;
-  border-radius:14px;
-  outline:none;
-  background:#0b0f2a;
-  color:#fff;
-}
-button{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:18px;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-  margin-top:10px;
-}
-.btn-login{
-  background:linear-gradient(90deg,#ff3b6a,#28e0ff);
-  color:#fff;
-}
-.btn-reg{
-  background:#1a1f4d;
-  color:#ccc;
-}
-#app{
-  display:none;
-  padding:20px;
-  max-width:500px;
-  margin:auto;
-}
-.review{
-  background:#0e1235;
-  padding:12px;
-  border-radius:14px;
-  margin-bottom:10px;
-}
-.review b{color:#4fdcff}
+  body { font-family: Arial; background: #05050d; color: #fff; margin:0; padding:0; }
+  .container { max-width: 500px; margin: 50px auto; padding: 20px; background: #0e1022; border-radius: 10px; }
+  input, button, textarea { width: 100%; margin: 10px 0; padding: 10px; border-radius: 5px; border: none; }
+  button { cursor: pointer; background: linear-gradient(90deg, #ff3c3c, #00e0ff); color: #fff; font-weight: bold; }
+  textarea { resize: none; }
+  .reviews { margin-top: 20px; }
+  .review { padding: 10px; background: #1a1c33; border-radius: 5px; margin-bottom: 10px; }
 </style>
 </head>
-
 <body>
-
-<!-- AUTH -->
-<div class="center" id="auth">
-  <div class="card">
-    <div class="logo">
-      <img src="bg.jpg">
-      <h3>FFGarouX</h3>
-    </div>
-    <input id="nick" placeholder="Никнейм">
-    <input id="pass" type="password" placeholder="Пароль">
-    <button class="btn-login" id="loginBtn">Войти</button>
-    <button class="btn-reg" id="regBtn">Регистрация</button>
-  </div>
+<div class="container" id="auth-container">
+  <h2>FFGarouX</h2>
+  <input type="text" id="nickname" placeholder="Ваш ник">
+  <input type="password" id="password" placeholder="Пароль">
+  <button id="register-btn">Регистрация</button>
+  <button id="login-btn">Войти</button>
+  <p id="auth-message"></p>
 </div>
 
-<!-- APP -->
-<div id="app">
+<div class="container" id="reviews-container" style="display:none;">
   <h2>Отзывы</h2>
-  <div id="reviews"></div>
-  <input id="reviewText" placeholder="Написать отзыв">
-  <button class="btn-login" id="sendReview">Отправить</button>
-  <br><br>
-  <button class="btn-reg" id="logout">Выйти</button>
+  <textarea id="review-text" placeholder="Напишите отзыв..."></textarea>
+  <button id="send-review">Отправить</button>
+  <div class="reviews" id="reviews-list"></div>
+  <button id="logout-btn" style="background:#ff4c4c;">Выйти</button>
 </div>
 
+<!-- Firebase SDK -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
-/* 🔥 ТВОЙ FIREBASE CONFIG — УЖЕ ВСТАВЛЕН 🔥 */
-const firebaseConfig = {
-  apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
-  authDomain: "ffgaroux-a58e7.firebaseapp.com",
-  projectId: "ffgaroux-a58e7",
-  storageBucket: "ffgaroux-a58e7.firebasestorage.app",
-  messagingSenderId: "967486028392",
-  appId: "1:967486028392:web:3de0f014b77d0ac27659dd"
-};
+  // 🔥 Вставь сюда свой Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
+    authDomain: "ffgaroux-a58e7.firebaseapp.com",
+    projectId: "ffgaroux-a58e7",
+    storageBucket: "ffgaroux-a58e7.firebasestorage.app",
+    messagingSenderId: "967486028392",
+    appId: "1:967486028392:web:3de0f014b77d0ac27659dd",
+    measurementId: "G-Y1VCLD1VKM"
+  };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-const authBox = document.getElementById("auth");
-const appBox = document.getElementById("app");
+  let currentUser = null;
 
-function nickToEmail(nick){
-  return nick.toLowerCase().replace(/\s+/g,'') + "@ffgaroux.app";
-}
+  // DOM элементы
+  const authContainer = document.getElementById('auth-container');
+  const reviewsContainer = document.getElementById('reviews-container');
+  const nicknameInput = document.getElementById('nickname');
+  const passwordInput = document.getElementById('password');
+  const authMessage = document.getElementById('auth-message');
+  const reviewsList = document.getElementById('reviews-list');
+  const reviewText = document.getElementById('review-text');
 
-loginBtn.onclick = () => {
-  if(!nick.value || !pass.value) return alert("Заполни все поля");
-  signInWithEmailAndPassword(auth, nickToEmail(nick.value), pass.value)
-    .catch(()=>alert("Неверный ник или пароль"));
-};
+  // Регистрация
+  document.getElementById('register-btn').onclick = async () => {
+    const nick = nicknameInput.value.trim();
+    const pass = passwordInput.value.trim();
+    if(!nick || !pass) return authMessage.textContent = "Заполните оба поля!";
+    
+    try {
+      // Сохраняем ник + пароль как документ (не безопасно для реального проекта, но для простого демо ок)
+      await addDoc(collection(db, "users"), { nickname: nick, password: pass });
+      authMessage.textContent = "Регистрация успешна! Теперь войдите.";
+    } catch(e) {
+      authMessage.textContent = "Ошибка регистрации!";
+      console.error(e);
+    }
+  };
 
-regBtn.onclick = () => {
-  if(nick.value.length < 3) return alert("Ник минимум 3 символа");
-  if(pass.value.length < 6) return alert("Пароль минимум 6 символов");
-  createUserWithEmailAndPassword(auth, nickToEmail(nick.value), pass.value)
-    .catch(()=>alert("Ник уже занят или ошибка"));
-};
+  // Вход
+  document.getElementById('login-btn').onclick = async () => {
+    const nick = nicknameInput.value.trim();
+    const pass = passwordInput.value.trim();
+    if(!nick || !pass) return authMessage.textContent = "Заполните оба поля!";
 
-logout.onclick = () => signOut(auth);
+    try {
+      const usersCol = collection(db, "users");
+      const usersSnap = await getDocs(usersCol);
+      let found = false;
+      usersSnap.forEach(doc => {
+        const data = doc.data();
+        if(data.nickname === nick && data.password === pass) found = true;
+      });
+      if(found){
+        currentUser = nick;
+        authContainer.style.display = "none";
+        reviewsContainer.style.display = "block";
+        loadReviews();
+      } else {
+        authMessage.textContent = "Неверный ник или пароль!";
+      }
+    } catch(e){
+      authMessage.textContent = "Ошибка входа!";
+      console.error(e);
+    }
+  };
 
-sendReview.onclick = async () => {
-  if(!reviewText.value) return;
-  await addDoc(collection(db,"reviews"),{
-    nick:nick.value,
-    text:reviewText.value,
-    time:serverTimestamp()
-  });
-  reviewText.value="";
-  loadReviews();
-};
+  // Отправка отзыва
+  document.getElementById('send-review').onclick = async () => {
+    const text = reviewText.value.trim();
+    if(!text) return;
+    try {
+      await addDoc(collection(db, "reviews"), { nickname: currentUser, text: text, time: new Date().toISOString() });
+      reviewText.value = "";
+      loadReviews();
+    } catch(e){
+      console.error(e);
+    }
+  };
 
-async function loadReviews(){
-  reviews.innerHTML="";
-  const q = query(collection(db,"reviews"), orderBy("time","desc"));
-  const snap = await getDocs(q);
-  snap.forEach(d=>{
-    const r=d.data();
-    reviews.innerHTML += `<div class="review"><b>${r.nick}</b><br>${r.text}</div>`;
-  });
-}
-
-onAuthStateChanged(auth,user=>{
-  if(user){
-    authBox.style.display="none";
-    appBox.style.display="block";
-    loadReviews();
-  }else{
-    authBox.style.display="flex";
-    appBox.style.display="none";
+  // Загрузка отзывов
+  async function loadReviews() {
+    reviewsList.innerHTML = "";
+    const q = query(collection(db, "reviews"), orderBy("time", "desc"));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      const div = document.createElement('div');
+      div.className = "review";
+      div.textContent = `${data.nickname}: ${data.text}`;
+      reviewsList.appendChild(div);
+    });
   }
-});
-</script>
 
+  // Выход
+  document.getElementById('logout-btn').onclick = () => {
+    currentUser = null;
+    authContainer.style.display = "block";
+    reviewsContainer.style.display = "none";
+    nicknameInput.value = "";
+    passwordInput.value = "";
+    authMessage.textContent = "";
+  };
+</script>
 </body>
 </html>
