@@ -3,145 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FFGarouX</title>
+<title>FFGarouX Panel</title>
 <style>
-  body { font-family: Arial; background: #05050d; color: #fff; margin:0; padding:0; }
-  .container { max-width: 500px; margin: 50px auto; padding: 20px; background: #0e1022; border-radius: 10px; }
-  input, button, textarea { width: 100%; margin: 10px 0; padding: 10px; border-radius: 5px; border: none; }
-  button { cursor: pointer; background: linear-gradient(90deg, #ff3c3c, #00e0ff); color: #fff; font-weight: bold; }
-  textarea { resize: none; }
-  .reviews { margin-top: 20px; }
-  .review { padding: 10px; background: #1a1c33; border-radius: 5px; margin-bottom: 10px; }
+  body { margin:0; font-family:'Segoe UI',sans-serif; background:#05050d; color:#fff; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); }
+  .logo { font-size:2rem; font-weight:bold; background:linear-gradient(90deg,#00f0ff,#ff00aa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .menu-btn { font-size:2rem; cursor:pointer; background:none; border:none; color:#fff; }
+  .menu { display:none; position:absolute; top:3.5rem; right:1rem; background:#1a1a2e; padding:1rem; border-radius:12px; border:1px solid rgba(0,240,255,0.3); }
+  .menu button { display:block; width:100%; background:none; border:none; color:#fff; padding:0.8rem; text-align:left; cursor:pointer; border-radius:8px; margin-bottom:5px; transition:0.2s; }
+  .menu button:hover { background:rgba(0,240,255,0.15); color:#00f0ff; }
+  section { display:none; padding:2rem; max-width:800px; margin:0 auto; }
+  section.active { display:block; }
+  h1,h2,h3 { color:#00f0ff; }
+  button.action { padding:1rem 2rem; border-radius:12px; border:none; font-weight:bold; cursor:pointer; margin:1rem 0; background:linear-gradient(90deg,#ff69b4,#00bfff); transition:0.3s; }
+  button.action:hover { transform:scale(1.05); }
+  ul { list-style:none; padding:0; }
+  li { padding:0.8rem; margin:0.5rem 0; background:#1a1a2e; border-radius:8px; border:1px solid rgba(0,240,255,0.1); }
+  input, textarea { width:100%; margin:0.5rem 0; padding:0.8rem; border-radius:8px; border:1px solid #00f0ff; background:#1a1a2e; color:#fff; }
+  textarea { resize:none; }
+  .reviews { max-height:300px; overflow-y:auto; margin-top:1rem; }
+  .review { padding:10px; margin-bottom:10px; background:#272946; border-radius:8px; transition:0.3s; }
+  .review:hover { background:#1a1a33; }
+  nav { position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); padding:1rem 0; border-top:1px solid rgba(0,240,255,0.2); }
+  nav button { background:none; border:none; color:#fff; display:flex; flex-direction:column; align-items:center; padding:0.5rem; border-radius:8px; transition:0.3s; cursor:pointer; }
+  nav button.active { background:rgba(0,240,255,0.15); color:#00f0ff; box-shadow:0 0 15px rgba(0,240,255,0.4); }
+  .toggle { cursor:pointer; color:#00f0ff; text-decoration:underline; margin-top:0.5rem; display:inline-block; }
 </style>
 </head>
 <body>
-<div class="container" id="auth-container">
-  <h2>FFGarouX</h2>
-  <input type="text" id="nickname" placeholder="Ваш ник">
-  <input type="password" id="password" placeholder="Пароль">
-  <button id="register-btn">Регистрация</button>
-  <button id="login-btn">Войти</button>
-  <p id="auth-message"></p>
-</div>
 
-<div class="container" id="reviews-container" style="display:none;">
-  <h2>Отзывы</h2>
-  <textarea id="review-text" placeholder="Напишите отзыв..."></textarea>
-  <button id="send-review">Отправить</button>
+<header>
+  <div class="logo">FFGarouX</div>
+  <button class="menu-btn" onclick="toggleMenu()">•••</button>
+  <div class="menu" id="menu">
+    <button onclick="showSection('guild')">Guild</button>
+    <button onclick="showSection('cheats')">Cheats</button>
+    <button onclick="showSection('reviews')">Reviews</button>
+    <button onclick="showSection('settings')">Settings</button>
+    <button onclick="logout()">Выйти</button>
+  </div>
+</header>
+
+<!-- Guild -->
+<section id="guild" class="active">
+  <h1>Доминируйте в славе клана</h1>
+  <p>Самая продвинутая система автоматизации клановой славы Free Fire. Поднимите рейтинг клана, пока спите, с помощью нашей технологии ботов.</p>
+  <ul>
+    <li>Умная автоматизация — боты работают круглосуточно</li>
+    <li>Панель управления в реальном времени</li>
+    <li>Многорегиональная поддержка</li>
+    <li>100% безопасность</li>
+    <li>Круглосуточная поддержка</li>
+  </ul>
+  <button class="action">Начните своё путешествие прямо сейчас</button>
+</section>
+
+<!-- Cheats -->
+<section id="cheats">
+  <h1>Читы DRIP CLIENT</h1>
+  <p>Android • Без бана</p>
+  <ul>
+    <li>Убийство при прицеливании</li>
+    <li>Тихий аимбот</li>
+    <li>Rage/Legit</li>
+    <li>ESP линии</li>
+    <li>Телепорт 8м</li>
+    <li>Скорость полёта</li>
+  </ul>
+  <h3>Ключи 🔑</h3>
+  <ul>
+    <li>1 день - 300₽</li>
+    <li>7 дней - 600₽</li>
+    <li>15 дней - 900₽</li>
+    <li>30 дней - 1500₽</li>
+  </ul>
+  <p>Купить: <a href="https://t.me/garoux24" style="color:#00f0ff;">Telegram</a></p>
+</section>
+
+<!-- Reviews -->
+<section id="reviews">
+  <h1>Отзывы</h1>
+  <textarea id="review-text" placeholder="Напишите отзыв"></textarea>
+  <button class="action" id="send-review">Отправить</button>
   <div class="reviews" id="reviews-list"></div>
-  <button id="logout-btn" style="background:#ff4c4c;">Выйти</button>
-</div>
+  <div id="users-list"></div>
+</section>
 
-<!-- Firebase SDK -->
+<!-- Settings -->
+<section id="settings">
+  <h1>Настройки</h1>
+  <p>FFGarouX — лучшая панель для гильдий и читов Free Fire.</p>
+  <p>Контакты: <a href="https://t.me/garoux24" style="color:#00f0ff;">Telegram @garoux24</a></p>
+  <button class="action" onclick="changeLanguage()">Сменить язык</button>
+  <button class="action" onclick="logout()">Выйти из аккаунта</button>
+</section>
+
+<nav>
+  <button onclick="showSection('guild')" class="active">Guild</button>
+  <button onclick="showSection('cheats')">Cheats</button>
+  <button onclick="showSection('reviews')">Reviews</button>
+  <button onclick="showSection('settings')">Settings</button>
+</nav>
+
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
-  // 🔥 Вставь сюда свой Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
-    authDomain: "ffgaroux-a58e7.firebaseapp.com",
-    projectId: "ffgaroux-a58e7",
-    storageBucket: "ffgaroux-a58e7.firebasestorage.app",
-    messagingSenderId: "967486028392",
-    appId: "1:967486028392:web:3de0f014b77d0ac27659dd",
-    measurementId: "G-Y1VCLD1VKM"
-  };
+// 🔥 Вставь свой Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
+  authDomain: "ffgaroux-a58e7.firebaseapp.com",
+  projectId: "ffgaroux-a58e7",
+  storageBucket: "ffgaroux-a58e7.firebasestorage.app",
+  messagingSenderId: "967486028392",
+  appId: "1:967486028392:web:3de0f014b77d0ac27659dd",
+  measurementId: "G-Y1VCLD1VKM"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+let currentUser = "Гость";
 
-  let currentUser = null;
+// Верхнее меню
+function toggleMenu() { document.getElementById("menu").classList.toggle("active"); }
+window.toggleMenu = toggleMenu;
 
-  // DOM элементы
-  const authContainer = document.getElementById('auth-container');
-  const reviewsContainer = document.getElementById('reviews-container');
-  const nicknameInput = document.getElementById('nickname');
-  const passwordInput = document.getElementById('password');
-  const authMessage = document.getElementById('auth-message');
-  const reviewsList = document.getElementById('reviews-list');
-  const reviewText = document.getElementById('review-text');
+// Секции
+function showSection(id){
+  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  document.querySelector(`nav button[onclick="showSection('${id}')"]`)?.classList.add("active");
+}
+window.showSection = showSection;
 
-  // Регистрация
-  document.getElementById('register-btn').onclick = async () => {
-    const nick = nicknameInput.value.trim();
-    const pass = passwordInput.value.trim();
-    if(!nick || !pass) return authMessage.textContent = "Заполните оба поля!";
-    
-    try {
-      // Сохраняем ник + пароль как документ (не безопасно для реального проекта, но для простого демо ок)
-      await addDoc(collection(db, "users"), { nickname: nick, password: pass });
-      authMessage.textContent = "Регистрация успешна! Теперь войдите.";
-    } catch(e) {
-      authMessage.textContent = "Ошибка регистрации!";
-      console.error(e);
-    }
-  };
+// Выход
+function logout(){
+  currentUser = "Гость";
+  alert("Вы вышли из аккаунта");
+}
+window.logout = logout;
 
-  // Вход
-  document.getElementById('login-btn').onclick = async () => {
-    const nick = nicknameInput.value.trim();
-    const pass = passwordInput.value.trim();
-    if(!nick || !pass) return authMessage.textContent = "Заполните оба поля!";
+// Отзывы
+const reviewText = document.getElementById("review-text");
+const reviewsList = document.getElementById("reviews-list");
 
-    try {
-      const usersCol = collection(db, "users");
-      const usersSnap = await getDocs(usersCol);
-      let found = false;
-      usersSnap.forEach(doc => {
-        const data = doc.data();
-        if(data.nickname === nick && data.password === pass) found = true;
-      });
-      if(found){
-        currentUser = nick;
-        authContainer.style.display = "none";
-        reviewsContainer.style.display = "block";
-        loadReviews();
-      } else {
-        authMessage.textContent = "Неверный ник или пароль!";
-      }
-    } catch(e){
-      authMessage.textContent = "Ошибка входа!";
-      console.error(e);
-    }
-  };
+document.getElementById("send-review").onclick = async () => {
+  if(!reviewText.value.trim()) return;
+  await addDoc(collection(db,"reviews"), { nickname: currentUser, text: reviewText.value.trim(), time:new Date().toISOString() });
+  reviewText.value="";
+  loadReviews();
+}
 
-  // Отправка отзыва
-  document.getElementById('send-review').onclick = async () => {
-    const text = reviewText.value.trim();
-    if(!text) return;
-    try {
-      await addDoc(collection(db, "reviews"), { nickname: currentUser, text: text, time: new Date().toISOString() });
-      reviewText.value = "";
-      loadReviews();
-    } catch(e){
-      console.error(e);
-    }
-  };
+async function loadReviews(){
+  reviewsList.innerHTML="";
+  const q = query(collection(db,"reviews"), orderBy("time","desc"));
+  const snapshot = await getDocs(q);
+  snapshot.forEach(doc=>{
+    const data=doc.data();
+    const div=document.createElement("div");
+    div.className="review";
+    div.textContent=`[${new Date(data.time).toLocaleString()}] ${data.nickname}: ${data.text}`;
+    reviewsList.appendChild(div);
+  });
+}
+loadReviews();
 
-  // Загрузка отзывов
-  async function loadReviews() {
-    reviewsList.innerHTML = "";
-    const q = query(collection(db, "reviews"), orderBy("time", "desc"));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(doc => {
-      const data = doc.data();
-      const div = document.createElement('div');
-      div.className = "review";
-      div.textContent = `${data.nickname}: ${data.text}`;
-      reviewsList.appendChild(div);
-    });
-  }
-
-  // Выход
-  document.getElementById('logout-btn').onclick = () => {
-    currentUser = null;
-    authContainer.style.display = "block";
-    reviewsContainer.style.display = "none";
-    nicknameInput.value = "";
-    passwordInput.value = "";
-    authMessage.textContent = "";
-  };
+// Пользователи онлайн (fake)
+const usersList = document.getElementById("users-list");
+usersList.textContent = "Пользователи: Гость";
+function changeLanguage(){ alert("Смена языка пока демо"); }
+window.changeLanguage = changeLanguage;
 </script>
 </body>
 </html>
