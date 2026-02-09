@@ -1,3 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FFGarouX</title>
+  <style>
+    :root { --bg: #0d0d1a; --card: #1a1a2e; --accent: #00f0ff; --accent2: #ff00aa; --text: #e0e0ff; --red: #ff4d4d; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+    body { background:linear-gradient(135deg,var(--bg),#1a0033); color:var(--text); min-height:100vh; }
+    @keyframes glow { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
+    .glow { animation:glow 4s linear infinite; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent)); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+    header { background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; position:fixed; top:0; width:100%; z-index:10; border-bottom:1px solid rgba(0,240,255,0.2); }
+    header .logo { font-size:2.2rem; font-weight:bold; }
+
+    #authPage { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:2rem; }
+    #authPage h1 { font-size:2rem; margin-bottom:0.5rem; }
+    #authPage p { color:#aaa; margin-bottom:2rem; }
+    #authPage input { width:100%; max-width:400px; padding:1rem; margin:0.8rem 0; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--accent); color:white; font-size:1.1rem; }
+    #authPage button { width:100%; max-width:400px; padding:1rem; border:none; border-radius:12px; background:linear-gradient(90deg,var(--red),#ff6a00); color:white; font-weight:bold; cursor:pointer; margin:0.8rem 0; transition:all 0.3s; }
+    #authPage button:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(255,77,77,0.6); }
+    .toggle { color:var(--accent); cursor:pointer; text-decoration:underline; margin:1rem 0; }
+
+    #dashboard { display:none; padding:5rem 1rem 4rem; }
+    .overview { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .card { background:var(--card); border-radius:12px; padding:1.5rem; text-align:center; border:1px solid rgba(0,240,255,0.2); }
+    .card h3 { color:var(--accent); }
+    nav { position:fixed; bottom:0; width:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); display:flex; justify-content:space-around; padding:1rem 0; border-top:1px solid rgba(0,240,255,0.2); }
+    nav button { background:none; border:none; color:var(--text); font-size:1rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
+    nav button.active { color:var(--accent); }
+    .section { display:none; }
+    .section.active { display:block; }
+    .message { background:var(--card); padding:1rem; border-radius:12px; margin:0.5rem 0; border:1px solid rgba(0,240,255,0.2); }
+  </style>
+</head>
+<body>
+
+<!-- Авторизация -->
+<div id="authPage">
+  <div class="logo glow" style="font-size:3.5rem; margin-bottom:1rem;">FFGarouX</div>
+  <h1 class="glow">Welcome Back</h1>
+  <p>Войдите в панель FFGarouX</p>
+
+  <div id="loginForm">
+    <input id="username" placeholder="Ник (username)" autocomplete="off">
+    <input id="password" placeholder="Пароль" type="password">
+    <button onclick="signIn()">Sign In</button>
+    <div id="authMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
+    <div class="toggle" onclick="showSignUp()">Нет аккаунта? Зарегистрироваться</div>
+  </div>
+
+  <div id="signUpForm" style="display:none;">
+    <input id="signUpUsername" placeholder="Ник (username)" autocomplete="off">
+    <input id="signUpPassword" placeholder="Пароль" type="password">
+    <input id="signUpConfirm" placeholder="Повторите пароль" type="password">
+    <button onclick="signUp()">Sign Up</button>
+    <div id="regMessage" style="color:var(--red); text-align:center; margin-top:1rem; min-height:1.5rem;"></div>
+    <div class="toggle" onclick="showLogin()">Уже есть аккаунт? Войти</div>
+  </div>
+</div>
+
+<!-- Дашборд -->
+<div id="dashboard">
+  <header>
+    <div class="logo glow">FFGarouX</div>
+    <button onclick="logout()">Выйти</button>
+  </header>
+
+  <div class="overview">
+    <div class="card"><h3>Активно</h3><p>—</p></div>
+    <div class="card"><h3>Сообщений</h3><p>—</p></div>
+  </div>
+
+  <section id="guild" class="section active">
+    <h2>Гильдии</h2>
+    <p>Продажа и прокачка гильдий Free Fire. Автоматизация славы клана. Связь: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+  </section>
+
+  <section id="cheats" class="section">
+    <h2>Читы DRIP CLIENT</h2>
+    <p>Android • Без бана</p>
+    <ul>
+      <li>Убийство при прицеливании</li>
+      <li>Тихое убийство</li>
+      <li>Тихий аимбот</li>
+      <li>Аимбот Rage / Legit</li>
+      <li>Телепорт 8м</li>
+      <li>Призрачный хак</li>
+      <li>ESP линия</li>
+      <li>Ранг CS/BR работает</li>
+    </ul>
+    <h3>Ключи</h3>
+    <ul>
+      <li>1 день — 300₽ (\~3.89$)</li>
+      <li>7 дней — 600₽ (\~7.79$)</li>
+      <li>15 дней — 900₽ (\~11.68$)</li>
+      <li>30 дней — 1500₽ (\~19.47$)</li>
+    </ul>
+    <p>Купить: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram</a></p>
+  </section>
+
+  <section id="reviews" class="section">
+    <h2>Отзывы & Чат</h2>
+    <input id="chatName" placeholder="Ваш ник" style="width:100%; padding:0.8rem; margin-bottom:0.5rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
+    <textarea id="chatText" placeholder="Сообщение..." style="width:100%; height:80px; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;"></textarea>
+    <button onclick="sendMessage()" style="width:100%; margin-top:0.5rem; padding:1rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#000; border:none; border-radius:8px; font-weight:bold;">Отправить</button>
+    <div id="chatMessages" style="margin-top:1rem; max-height:400px; overflow-y:auto;"></div>
+
+    <h2 style="margin-top:2rem;">Поиск по UID</h2>
+    <input id="uidInput" placeholder="UID игрока" style="width:100%; padding:0.8rem; background:var(--card); border:1px solid var(--accent); color:var(--text); border-radius:8px;">
+    <button onclick="searchUID()" style="width:100%; margin-top:0.5rem; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px;">Искать</button>
+    <pre id="uidResult" style="margin-top:1rem; background:var(--card); padding:1rem; border-radius:8px; white-space:pre-wrap; font-size:0.95rem;"></pre>
+  </section>
+
+  <section id="settings" class="section">
+    <h2>Настройки</h2>
+    <p>FFGarouX — лучшая панель для гильдий и читов Free Fire.<br>Контакты: <a href="https://t.me/garoux24" style="color:var(--accent);">Telegram @garoux24</a></p>
+    <button onclick="logout()" style="width:100%; padding:1rem; background:var(--red); color:white; border:none; border-radius:8px; margin-top:1rem;">Выйти из аккаунта</button>
+  </section>
+
+  <nav>
+    <button onclick="showSection('guild')" class="active">Guild</button>
+    <button onclick="showSection('cheats')">Cheats</button>
+    <button onclick="showSection('reviews')">Reviews</button>
+    <button onclick="showSection('settings')">Settings</button>
+  </nav>
+</div>
+
+<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -20,24 +150,34 @@
   const db = getDatabase(app);
   console.log("Firebase подключён успешно");
 
+  // Защита от null-элементов
+  function toggleElement(id, display) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = display;
+    } else {
+      console.error(`Элемент с id "${id}" не найден! Проверь HTML.`);
+    }
+  }
+
   onAuthStateChanged(auth, (user) => {
     if (user) {
       console.log("Пользователь вошёл:", user.uid);
-      document.getElementById('authPage').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
+      toggleElement('authPage', 'none');
+      toggleElement('dashboard', 'block');
       loadMessages();
     } else {
       console.log("Пользователь вышел или не авторизован");
-      document.getElementById('authPage').style.display = 'flex';
-      document.getElementById('dashboard').style.display = 'none';
+      toggleElement('authPage', 'flex');
+      toggleElement('dashboard', 'none');
     }
   });
 
-  window.signUp = function() {  // <-- window. делает функцию глобальной для onclick
+  window.signUp = function() {
     console.log("Нажата кнопка Sign Up");
-    const username = document.getElementById('signUpUsername').value.trim();
-    const password = document.getElementById('signUpPassword').value.trim();
-    const confirm = document.getElementById('signUpConfirm').value.trim();
+    const username = document.getElementById('signUpUsername')?.value.trim();
+    const password = document.getElementById('signUpPassword')?.value.trim();
+    const confirm = document.getElementById('signUpConfirm')?.value.trim();
 
     if (!username) {
       document.getElementById('regMessage').innerText = 'Введите ник!';
@@ -55,7 +195,6 @@
       .then((userCredential) => {
         console.log("Регистрация успешна:", userCredential.user.uid);
         set(ref(db, 'users/' + userCredential.user.uid), { username });
-        document.getElementById('regMessage').innerText = '';
         alert('Регистрация успешна! Теперь войдите под ником: ' + username);
         showLogin();
       })
@@ -71,10 +210,10 @@
       });
   };
 
-  window.signIn = function() {  // <-- window. для onclick
+  window.signIn = function() {
     console.log("Нажата кнопка Sign In");
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const username = document.getElementById('username')?.value.trim();
+    const password = document.getElementById('password')?.value.trim();
 
     if (!username) {
       document.getElementById('authMessage').innerText = 'Введите ник!';
@@ -87,7 +226,6 @@
     signInWithEmailAndPassword(auth, fakeEmail, password)
       .then(() => {
         console.log("Вход успешен");
-        document.getElementById('authMessage').innerText = '';
         alert('Вход успешен!');
       })
       .catch((error) => {
@@ -119,7 +257,6 @@
     document.getElementById('regMessage').innerText = '';
   };
 
-  // Чат и остальные функции (оставь как было, или вставь из предыдущего кода)
   function sendMessage() {
     const name = document.getElementById('chatName').value || 'Гость';
     const text = document.getElementById('chatText').value;
@@ -161,4 +298,6 @@
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
   }
-             </script>
+</script>
+</body>
+</html>
