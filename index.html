@@ -8,20 +8,21 @@
 <style>
 body {
   margin:0;
-  font-family:Arial;
+  font-family: Arial, sans-serif;
   background:#05050d;
   color:#fff;
 }
 
-/* ---------- AUTH ---------- */
+/* AUTH */
 #auth-container {
   max-width:400px;
   margin:80px auto;
-  background:#0e1022;
   padding:25px;
-  border-radius:12px;
+  background:#0e1022;
+  border-radius:10px;
   text-align:center;
 }
+
 #auth-container input,
 #auth-container button {
   width:100%;
@@ -30,83 +31,27 @@ body {
   border:none;
   border-radius:6px;
 }
+
 #auth-container button {
   background:linear-gradient(90deg,#ff3c3c,#00e0ff);
   color:#fff;
   font-weight:bold;
   cursor:pointer;
 }
-#auth-message { color:#ff7070; }
 
-/* ---------- APP ---------- */
+#auth-message {
+  color:#ff6b6b;
+}
+
+/* APP */
 #reviews-container {
   display:none;
-  padding-bottom:80px;
-}
-
-/* HEADER */
-header {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:15px;
-  background:#0e1022;
-  position:sticky;
-  top:0;
-}
-header img {
-  width:40px;
-  height:40px;
-  border-radius:8px;
-}
-
-/* SECTIONS */
-section {
+  max-width:600px;
+  margin:40px auto;
   padding:20px;
-}
-.stat-box {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-.stat {
-  background:#1a1c33;
-  padding:15px;
-  border-radius:10px;
-  text-align:center;
-}
-
-/* REVIEWS */
-.review {
-  background:#1a1c33;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:10px;
-}
-.review small {
-  display:block;
-  color:#aaa;
-  font-size:11px;
-}
-
-/* BOTTOM MENU */
-nav {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
   background:#0e1022;
-  display:flex;
-  justify-content:space-around;
-  padding:10px 0;
+  border-radius:10px;
 }
-nav button {
-  background:none;
-  border:none;
-  color:#aaa;
-  font-size:12px;
-}
-nav button.active { color:#00e0ff; }
 
 textarea {
   width:100%;
@@ -115,56 +60,62 @@ textarea {
   border:none;
   resize:none;
 }
+
+.review {
+  background:#1a1c33;
+  padding:10px;
+  border-radius:6px;
+  margin-top:10px;
+}
+
+.review small {
+  display:block;
+  color:#aaa;
+  font-size:11px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- AUTH (ТВОЙ, НЕ ТРОНУТ) -->
-<div class="container" id="auth-container">
+<!-- LOGIN / REGISTER -->
+<div id="auth-container">
   <h2>FFGarouX</h2>
+
   <input type="text" id="nickname" placeholder="Ваш ник">
   <input type="password" id="password" placeholder="Пароль">
+
   <button id="register-btn">Регистрация</button>
   <button id="login-btn">Войти</button>
+
   <p id="auth-message"></p>
 </div>
 
 <!-- APP -->
 <div id="reviews-container">
+  <h2>Отзывы</h2>
 
-<header>
-  <img src="bg.jpg">
-  <b>FFGarouX</b>
-</header>
-
-<section>
-  <h2>Доминируйте в славе клана автоматически</h2>
-  <p>Самая продвинутая система автоматизации клановой славы Free Fire.</p>
-
-  <div class="stat-box">
-    <div class="stat"><b>40M+</b><br>Слава/день</div>
-    <div class="stat"><b>50+</b><br>Пользователи</div>
-    <div class="stat"><b>24/7</b><br>Работа</div>
-    <div class="stat"><b>100%</b><br>Безопасно</div>
-  </div>
-</section>
-
-<section>
-  <h3>Отзывы</h3>
   <textarea id="review-text" placeholder="Напишите отзыв..."></textarea>
   <button id="send-review">Отправить</button>
+
   <div id="reviews-list"></div>
-</section>
 
-<button id="logout-btn">Выйти</button>
-
+  <button id="logout-btn" style="margin-top:15px;background:#ff4c4c;color:#fff;border:none;padding:10px;border-radius:6px;">
+    Выйти
+  </button>
 </div>
 
-<!-- 🔥 ТВОЙ JS — БЕЗ ИЗМЕНЕНИЙ -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCBZQzVUcx7-A5y7hgCvGjwhu4mfAWVEIE",
@@ -174,64 +125,99 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 let currentUser = null;
 
-const authContainer = document.getElementById('auth-container');
-const reviewsContainer = document.getElementById('reviews-container');
-const nicknameInput = document.getElementById('nickname');
-const passwordInput = document.getElementById('password');
-const authMessage = document.getElementById('auth-message');
-const reviewsList = document.getElementById('reviews-list');
-const reviewText = document.getElementById('review-text');
+// DOM
+const authContainer = document.getElementById("auth-container");
+const reviewsContainer = document.getElementById("reviews-container");
+const nicknameInput = document.getElementById("nickname");
+const passwordInput = document.getElementById("password");
+const authMessage = document.getElementById("auth-message");
+const reviewsList = document.getElementById("reviews-list");
+const reviewText = document.getElementById("review-text");
 
-document.getElementById('register-btn').onclick = async () => {
+// REGISTER
+document.getElementById("register-btn").onclick = async () => {
   const nick = nicknameInput.value.trim();
   const pass = passwordInput.value.trim();
-  if(!nick || !pass) return authMessage.textContent = "Заполните оба поля!";
-  await addDoc(collection(db, "users"), { nickname: nick, password: pass });
-  authMessage.textContent = "Регистрация успешна!";
+  if (!nick || !pass) {
+    authMessage.textContent = "Заполните оба поля";
+    return;
+  }
+
+  await addDoc(collection(db, "users"), {
+    nickname: nick,
+    password: pass
+  });
+
+  authMessage.textContent = "Регистрация успешна. Теперь войдите.";
 };
 
-document.getElementById('login-btn').onclick = async () => {
-  const usersSnap = await getDocs(collection(db, "users"));
+// LOGIN
+document.getElementById("login-btn").onclick = async () => {
+  const nick = nicknameInput.value.trim();
+  const pass = passwordInput.value.trim();
+
+  const snap = await getDocs(collection(db, "users"));
   let found = false;
-  usersSnap.forEach(doc => {
-    const data = doc.data();
-    if(data.nickname === nicknameInput.value && data.password === passwordInput.value) found = true;
-  });
-  if(found){
-    currentUser = nicknameInput.value;
-    authContainer.style.display = "none";
-    reviewsContainer.style.display = "block";
-    loadReviews();
-  } else authMessage.textContent = "Неверный ник или пароль!";
-};
 
-document.getElementById('send-review').onclick = async () => {
-  if(!reviewText.value) return;
-  await addDoc(collection(db,"reviews"),{
-    nickname:currentUser,
-    text:reviewText.value,
-    time:Date.now()
+  snap.forEach(doc => {
+    const u = doc.data();
+    if (u.nickname === nick && u.password === pass) {
+      found = true;
+    }
   });
-  reviewText.value="";
+
+  if (!found) {
+    authMessage.textContent = "Неверный ник или пароль";
+    return;
+  }
+
+  currentUser = nick;
+  authContainer.style.display = "none";
+  reviewsContainer.style.display = "block";
   loadReviews();
 };
 
-async function loadReviews(){
-  reviewsList.innerHTML="";
-  const q=query(collection(db,"reviews"),orderBy("time","desc"));
-  const snap=await getDocs(q);
-  snap.forEach(d=>{
-    const r=d.data();
-    reviewsList.innerHTML+=`<div class="review"><b>${r.nickname}</b><small>${new Date(r.time).toLocaleString()}</small>${r.text}</div>`;
+// SEND REVIEW
+document.getElementById("send-review").onclick = async () => {
+  if (!reviewText.value.trim()) return;
+
+  await addDoc(collection(db, "reviews"), {
+    nickname: currentUser,
+    text: reviewText.value,
+    time: Date.now()
+  });
+
+  reviewText.value = "";
+  loadReviews();
+};
+
+// LOAD REVIEWS
+async function loadReviews() {
+  reviewsList.innerHTML = "";
+  const q = query(collection(db, "reviews"), orderBy("time", "desc"));
+  const snap = await getDocs(q);
+
+  snap.forEach(doc => {
+    const r = doc.data();
+    const div = document.createElement("div");
+    div.className = "review";
+    div.innerHTML = `
+      <b>${r.nickname}</b>
+      <small>${new Date(r.time).toLocaleString()}</small>
+      <div>${r.text}</div>
+    `;
+    reviewsList.appendChild(div);
   });
 }
 
-logout-btn.onclick=()=>{
-  currentUser=null;
-  reviewsContainer.style.display="none";
-  authContainer.style.display="block";
+// LOGOUT
+document.getElementById("logout-btn").onclick = () => {
+  currentUser = null;
+  reviewsContainer.style.display = "none";
+  authContainer.style.display = "block";
 };
 </script>
 
