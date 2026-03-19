@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAROUX MODZ - Инфо Free Fire</title>
+    
+    <!-- ЛОГОТИП КАК FAVICON (иконка в браузере, закладках и Google) -->
+    <link rel="icon" href="garoux.jpg" type="image/jpeg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -86,7 +90,7 @@
                 </div>
             </div>
             
-            <!-- КРУГЛАЯ КНОПКА TELEGRAM (без текста) -->
+            <!-- КРУГЛАЯ КНОПКА TELEGRAM -->
             <a href="https://t.me/garouxmodz" target="_blank"
                class="tg-btn rounded-full flex items-center justify-center text-3xl shadow-2xl">
                 <i class="fab fa-telegram-plane"></i>
@@ -149,7 +153,6 @@
                             <span class="text-gray-400 text-lg">Лайки</span>
                             <span class="font-bold text-pink-400 text-2xl" id="likes">19883</span>
                         </div>
-                        <!-- КБ РЕЙТИНГ — теперь показываем rankingPoints (1610) -->
                         <div class="flex justify-between items-center bg-slate-900 p-5 rounded-3xl">
                             <span class="text-gray-400 text-lg">КБ Рейтинг</span>
                             <span class="font-mono text-2xl text-yellow-400" id="rank">1610</span>
@@ -270,8 +273,6 @@
                 document.getElementById('level').textContent = info.level || '—';
                 document.getElementById('exp').textContent = info.exp || '—';
                 document.getElementById('likes').textContent = info.liked || '—';
-                
-                // ИСПОЛЬЗУЕМ rankingPoints (1610) вместо rank (307)
                 document.getElementById('rank').textContent = info.rankingPoints || info.rank || '—';
 
                 document.getElementById('clanName').textContent = clan.clanName || 'Нет клана';
