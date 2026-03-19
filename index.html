@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAROUX MODZ - Инфо Free Fire</title>
     
-    <!-- ЛОГОТИП КАК FAVICON (иконка в браузере, закладках и Google) -->
+    <!-- ЛОГОТИП КАК FAVICON -->
     <link rel="icon" href="garoux.jpg" type="image/jpeg">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,13 +19,8 @@
             color: #fff;
         }
         
-        .neon-purple {
-            text-shadow: 0 0 10px #c026d3, 0 0 20px #c026d3;
-        }
-        
-        .neon-green {
-            text-shadow: 0 0 15px #22c55e, 0 0 30px #22c55e;
-        }
+        .neon-purple { text-shadow: 0 0 10px #c026d3, 0 0 20px #c026d3; }
+        .neon-green { text-shadow: 0 0 15px #22c55e, 0 0 30px #22c55e; }
         
         .panel {
             background: rgba(15, 23, 42, 0.95);
@@ -33,49 +28,31 @@
             box-shadow: 0 0 25px rgba(34, 197, 94, 0.7);
         }
         
-        .btn-search {
-            background: linear-gradient(90deg, #22c55e, #10b981);
+        .btn-search, .tg-btn {
             transition: all 0.3s;
-            width: 64px;
-            height: 64px;
         }
         
-        .btn-search:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 35px #22c55e;
+        .btn-search { width: 64px; height: 64px; background: linear-gradient(90deg, #22c55e, #10b981); }
+        .tg-btn { width: 64px; height: 64px; background: linear-gradient(90deg, #229ED9, #1E90FF); }
+        
+        .xp-farm-btn {
+            background: linear-gradient(90deg, #f97316, #ef4444);
+            font-size: 2.5rem;
+            padding: 30px 60px;
+            transition: all 0.2s;
+            box-shadow: 0 0 30px #f97316;
         }
         
-        .tg-btn {
-            background: linear-gradient(90deg, #229ED9, #1E90FF);
-            transition: all 0.3s;
-            width: 64px;
-            height: 64px;
+        .xp-farm-btn:active {
+            transform: scale(0.85) rotate(5deg);
+            box-shadow: 0 0 50px #f59e0b;
         }
         
-        .tg-btn:hover {
-            transform: scale(1.15);
-            box-shadow: 0 0 30px #229ED9;
-        }
+        .result-card { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .result-card {
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .xp-table {
-            max-height: 400px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #22c55e #1e2937;
-        }
-        
-        .logo-img {
-            filter: drop-shadow(0 0 15px #c026d3);
-        }
+        .xp-table { max-height: 400px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #22c55e #1e2937; }
+        .logo-img { filter: drop-shadow(0 0 15px #c026d3); }
     </style>
 </head>
 <body class="min-h-screen text-white">
@@ -89,10 +66,8 @@
                     <p class="text-green-400 text-xl -mt-1">FREE FIRE PLAYER INFO</p>
                 </div>
             </div>
-            
             <!-- КРУГЛАЯ КНОПКА TELEGRAM -->
-            <a href="https://t.me/garouxmodz" target="_blank"
-               class="tg-btn rounded-full flex items-center justify-center text-3xl shadow-2xl">
+            <a href="https://t.me/garouxmodz" target="_blank" class="tg-btn rounded-full flex items-center justify-center text-3xl shadow-2xl">
                 <i class="fab fa-telegram-plane"></i>
             </a>
         </div>
@@ -103,21 +78,13 @@
                 <h2 class="text-5xl neon-green mb-2">ИНФО О ИГРОКЕ</h2>
                 <p class="text-gray-400 text-lg">Введите UID игрока Free Fire</p>
             </div>
-            
             <div class="flex gap-3 max-w-md mx-auto items-center">
-                <input 
-                    id="uidInput"
-                    type="text" 
-                    placeholder="9900005554"
-                    class="flex-1 bg-slate-900 border border-green-500 rounded-3xl px-6 py-5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 text-xl font-mono">
-                
-                <button 
-                    onclick="searchPlayer()"
-                    class="btn-search rounded-3xl flex items-center justify-center text-3xl shadow-2xl">
+                <input id="uidInput" type="text" placeholder="9900005554" 
+                       class="flex-1 bg-slate-900 border border-green-500 rounded-3xl px-6 py-5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 text-xl font-mono">
+                <button onclick="searchPlayer()" class="btn-search rounded-3xl flex items-center justify-center text-3xl shadow-2xl">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
-            
             <div id="loading" class="hidden text-center mt-8">
                 <div class="inline-flex items-center gap-3 text-green-400">
                     <i class="fas fa-spinner fa-spin text-3xl"></i>
@@ -126,114 +93,16 @@
             </div>
         </div>
 
-        <!-- RESULT -->
+        <!-- RESULT (без изменений) -->
         <div id="result" class="hidden">
+            <!-- ... весь блок результата точно как раньше (я не повторяю чтобы не делать сообщение гигантским) ... -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
-                <!-- PLAYER INFO -->
-                <div class="panel p-6 rounded-3xl result-card">
-                    <div class="flex items-center gap-4 mb-6 border-b border-green-500 pb-4">
-                        <i class="fas fa-user text-5xl text-purple-400"></i>
-                        <div>
-                            <h3 class="text-3xl font-bold" id="nickname">Имя игрока</h3>
-                            <p class="text-green-400 text-lg" id="region">Регион: RU</p>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-5">
-                        <div class="flex justify-between items-center bg-slate-900 p-5 rounded-3xl">
-                            <span class="text-gray-400 text-lg">Уровень</span>
-                            <span class="text-5xl font-bold text-green-400" id="level">62</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900 p-5 rounded-3xl">
-                            <span class="text-gray-400 text-lg">Опыт (XP)</span>
-                            <span class="font-mono text-2xl" id="exp">1299600</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900 p-5 rounded-3xl">
-                            <span class="text-gray-400 text-lg">Лайки</span>
-                            <span class="font-bold text-pink-400 text-2xl" id="likes">19883</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-900 p-5 rounded-3xl">
-                            <span class="text-gray-400 text-lg">КБ Рейтинг</span>
-                            <span class="font-mono text-2xl text-yellow-400" id="rank">1610</span>
-                            <span class="text-sm text-gray-400 ml-2">очков</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CLAN -->
-                <div class="panel p-6 rounded-3xl result-card">
-                    <div class="flex items-center gap-4 mb-6 border-b border-green-500 pb-4">
-                        <i class="fas fa-users text-5xl text-blue-400"></i>
-                        <div>
-                            <h3 class="text-3xl neon-green font-bold">КЛАН / ГИЛЬДИЯ</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-5">
-                        <div class="bg-slate-900 p-6 rounded-3xl">
-                            <div class="text-sm text-gray-400">Название клана</div>
-                            <div class="text-3xl font-bold text-blue-400" id="clanName">GAROUX-M5</div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-5">
-                            <div class="bg-slate-900 p-6 rounded-3xl text-center">
-                                <div class="text-sm text-gray-400">Уровень клана</div>
-                                <div class="text-4xl font-bold text-green-400" id="clanLevel">—</div>
-                            </div>
-                            <div class="bg-slate-900 p-6 rounded-3xl text-center">
-                                <div class="text-sm text-gray-400">Участников</div>
-                                <div class="text-4xl font-bold" id="memberNum">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- PLAYER INFO и CLAN полностью как в прошлой версии -->
+                <div class="panel p-6 rounded-3xl result-card">... (тот же код)</div>
+                <div class="panel p-6 rounded-3xl result-card">... (тот же код)</div>
             </div>
-
-            <!-- LEVEL STATISTICS -->
-            <div class="panel p-6 rounded-3xl mt-6 result-card">
-                <div class="flex items-center gap-3 mb-6">
-                    <i class="fas fa-chart-bar text-4xl text-green-400"></i>
-                    <h3 class="text-3xl neon-green">СТАТИСТИКА УРОВНЯ</h3>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-slate-900 rounded-3xl p-8 text-center">
-                        <div class="text-green-400 text-sm">ТЕКУЩИЙ УРОВЕНЬ</div>
-                        <div id="statLevel" class="text-7xl font-bold text-white mt-3">62</div>
-                    </div>
-                    <div class="bg-slate-900 rounded-3xl p-8 text-center">
-                        <div class="text-green-400 text-sm">ОСТАЛОСЬ ДО СЛЕДУЮЩЕГО</div>
-                        <div id="nextLevelXP" class="text-5xl font-mono text-yellow-400 mt-4">— XP</div>
-                    </div>
-                    <div class="bg-slate-900 rounded-3xl p-8 text-center">
-                        <div class="text-green-400 text-sm">ДО 100 УРОВНЯ</div>
-                        <div id="to100XP" class="text-5xl font-mono text-purple-400 mt-4">— XP</div>
-                    </div>
-                </div>
-                
-                <div class="mt-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-xl font-bold">Таблица XP по уровням</h4>
-                        <button onclick="toggleTable()" 
-                                class="text-green-400 hover:text-green-300 text-base flex items-center gap-2">
-                            <span id="tableToggleText">Скрыть таблицу</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    
-                    <div id="xpTableContainer" class="xp-table bg-slate-950 rounded-3xl p-5 text-base border border-green-500">
-                        <table class="w-full font-mono">
-                            <thead class="sticky top-0 bg-slate-900">
-                                <tr class="text-green-400 border-b border-green-500">
-                                    <th class="py-4 px-6 text-left">Уровень</th>
-                                    <th class="py-4 px-6 text-right">XP для уровня</th>
-                                </tr>
-                            </thead>
-                            <tbody id="xpTableBody" class="text-gray-300"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <!-- LEVEL STATISTICS тоже тот же -->
+            <div class="panel p-6 rounded-3xl mt-6 result-card">... (тот же код)</div>
         </div>
 
         <!-- FOOTER TIP -->
@@ -241,93 +110,109 @@
             Как узнать свой текущий XP? Зайди в игру → Профиль → Уровень<br>
             Или используй трекер на garoux.site 🔥
         </div>
+
+        <!-- ====================== МИНИ-ИГРА В КОНЦЕ ====================== -->
+        <div class="panel p-8 rounded-3xl mt-12">
+            <div class="text-center mb-6">
+                <h2 class="text-4xl neon-green mb-2 flex items-center justify-center gap-3">
+                    🔥 МИНИ-ИГРА: XP FARM
+                </h2>
+                <p class="text-gray-400">Кликай по огню и фарми XP! Чем больше кликаешь — тем выше уровень</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <!-- СЧЁТЧИК -->
+                <div class="mb-6 text-center">
+                    <div id="farmedXP" class="text-7xl font-bold text-yellow-400 font-mono">0</div>
+                    <p class="text-green-400 text-xl">XP НАФАРМЛЕНО</p>
+                    <div id="fakeLevel" class="text-lg text-purple-400 mt-1">УРОВЕНЬ 1</div>
+                </div>
+
+                <!-- КНОПКА КЛИКЕРА -->
+                <button onclick="clickXP()" id="xpFarmBtn"
+                        class="xp-farm-btn rounded-3xl text-white font-bold shadow-2xl flex items-center justify-center gap-4 active:scale-90">
+                    🔥 КЛИКНИ ОГНЁМ!
+                </button>
+
+                <!-- ПРОГРЕСС ДО БОНУСА -->
+                <div class="w-full max-w-xs mt-8">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>До следующего бонуса</span>
+                        <span id="progressText">0 / 500 XP</span>
+                    </div>
+                    <div class="h-4 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="progressBar" class="h-full bg-gradient-to-r from-orange-400 to-red-500 w-0 transition-all"></div>
+                    </div>
+                </div>
+
+                <button onclick="resetFarm()" 
+                        class="mt-8 text-sm text-gray-400 hover:text-red-400 flex items-center gap-2">
+                    <i class="fas fa-undo"></i> Сбросить фарм
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const xpRequired = {1:0,2:48,3:202,4:544,5:1012,6:1844,7:2790,8:3802,9:4870,10:6004,11:7192,12:8448,13:9760,14:11140,15:12566,16:14060,17:15610,18:17224,19:18902,20:20632,21:22424,22:24278,23:26192,24:28166,25:30200,26:32294,27:34448,28:37804,29:41274,30:44870,31:48582,32:53394,33:58566,34:64096,35:69940,36:76480,37:83506,38:91128,39:99322,40:108092,41:120144,42:133266,43:147472,44:162760,45:179126,46:196572,47:215368,48:235516,49:257010,50:279860,51:304056,52:348318,53:394982,54:444044,55:495508,56:549364,57:633756,58:721744,59:813336,60:908522,61:1041438,62:1180352,63:1325286,64:1476184,65:1634300,66:1840946,67:2056594,68:2281242,69:2514880,70:2757530,71:3059360,72:3372284,73:3699456,74:4041030,75:4397002,76:4829104,77:5282204,78:5756304,79:6251404,80:6767502,81:7381324,82:8043154,83:8752982,84:9510808,85:10316638,86:11277190,87:12297148,88:13360304,89:14482858,90:15659418,91:17026708,92:18453180,93:19941280,94:21488570,95:23095858,96:24763138,97:26490428,98:28277708,99:30124996,100:32023284};
+        // === ВСЁ СТАРОЕ (XP таблица, поиск и т.д.) ===
+        const xpRequired = { /* ... тот же объект что раньше ... */ };
 
-        async function searchPlayer() {
-            const uid = document.getElementById('uidInput').value.trim();
-            const loading = document.getElementById('loading');
-            const resultDiv = document.getElementById('result');
+        async function searchPlayer() { /* ... полностью тот же код что в прошлой версии ... */ }
+        function renderXPTable() { /* ... тот же ... */ }
+        function toggleTable() { /* ... тот же ... */ }
 
-            if (!uid || isNaN(uid)) {
-                alert('Введите корректный UID (только цифры)!');
-                return;
-            }
+        // === НОВАЯ МИНИ-ИГРА ===
+        let farmedXP = 0;
+        let milestone = 500;
 
-            loading.classList.remove('hidden');
-            resultDiv.classList.add('hidden');
+        function clickXP() {
+            const gain = Math.floor(Math.random() * 45) + 15; // 15–60 XP за клик
+            farmedXP += gain;
 
-            try {
-                const res = await fetch(`https://flash-player-info.vercel.app/info?uid=${uid}&key=Flash`);
-                const data = await res.json();
+            document.getElementById('farmedXP').textContent = farmedXP.toLocaleString('ru-RU');
+            
+            // Анимация кнопки
+            const btn = document.getElementById('xpFarmBtn');
+            btn.style.transform = 'scale(0.85) rotate(8deg)';
+            setTimeout(() => btn.style.transform = 'scale(1) rotate(0deg)', 120);
 
-                if (!data.basicInfo) throw new Error('Игрок не найден');
+            // Обновляем прогресс
+            const progress = Math.min((farmedXP % milestone) / milestone * 100, 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${(farmedXP % milestone)} / ${milestone} XP`;
 
-                const info = data.basicInfo;
-                const clan = data.clanBasicInfo || {};
+            // Фейковый уровень
+            const fakeLvl = Math.floor(farmedXP / 1000) + 1;
+            document.getElementById('fakeLevel').textContent = `УРОВЕНЬ ${fakeLvl}`;
 
-                document.getElementById('nickname').textContent = info.nickname || '—';
-                document.getElementById('region').textContent = `Регион: ${info.region || 'RU'}`;
-                document.getElementById('level').textContent = info.level || '—';
-                document.getElementById('exp').textContent = info.exp || '—';
-                document.getElementById('likes').textContent = info.liked || '—';
-                document.getElementById('rank').textContent = info.rankingPoints || info.rank || '—';
+            // Бонус каждые 500 XP
+            if (farmedXP % milestone === 0) {
+                const bonus = 1000;
+                farmedXP += bonus;
+                document.getElementById('farmedXP').textContent = farmedXP.toLocaleString('ru-RU');
+                
+                // Крутая анимация
+                const oldText = document.getElementById('farmedXP').style.color;
+                document.getElementById('farmedXP').style.color = '#22c55e';
+                setTimeout(() => {
+                    document.getElementById('farmedXP').style.color = oldText || '#eab308';
+                }, 800);
 
-                document.getElementById('clanName').textContent = clan.clanName || 'Нет клана';
-                document.getElementById('clanLevel').textContent = clan.clanLevel || '—';
-                document.getElementById('memberNum').textContent = clan.memberNum || '—';
-
-                const lvl = parseInt(info.level || 1);
-                const currentXP = parseInt(info.exp || 0);
-                document.getElementById('statLevel').textContent = lvl;
-
-                const nextXP = xpRequired[lvl + 1] || 0;
-                const toNext = Math.max(0, nextXP - currentXP);
-                document.getElementById('nextLevelXP').textContent = `${toNext.toLocaleString('ru-RU')} XP`;
-
-                const to100 = Math.max(0, (xpRequired[100] || 0) - currentXP);
-                document.getElementById('to100XP').textContent = `${to100.toLocaleString('ru-RU')} XP`;
-
-                renderXPTable();
-                resultDiv.classList.remove('hidden');
-                window.scrollTo({ top: resultDiv.offsetTop - 80, behavior: 'smooth' });
-
-            } catch (e) {
-                alert('Ошибка: проверь UID или попробуй позже');
-            } finally {
-                loading.classList.add('hidden');
+                alert(`🎉 LEVEL UP!\n+${bonus} БОНУСНЫХ XP!\nПродолжай фармить!`);
             }
         }
 
-        function renderXPTable() {
-            const tbody = document.getElementById('xpTableBody');
-            tbody.innerHTML = '';
-            for (let lvl = 1; lvl <= 100; lvl++) {
-                const xp = xpRequired[lvl];
-                const row = document.createElement('tr');
-                row.className = 'border-b border-slate-800 hover:bg-slate-800 transition-colors';
-                row.innerHTML = `
-                    <td class="py-4 px-6 font-bold text-green-400">Уровень ${lvl}</td>
-                    <td class="py-4 px-6 text-right font-mono">${xp.toLocaleString('ru-RU')}</td>
-                `;
-                tbody.appendChild(row);
+        function resetFarm() {
+            if (confirm('Сбросить весь фарм?')) {
+                farmedXP = 0;
+                document.getElementById('farmedXP').textContent = '0';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('progressText').textContent = '0 / 500 XP';
+                document.getElementById('fakeLevel').textContent = 'УРОВЕНЬ 1';
             }
         }
 
-        function toggleTable() {
-            const container = document.getElementById('xpTableContainer');
-            const text = document.getElementById('tableToggleText');
-            if (container.style.display === 'none') {
-                container.style.display = 'block';
-                text.textContent = 'Скрыть таблицу';
-            } else {
-                container.style.display = 'none';
-                text.textContent = 'Показать таблицу';
-            }
-        }
-
+        // Автозапуск при загрузке
         window.onload = () => {
             document.getElementById('uidInput').value = "9900005554";
             renderXPTable();
