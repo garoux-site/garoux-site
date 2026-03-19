@@ -3,204 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAROUX MODZ - Free Fire Info</title>
+    <title>GAROUX MODZ - Отслеживание Free Fire</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        body { background: #0f0f1e; color: #ffcc00; font-family: 'Press Start 2P', sans-serif; margin:0; padding:0; }
-        header { background: linear-gradient(#ff0000, #000); padding:20px; text-align:center; font-size:2em; text-shadow: 0 0 10px #ffcc00; }
-        .logo { font-size:2.5em; color:#fff; text-shadow: 3px 3px #ff0000; }
-        .main-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:20px; padding:20px; }
-        .card { background:#1a1a2e; border:3px solid #ffcc00; border-radius:15px; padding:15px; text-align:center; cursor:pointer; transition:0.3s; }
-        .card:hover { transform:scale(1.05); box-shadow:0 0 20px #ff0000; }
-        .avatar { width:120px; height:120px; border-radius:50%; border:5px solid #ffcc00; background:#000; }
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; }
-        .modal-content { background:#16213e; margin:5% auto; width:90%; max-width:800px; border:5px solid #ffcc00; padding:20px; }
-        .tabs { display:flex; background:#0f0f1e; }
-        .tab { padding:15px; flex:1; text-align:center; cursor:pointer; background:#1a1a2e; }
-        .tab.active { background:#ffcc00; color:#000; }
-        .profile-screen, .stats-screen { padding:20px; }
-        .big-avatar { width:300px; height:300px; border-radius:20px; border:8px solid #ff0000; background-size:cover; margin:auto; }
-        table { width:100%; border-collapse:collapse; margin-top:20px; }
-        th, td { border:2px solid #ffcc00; padding:12px; text-align:center; }
-        .status { font-size:1.2em; padding:10px; border-radius:10px; }
-        .online { background:#00ff00; color:#000; }
-        .offline { background:#ff0000; color:#fff; }
-        input, button { padding:10px; font-family:inherit; background:#ffcc00; color:#000; border:none; margin:5px; }
+        body {
+            margin:0; padding:0;
+            background: url('bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #00ffff;
+            font-family: 'Press Start 2P', sans-serif;
+            overflow-x: hidden;
+        }
+        header {
+            background: linear-gradient(180deg, #ff0000, #000);
+            padding: 20px;
+            text-align: center;
+            font-size: 2.2em;
+            text-shadow: 0 0 15px #00ffff;
+        }
+        .logo { font-size: 2.8em; color: #fff; text-shadow: 4px 4px #ff0000; }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(10, 20, 50, 0.95);
+            border: 4px solid #00bfff;
+            border-radius: 25px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s;
+            box-shadow: 0 0 20px #00ffff;
+        }
+        .card:hover { transform: scale(1.08); box-shadow: 0 0 40px #00ffff; }
+        .avatar { width: 130px; height: 130px; border-radius: 50%; border: 6px solid #ff00ff; }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 999; overflow-y: auto;
+        }
+        .modal-content {
+            background: #0a1329; margin: 30px auto; width: 95%; max-width: 850px;
+            border: 6px solid #00ffff; border-radius: 30px; padding: 25px; box-shadow: 0 0 50px #00ffff;
+        }
+        .xp-panels {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px;
+        }
+        .xp-panel {
+            background: rgba(0, 191, 255, 0.1); border: 3px solid #00ffff; border-radius: 20px;
+            padding: 15px; text-align: center;
+        }
+        .progress-bar {
+            height: 25px; background: #001122; border-radius: 30px; overflow: hidden; margin: 10px 0;
+        }
+        .bar {
+            height: 100%; background: linear-gradient(90deg, #00ffff, #00ff00); transition: width 1s;
+        }
+        table { width:100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; border: 2px solid #00ffff; text-align: center; }
+        .status { padding: 12px; border-radius: 15px; font-weight: bold; }
+        .online { background: #00ff00; color: #000; }
+        .offline { background: #ff0000; color: #fff; }
+        button, input { padding: 12px; font-size: 1em; background: #00ffff; color: #000; border: none; border-radius: 15px; }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">GAROUX MODZ</div>
-        <p style="font-size:0.8em;color:#fff;">Free Fire Info Dashboard • Обновление каждые 15 сек</p>
+        <div class="logo">🔥 GAROUX MODZ</div>
+        <p style="font-size:0.9em;color:#fff;">Отслеживание уровня и опыта Free Fire • Реальное время</p>
     </header>
 
-    <div style="text-align:center;padding:10px;">
-        <input id="newUid" placeholder="Введи UID" style="width:200px;">
-        <button onclick="addAccount()">Добавить/Заменить аккаунт</button>
+    <div style="text-align:center;padding:15px;">
+        <input id="newUid" placeholder="Введи UID" style="width:220px;">
+        <button onclick="addAccount()">Добавить аккаунт</button>
     </div>
 
     <div class="main-grid" id="accountsGrid"></div>
 
-    <!-- Модальное окно профиля -->
+    <!-- МОДАЛЬНОЕ ОКНО -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <button onclick="closeModal()" style="float:right;background:#ff0000;color:#fff;">✕</button>
-            <h2 id="modalNickname" style="text-align:center;"></h2>
-            
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab(0)">Профиль</div>
-                <div class="tab" onclick="switchTab(1)">Статистика</div>
+            <button onclick="closeModal()" style="float:right;font-size:2em;background:transparent;color:#ff0000;border:none;">✕</button>
+            <h2 id="modalNickname" style="text-align:center;color:#fff;margin-bottom:20px;"></h2>
+
+            <!-- ПАНЕЛИ КАК НА ТВОЁМ СКРИНЕ -->
+            <div class="xp-panels">
+                <div class="xp-panel">
+                    <h3>🔥 Текущий опыт</h3>
+                    <h2 id="currentExp">0</h2>
+                </div>
+                <div class="xp-panel">
+                    <h3>До следующего уровня</h3>
+                    <h2 id="toNext">0</h2>
+                    <div class="progress-bar"><div id="progressNext" class="bar" style="width:0%"></div></div>
+                </div>
+                <div class="xp-panel">
+                    <h3>До 100 уровня</h3>
+                    <h2 id="to100">0</h2>
+                </div>
+                <div class="xp-panel">
+                    <h3>⏱ Время сессии</h3>
+                    <h2 id="sessionTime">00:00:00</h2>
+                </div>
             </div>
-            
-            <!-- Экран 1: Профиль -->
-            <div id="profileScreen" class="profile-screen">
-                <div id="bigAvatar" class="big-avatar"></div>
-                <p><strong>Уровень:</strong> <span id="level"></span></p>
-                <p><strong>Лайки:</strong> <span id="likes"></span></p>
-                <p><strong>Рейтинг:</strong> <span id="rank"></span> (RP: <span id="rp"></span>)</p>
-                <p class="status" id="status"></p>
-            </div>
-            
-            <!-- Экран 2: Статистика -->
-            <div id="statsScreen" class="stats-screen" style="display:none;">
-                <h3>За сегодня</h3>
-                <table>
-                    <tr><th>Параметр</th><th>Прирост</th><th>Всего</th></tr>
-                    <tr><td>Лайки</td><td id="todayLikes">+0</td><td id="totalLikes"></td></tr>
-                    <tr><td>XP</td><td id="todayExp">+0</td><td id="totalExp"></td></tr>
-                    <tr><td>Рейтинг</td><td id="todayRP">+0</td><td id="totalRP"></td></tr>
-                </table>
-                <p><strong>До следующего уровня осталось:</strong> <span id="toNextLevel"></span> XP</p>
-            </div>
+
+            <!-- ТАБЛИЦА ЗА СЕГОДНЯ -->
+            <h3 style="margin-top:30px;">📊 За сегодня</h3>
+            <table>
+                <tr><th>Параметр</th><th>Прирост</th><th>Всего</th></tr>
+                <tr><td>Лайки</td><td id="todayLikes">+0</td><td id="totalLikes"></td></tr>
+                <tr><td>XP</td><td id="todayExp">+0</td><td id="totalExp"></td></tr>
+                <tr><td>Рейтинг</td><td id="todayRP">+0</td><td id="totalRP"></td></tr>
+            </table>
+
+            <button onclick="closeModal()" style="width:100%;margin-top:20px;">Закрыть</button>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://flash-player-info.vercel.app/info?uid=";
+        const API = "https://flash-player-info.vercel.app/info?uid=";
         const KEY = "&key=Flash";
-        
-        // === ТВОИ 4 АККАУНТА (ЗАМЕНИ НА СВОИ UID) ===
+
+        // === ТВОИ 4 АККАУНТА (замени UID) ===
         let accounts = [
-            {uid: "9900005554", nickname: "Загрузка..."},
-            {uid: "13777777733", nickname: "Загрузка..."},
-            {uid: "14830000000", nickname: "Загрузка..."},
-            {uid: "14507770000", nickname: "Загрузка..."}
+            {uid: "9900005554", nick: "Загрузка..."},
+            {uid: "13777777733", nick: "Загрузка..."},
+            {uid: "14830000000", nick: "Загрузка..."},
+            {uid: "14507770000", nick: "Загрузка..."}
         ];
-        
-        let currentAccountIndex = 0;
-        let previousData = {}; // для дельт "за сегодня"
-        
-        function fetchPlayer(uid) {
-            return fetch(API_URL + uid + KEY)
-                .then(r => r.json())
-                .catch(() => null);
-        }
-        
+
+        // === ТАБЛИЦА XP ИЗ ТВОЕГО СКРИНА (полная 1-100) ===
+        const xpToReach = [
+            0,0,48,202,544,1012,1844,2790,3802,4870,6004,7192,8448,9760,11140,12566,
+            14060,15610,17224,18902,20632,22424,24278,26192,28166,30200,32294,34448,
+            37804,41274,44870,48582,53394,58566,64096,69994,76480,83506,91128,99322,
+            108092,120144,133266,147472,162760,179126,196572,215368,235516,257010,
+            279860,304056,348318,394982,444044,495508,549364,633756,721744,813336,
+            908522,1041438,1180352,1325286,1476184,1634300,1840946,2056594,2281242,
+            2514880,2757530,3059506,3372284,3699456,4041030,4397002,4829104,5282204,
+            5756304,6251404,6767502,7381324,8043154,8752982,9510808,10316638,11277190,
+            12291748,13360304,14482858,15659418,17026708,18453570,19941280,21488570,
+            23095858,24743138,26490428,28277708,30124996,32023284
+        ];
+
+        let previousData = {};
+
         async function updateAll() {
             const grid = document.getElementById("accountsGrid");
             grid.innerHTML = "";
-            
             for (let i = 0; i < accounts.length; i++) {
-                const data = await fetchPlayer(accounts[i].uid);
-                if (!data || !data.basicInfo) continue;
-                
-                const info = data.basicInfo;
-                const lastLogin = new Date(info.lastLoginAt * 1000);
-                const now = new Date();
-                const minutesAgo = Math.floor((now - lastLogin) / 60000);
+                const res = await fetch(API + accounts[i].uid + KEY).then(r => r.json()).catch(()=>null);
+                if (!res?.basicInfo) continue;
+                const info = res.basicInfo;
+
+                const minutesAgo = Math.floor((Date.now()/1000 - info.lastLoginAt)/60);
                 const status = minutesAgo < 10 ? "Онлайн" : "Офлайн";
-                
-                // Сохраняем дельты
+
+                // сохраняем прирост
                 const prev = previousData[accounts[i].uid] || {};
-                const deltaLikes = prev.likes ? info.liked - prev.likes : 0;
-                const deltaExp = prev.exp ? info.exp - prev.exp : 0;
-                const deltaRP = prev.rankingPoints ? info.rankingPoints - prev.rankingPoints : 0;
-                
-                previousData[accounts[i].uid] = {
-                    likes: info.liked,
-                    exp: info.exp,
-                    rankingPoints: info.rankingPoints
-                };
-                
-                // Карточка
+                previousData[accounts[i].uid] = {likes: info.liked, exp: info.exp, rp: info.rankingPoints};
+
                 const card = document.createElement("div");
                 card.className = "card";
                 card.innerHTML = `
-                    <img src="https://via.placeholder.com/120?text=FF" class="avatar" style="background-image:url('https://picsum.photos/id/${i+10}/300');">
+                    <img src="https://picsum.photos/id/${i+50}/300" class="avatar">
                     <h3>${info.nickname}</h3>
-                    <p>Ур: ${info.level} | Лайки: ${info.liked}</p>
-                    <p>Рейтинг: ${info.rank}</p>
-                    <p class="status \( {status === 'Онлайн' ? 'online' : 'offline'}"> \){status}</p>
+                    <p>Уровень ${info.level} | Лайки ${info.liked}</p>
+                    <p class="status \( {status==='Онлайн'?'online':'offline'}"> \){status}</p>
                 `;
-                card.onclick = () => openProfile(i, data);
+                card.onclick = () => openProfile(i, info);
                 grid.appendChild(card);
-                
-                accounts[i].nickname = info.nickname;
             }
         }
-        
-        function openProfile(index, data) {
-            currentAccountIndex = index;
-            const info = data.basicInfo;
-            const profile = data.profileInfo || {};
-            
+
+        function openProfile(index, info) {
             document.getElementById("modal").style.display = "block";
             document.getElementById("modalNickname").textContent = info.nickname;
-            
-            // Аватар + фон (пример)
-            const avatarDiv = document.getElementById("bigAvatar");
-            avatarDiv.style.backgroundImage = `url('https://picsum.photos/id/1015/600')`; // замени на реальный фон
-            avatarDiv.style.backgroundSize = "cover";
-            
-            document.getElementById("level").textContent = info.level;
-            document.getElementById("likes").textContent = info.liked;
-            document.getElementById("rank").textContent = info.rank;
-            document.getElementById("rp").textContent = info.rankingPoints;
-            
-            const lastLogin = new Date(info.lastLoginAt * 1000);
-            const minutesAgo = Math.floor((Date.now() - lastLogin) / 60000);
-            const statusEl = document.getElementById("status");
-            statusEl.textContent = minutesAgo < 10 ? "ОНЛАЙН СЕЙЧАС" : `Оффлайн (${minutesAgo} мин назад)`;
-            statusEl.className = minutesAgo < 10 ? "status online" : "status offline";
-            
-            // Статистика за сегодня
+
+            const lvl = info.level;
+            const exp = info.exp || 0;
+
+            // Расчёты
+            const nextXP = xpToReach[lvl + 1] || xpToReach[100];
+            const missingNext = Math.max(0, nextXP - exp);
+            const progress = lvl >= 100 ? 100 : Math.min(100, Math.floor(((exp - xpToReach[lvl]) / (nextXP - xpToReach[lvl])) * 100));
+
+            const missing100 = Math.max(0, xpToReach[100] - exp);
+
+            // Заполняем панели
+            document.getElementById("currentExp").textContent = exp.toLocaleString('ru-RU');
+            document.getElementById("toNext").textContent = missingNext.toLocaleString('ru-RU');
+            document.getElementById("progressNext").style.width = progress + "%";
+            document.getElementById("to100").textContent = missing100.toLocaleString('ru-RU');
+
+            // Прирост за сегодня
             const prev = previousData[accounts[index].uid] || {};
-            document.getElementById("todayLikes").textContent = "+" + (info.liked - (prev.likes || info.liked));
-            document.getElementById("todayExp").textContent = "+" + (info.exp - (prev.exp || info.exp));
-            document.getElementById("todayRP").textContent = "+" + (info.rankingPoints - (prev.rankingPoints || info.rankingPoints));
-            
+            document.getElementById("todayLikes").textContent = "+" + (info.liked - (prev.likes || 0));
+            document.getElementById("todayExp").textContent = "+" + (info.exp - (prev.exp || 0));
+            document.getElementById("todayRP").textContent = "+" + (info.rankingPoints - (prev.rp || 0));
+
             document.getElementById("totalLikes").textContent = info.liked;
             document.getElementById("totalExp").textContent = info.exp;
             document.getElementById("totalRP").textContent = info.rankingPoints;
-            
-            // До следующего уровня (примерная формула, можно доработать)
-            const toNext = Math.max(0, 50000 + info.level * 2000 - (info.exp % 100000)); // заменить на точную таблицу если нужно
-            document.getElementById("toNextLevel").textContent = toNext;
-            
-            switchTab(0);
         }
-        
-        function switchTab(n) {
-            document.getElementById("profileScreen").style.display = n===0 ? "block" : "none";
-            document.getElementById("statsScreen").style.display = n===1 ? "block" : "none";
-            document.querySelectorAll(".tab").forEach((t,i)=> t.classList.toggle("active", i===n));
-        }
-        
-        function closeModal() {
-            document.getElementById("modal").style.display = "none";
-        }
-        
+
+        function closeModal() { document.getElementById("modal").style.display = "none"; }
         function addAccount() {
             const uid = document.getElementById("newUid").value.trim();
-            if (!uid) return alert("Введи UID!");
-            accounts[3] = {uid: uid, nickname: "Загрузка..."}; // заменяет 4-й
-            updateAll();
+            if (uid) { accounts[3] = {uid: uid, nick: "Загрузка..."}; updateAll(); }
         }
-        
-        // Авто-обновление каждые 15 сек
+
         setInterval(updateAll, 15000);
-        
-        // Первый запуск
         window.onload = updateAll;
     </script>
 </body>
