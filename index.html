@@ -1,190 +1,180 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAROUX MODZ - Free Fire Info</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Press+Start+2P&display=swap');
-        body {
-            margin:0; padding:0;
-            background: url('gg.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: #00ffff;
-            font-family: 'Press Start 2P', sans-serif;
-        }
-        header { background: linear-gradient(#ff0000,#000); padding:20px; text-align:center; font-size:2.3em; }
-        .logo { font-family:'Anton',sans-serif; font-size:3em; color:#fff; text-shadow:4px 4px #ff0000; }
+<meta charset="UTF-8">
+<title>Free Fire Tracker</title>
 
-        .main-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; padding:20px; }
-        .card { background:rgba(10,20,50,0.95); border:4px solid #00bfff; border-radius:25px; padding:20px; text-align:center; cursor:pointer; transition:0.4s; }
-        .card:hover { transform:scale(1.08); box-shadow:0 0 40px #00ffff; }
-        .avatar { width:130px; height:130px; border-radius:50%; border:6px solid #ff00ff; }
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background: linear-gradient(180deg,#050816,#0b1c2c);
+    color:white;
+}
 
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999; }
-        .modal-content { 
-            background: transparent; /* ← gg.jpg видно полностью */
-            margin:30px auto; width:95%; max-width:900px; 
-            padding:25px; font-family:'Anton',sans-serif; 
-        }
+/* контейнер */
+.container {
+    padding:15px;
+}
 
-        /* === ТОП БАР (ТОЛЬКО СВЕРХУ НА gg.jpg) === */
-        .ff-profile {
-            background: linear-gradient(#1a1a1a, #000); border:5px solid #ffd700; border-radius:15px; padding:15px; position:relative;
-        }
-        .ff-top { background:#ffcc00; color:#000; font-family:'Anton',sans-serif; font-size:1.8em; text-align:center; padding:5px; border-radius:10px 10px 0 0; }
-        .ff-bar { display:flex; background:#fff; color:#000; padding:10px; border-radius:10px; align-items:center; margin:10px 0; }
-        .ff-avatar { width:110px; height:110px; background:#ff0000; border:6px solid #ffd700; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:4.5em; color:#fff; margin-right:15px; position:relative; }
-        .ff-avatar::after { content:'★'; position:absolute; top:-8px; right:-8px; font-size:1.2em; color:#ffcc00; }
-        .ff-info { flex:1; }
-        .ff-info h1 { margin:0; font-size:1.6em; }
-        .guild { color:#ffd700; font-size:1.1em; margin-top:5px; }
-        .level-badge { position:absolute; bottom:85px; left:20px; background:#ffcc00; color:#000; padding:5px 15px; border-radius:10px; font-weight:bold; }
-        .uid { font-size:0.9em; color:#aaa; text-align:right; }
+/* заголовок */
+.title {
+    font-size:22px;
+    text-align:center;
+    margin-bottom:20px;
+    color:#00e5ff;
+}
 
-        /* === ПАНЕЛИ ЗАПОЛНЯЮТ ОСТАЛЬНОЕ ПРОСТРАНСТВО === */
-        .xp-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; margin-top:20px; }
-        .xp-panel { background:#001122; border:4px solid #00ffff; border-radius:20px; padding:15px; text-align:center; }
-        .xp-panel h3 { margin:0; font-size:1.1em; color:#00ffff; }
-        .xp-panel h2 { margin:5px 0; font-size:1.8em; color:#00ffcc; }
-        .progress-bar { height:18px; background:#001122; border-radius:30px; overflow:hidden; margin-top:8px; }
-        .bar { height:100%; background:linear-gradient(90deg,#00ffff,#00ff00); transition:width 1s; }
+/* ввод */
+.input-box {
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
 
-        /* === ЖЁЛТАЯ ПАНЕЛЬ ЗА СЕГОДНЯ === */
-        .yellow-panel { background:rgba(255,204,0,0.15); border:4px solid #ffcc00; border-radius:20px; padding:15px; margin-top:25px; }
-        .yellow-panel h3 { color:#ffcc00; text-align:center; }
-        table { width:100%; border-collapse:collapse; }
-        th, td { border:2px solid #00ffff; padding:12px; text-align:center; color:#fff; }
-    </style>
+input {
+    flex:1;
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    background:#1a2a3a;
+    color:white;
+}
+
+button {
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#00c8ff;
+    color:white;
+    cursor:pointer;
+}
+
+/* карточки */
+.grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.card {
+    background:#132536;
+    border-radius:15px;
+    padding:15px;
+    box-shadow:0 0 10px rgba(0,255,255,0.2);
+}
+
+.card span {
+    font-size:18px;
+    color:#00e5ff;
+}
+
+/* профиль */
+.profile {
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:15px;
+}
+
+.avatar {
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:2px solid #00e5ff;
+}
+
+/* прогресс */
+.progress {
+    height:10px;
+    background:#222;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:5px;
+}
+
+.bar {
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#00ffcc,#00ff66);
+}
+
+/* блок */
+.big-card {
+    background:#0f2a3a;
+    padding:15px;
+    border-radius:15px;
+    margin-top:15px;
+}
+</style>
+
 </head>
+
 <body>
-    <header><div class="logo">🔥 GAROUX MODZ</div></header>
 
-    <div style="text-align:center;padding:15px;">
-        <input id="newUid" placeholder="Введи UID" style="width:220px;">
-        <button onclick="addAccount()">Добавить аккаунт</button>
+<div class="container">
+
+<div class="title">🔥 Free Fire Tracker</div>
+
+<div class="input-box">
+    <input id="uid" placeholder="Введите UID">
+    <button onclick="loadData()">Старт</button>
+</div>
+
+<div class="profile">
+    <img id="avatar" class="avatar" src="https://i.imgur.com/3ZQ3Z6F.png">
+    <div>
+        <div>ID: <span id="playerId">-</span></div>
+        <div>Уровень: <span id="level">-</span></div>
     </div>
+</div>
 
-    <div class="main-grid" id="accountsGrid"></div>
+<div class="grid">
+    <div class="card">🔥 Опыт<br><span id="xp">-</span></div>
+    <div class="card">👍 Лайки<br><span id="likes">-</span></div>
+    <div class="card">🎯 До уровня<br><span id="next">-</span></div>
+    <div class="card">📊 Прогресс<br><span id="percent">0%</span></div>
+</div>
 
-    <!-- МОДАЛКА (gg.jpg как фон профиля) -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <button onclick="closeModal()" style="float:right;font-size:2.5em;color:#ff0000;background:none;border:none;">✕</button>
-            <h2 id="modalNickname" style="text-align:center;color:#fff;"></h2>
-
-            <div class="ff-profile" id="ffProfile"></div>
-
-            <div class="xp-grid">
-                <div class="xp-panel"><h3>🔥 Текущий опыт</h3><h2 id="currentExp">0</h2></div>
-                <div class="xp-panel"><h3>До следующего уровня</h3><h2 id="toNext">0</h2><div class="progress-bar"><div id="progressNext" class="bar" style="width:0%"></div></div></div>
-                <div class="xp-panel"><h3>До 100 уровня</h3><h2 id="to100">0</h2></div>
-                <div class="xp-panel"><h3>⏰ Время сессии</h3><h2 id="sessionTime">00:00:00</h2></div>
-            </div>
-
-            <div class="yellow-panel">
-                <h3>📊 За сегодня</h3>
-                <table>
-                    <tr><th>Параметр</th><th>Прирост</th><th>Всего</th></tr>
-                    <tr><td>Лайки</td><td id="todayLikes">+0</td><td id="totalLikes"></td></tr>
-                    <tr><td>XP</td><td id="todayExp">+0</td><td id="totalExp"></td></tr>
-                    <tr><td>Рейтинг</td><td id="todayRP">+0</td><td id="totalRP"></td></tr>
-                </table>
-            </div>
-        </div>
+<div class="big-card">
+    Прогресс уровня
+    <div class="progress">
+        <div id="bar" class="bar"></div>
     </div>
+</div>
 
-    <script>
-        const API = "https://flash-player-info.vercel.app/info?uid=";
-        const KEY = "&key=Flash";
-        let accounts = [
-            {uid: "9900005554", nick: "Загрузка..."},
-            {uid: "13777777734", nick: "Загрузка..."},
-            {uid: "9899989986", nick: "Загрузка..."},
-            {uid: "13507770000", nick: "Загрузка..."}
-        ];
-        let currentIndex = -1;
-        let cachedData = {};
-        const xpToReach = [0,0,48,202,544,1012,1844,2790,3802,4870,6004,7192,8448,9760,11140,12566,14060,15610,17224,18902,20632,22424,24278,26192,28166,30200,32294,34448,37804,41274,44870,48582,53394,58566,64096,69994,76480,83506,91128,99322,108092,120144,133266,147472,162760,179126,196572,215368,235516,257010,279860,304056,348318,394982,444044,495508,549364,633756,721744,813336,908522,1041438,1180352,1325286,1476184,1634300,1840946,2056594,2281242,2514880,2757530,3059506,3372284,3699456,4041030,4397002,4829104,5282204,5756304,6251404,6767502,7381324,8043154,8752982,9510808,10316638,11277190,12291748,13360304,14482858,15659418,17026708,18453570,19941280,21488570,23095858,24743138,26490428,28277708,30124996,32023284];
+</div>
 
-        async function updateAll() {
-            const grid = document.getElementById("accountsGrid");
-            grid.innerHTML = "";
-            for (let i = 0; i < accounts.length; i++) {
-                const res = await fetch(API + accounts[i].uid + KEY).then(r => r.json()).catch(()=>null);
-                if (!res?.basicInfo) continue;
-                cachedData[accounts[i].uid] = res;
-                const info = res.basicInfo;
-                const clan = res.clanBasicInfo ? res.clanBasicInfo.clanName : "Без гильдии";
+<script>
+async function loadData(){
+    let uid = document.getElementById("uid").value;
 
-                const card = document.createElement("div");
-                card.className = "card";
-                card.innerHTML = `<img src="https://picsum.photos/id/\( {i+50}/300" class="avatar"><h3> \){info.nickname}</h3><p>Ур. ${info.level} | Гильдия: ${clan}</p>`;
-                card.onclick = () => openProfile(i);
-                grid.appendChild(card);
-            }
-            if (document.getElementById("modal").style.display === "block" && currentIndex >= 0) updateModal(cachedData[accounts[currentIndex].uid]);
-        }
+    let res = await fetch(`https://flash-player-info.vercel.app/info?uid=${uid}&key=Flash`);
+    let data = await res.json();
 
-        function openProfile(index) {
-            currentIndex = index;
-            const data = cachedData[accounts[index].uid];
-            if (!data) return;
-            document.getElementById("modal").style.display = "block";
-            updateModal(data);
-        }
+    // данные
+    document.getElementById("playerId").innerText = data.accountId || uid;
+    document.getElementById("level").innerText = data.level || "0";
+    document.getElementById("likes").innerText = data.likes || "0";
+    document.getElementById("xp").innerText = data.exp || "0";
 
-        function updateModal(data) {
-            const info = data.basicInfo;
-            const clan = data.clanBasicInfo ? data.clanBasicInfo.clanName : "Без гильдии";
-            document.getElementById("modalNickname").textContent = info.nickname;
+    // пример расчета
+    let current = data.exp || 0;
+    let max = data.nextLevelExp || 100000;
 
-            const ffHTML = `
-                <div class="ff-top">FREE FIRE</div>
-                <div class="ff-bar">
-                    <div class="ff-avatar">G</div>
-                    <div class="ff-info">
-                        <h1>⭐ ${info.nickname}</h1>
-                        <div style="font-size:1.4em">📅 ⏰ 🎯</div>
-                        <div class="guild">Гильдия: ${clan}</div>
-                    </div>
-                    <div style="font-size:2.5em">👍 ${info.liked}</div>
-                </div>
-                <div class="level-badge">Ур.${info.level}</div>
-                <div class="uid">UID: ${info.accountId}</div>
-            `;
-            document.getElementById("ffProfile").innerHTML = ffHTML;
+    let percent = Math.floor((current / max) * 100);
 
-            const lvl = info.level;
-            const exp = info.exp || 0;
-            const nextXP = xpToReach[lvl + 1] || xpToReach[100];
-            const missingNext = Math.max(0, nextXP - exp);
-            const progress = lvl >= 100 ? 100 : Math.min(100, Math.floor(((exp - (xpToReach[lvl]||0)) / (nextXP - (xpToReach[lvl]||0))) * 100));
-            const missing100 = Math.max(0, xpToReach[100] - exp);
+    document.getElementById("percent").innerText = percent + "%";
+    document.getElementById("next").innerText = max - current;
 
-            document.getElementById("currentExp").textContent = exp.toLocaleString('ru-RU');
-            document.getElementById("toNext").textContent = missingNext.toLocaleString('ru-RU');
-            document.getElementById("progressNext").style.width = progress + "%";
-            document.getElementById("to100").textContent = missing100.toLocaleString('ru-RU');
-            document.getElementById("sessionTime").textContent = "00:00:00";
+    document.getElementById("bar").style.width = percent + "%";
 
-            const prev = cachedData[accounts[currentIndex].uid] || {};
-            document.getElementById("todayLikes").textContent = "+" + (info.liked - (prev.basicInfo?.liked || 0));
-            document.getElementById("todayExp").textContent = "+" + (info.exp - (prev.basicInfo?.exp || 0));
-            document.getElementById("todayRP").textContent = "+" + (info.rankingPoints - (prev.basicInfo?.rankingPoints || 0));
-            document.getElementById("totalLikes").textContent = info.liked;
-            document.getElementById("totalExp").textContent = info.exp;
-            document.getElementById("totalRP").textContent = info.rankingPoints;
-        }
+    // аватар (если API даст)
+    if(data.avatar){
+        document.getElementById("avatar").src = data.avatar;
+    }
+}
+</script>
 
-        function closeModal() { document.getElementById("modal").style.display = "none"; currentIndex = -1; }
-        function addAccount() {
-            const uid = document.getElementById("newUid").value.trim();
-            if (uid) { accounts[3] = {uid: uid, nick: "Загрузка..."}; updateAll(); }
-        }
-
-        setInterval(updateAll, 15000);
-        window.onload = updateAll;
-    </script>
 </body>
 </html>
