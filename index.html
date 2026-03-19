@@ -3,79 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAROUX MODZ - Отслеживание Free Fire</title>
+    <title>GAROUX MODZ - Free Fire Info</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Press+Start+2P&display=swap');
         body {
             margin:0; padding:0;
             background: url('bg.jpg') no-repeat center center fixed;
             background-size: cover;
             color: #00ffff;
             font-family: 'Press Start 2P', sans-serif;
-            overflow-x: hidden;
         }
-        header {
-            background: linear-gradient(180deg, #ff0000, #000);
-            padding: 20px;
-            text-align: center;
-            font-size: 2.2em;
-            text-shadow: 0 0 15px #00ffff;
-        }
-        .logo { font-size: 2.8em; color: #fff; text-shadow: 4px 4px #ff0000; }
-        
-        .main-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-        .card {
-            background: rgba(10, 20, 50, 0.95);
-            border: 4px solid #00bfff;
-            border-radius: 25px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s;
-            box-shadow: 0 0 20px #00ffff;
-        }
-        .card:hover { transform: scale(1.08); box-shadow: 0 0 40px #00ffff; }
-        .avatar { width: 130px; height: 130px; border-radius: 50%; border: 6px solid #ff00ff; }
+        header { background: linear-gradient(#ff0000,#000); padding:20px; text-align:center; font-size:2.3em; }
+        .logo { font-family:'Anton',sans-serif; font-size:3em; color:#fff; text-shadow:4px 4px #ff0000; }
 
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 999; overflow-y: auto;
+        .main-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; padding:20px; }
+        .card { background:rgba(10,20,50,0.95); border:4px solid #00bfff; border-radius:25px; padding:20px; text-align:center; cursor:pointer; transition:0.4s; }
+        .card:hover { transform:scale(1.08); box-shadow:0 0 40px #00ffff; }
+        .avatar { width:130px; height:130px; border-radius:50%; border:6px solid #ff00ff; }
+
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:999; }
+        .modal-content { background:#0a1329; margin:30px auto; width:95%; max-width:900px; border:6px solid #00ffff; border-radius:30px; padding:25px; font-family:'Anton',sans-serif; }
+        
+        /* === ТАБЫ === */
+        .tabs { display:flex; background:#001122; border-radius:20px; overflow:hidden; }
+        .tab { flex:1; padding:15px; text-align:center; cursor:pointer; font-size:1.1em; }
+        .tab.active { background:#00ffff; color:#000; }
+
+        /* === 1 ЭКРАН — ТОЧНЫЙ КОПИЯТ FREE FIRE === */
+        .ff-profile {
+            background: linear-gradient(#1a1a1a, #000); border:5px solid #ffd700; border-radius:15px; padding:15px; position:relative;
         }
-        .modal-content {
-            background: #0a1329; margin: 30px auto; width: 95%; max-width: 850px;
-            border: 6px solid #00ffff; border-radius: 30px; padding: 25px; box-shadow: 0 0 50px #00ffff;
-        }
-        .xp-panels {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px;
-        }
-        .xp-panel {
-            background: rgba(0, 191, 255, 0.1); border: 3px solid #00ffff; border-radius: 20px;
-            padding: 15px; text-align: center;
-        }
-        .progress-bar {
-            height: 25px; background: #001122; border-radius: 30px; overflow: hidden; margin: 10px 0;
-        }
-        .bar {
-            height: 100%; background: linear-gradient(90deg, #00ffff, #00ff00); transition: width 1s;
-        }
-        table { width:100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; border: 2px solid #00ffff; text-align: center; }
-        .status { padding: 12px; border-radius: 15px; font-weight: bold; }
-        .online { background: #00ff00; color: #000; }
-        .offline { background: #ff0000; color: #fff; }
-        button, input { padding: 12px; font-size: 1em; background: #00ffff; color: #000; border: none; border-radius: 15px; }
+        .ff-top { background:#ffcc00; color:#000; font-family:'Anton',sans-serif; font-size:1.8em; text-align:center; padding:5px; border-radius:10px 10px 0 0; }
+        .ff-bar { display:flex; background:#fff; color:#000; padding:10px; border-radius:10px; align-items:center; margin:10px 0; }
+        .ff-avatar { width:110px; height:110px; background:#ff0000; border:6px solid #ffd700; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:4em; color:#fff; margin-right:15px; }
+        .ff-info { flex:1; }
+        .ff-info h1 { margin:0; font-size:1.6em; }
+        .ff-icons { font-size:1.4em; margin:5px 0; }
+        .likes { font-size:2em; text-align:right; }
+        .level-badge { position:absolute; bottom:80px; left:20px; background:#ffcc00; color:#000; padding:5px 15px; border-radius:10px; font-weight:bold; }
+        .uid { font-size:0.9em; color:#aaa; text-align:right; margin-top:5px; }
+        .guild-bar { background:#ffd700; color:#000; padding:8px; font-size:1.3em; text-align:center; margin:15px 0; border-radius:8px; }
+        .badges { display:flex; justify-content:space-around; }
+        .badge { text-align:center; width:100px; }
+        .badge-icon { font-size:3em; margin-bottom:5px; }
+        .purple { color:#b300ff; }
+        .wing { color:#00ffff; }
+        .gun { color:#ff0000; }
+
+        /* === 2 ЭКРАН — СТАТИСТИКА === */
+        .xp-panels { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:15px; }
+        .xp-panel { background:rgba(0,191,255,0.15); border:3px solid #00ffff; border-radius:20px; padding:15px; text-align:center; }
+        .progress-bar { height:25px; background:#001122; border-radius:30px; overflow:hidden; }
+        .bar { height:100%; background:linear-gradient(90deg,#00ffff,#00ff00); transition:width 1s; }
+        table { width:100%; border-collapse:collapse; margin:20px 0; }
+        th, td { border:2px solid #00ffff; padding:12px; text-align:center; }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">🔥 GAROUX MODZ</div>
-        <p style="font-size:0.9em;color:#fff;">Отслеживание уровня и опыта Free Fire • Реальное время</p>
-    </header>
+    <header><div class="logo">🔥 GAROUX MODZ</div></header>
 
     <div style="text-align:center;padding:15px;">
         <input id="newUid" placeholder="Введи UID" style="width:220px;">
@@ -84,73 +69,62 @@
 
     <div class="main-grid" id="accountsGrid"></div>
 
-    <!-- МОДАЛЬНОЕ ОКНО -->
+    <!-- МОДАЛКА -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <button onclick="closeModal()" style="float:right;font-size:2em;background:transparent;color:#ff0000;border:none;">✕</button>
-            <h2 id="modalNickname" style="text-align:center;color:#fff;margin-bottom:20px;"></h2>
+            <button onclick="closeModal()" style="float:right;font-size:2.5em;color:#ff0000;background:none;border:none;">✕</button>
+            <h2 id="modalNickname" style="text-align:center;color:#fff;"></h2>
 
-            <!-- ПАНЕЛИ КАК НА ТВОЁМ СКРИНЕ -->
-            <div class="xp-panels">
-                <div class="xp-panel">
-                    <h3>🔥 Текущий опыт</h3>
-                    <h2 id="currentExp">0</h2>
-                </div>
-                <div class="xp-panel">
-                    <h3>До следующего уровня</h3>
-                    <h2 id="toNext">0</h2>
-                    <div class="progress-bar"><div id="progressNext" class="bar" style="width:0%"></div></div>
-                </div>
-                <div class="xp-panel">
-                    <h3>До 100 уровня</h3>
-                    <h2 id="to100">0</h2>
-                </div>
-                <div class="xp-panel">
-                    <h3>⏱ Время сессии</h3>
-                    <h2 id="sessionTime">00:00:00</h2>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab(0)">Профиль (как в игре)</div>
+                <div class="tab" onclick="switchTab(1)">Статистика</div>
+            </div>
+
+            <!-- 1 ЭКРАН — FF ПРОФИЛЬ -->
+            <div id="profileScreen">
+                <div class="ff-profile" id="ffProfile">
+                    <!-- Заполняется JS -->
                 </div>
             </div>
 
-            <!-- ТАБЛИЦА ЗА СЕГОДНЯ -->
-            <h3 style="margin-top:30px;">📊 За сегодня</h3>
-            <table>
-                <tr><th>Параметр</th><th>Прирост</th><th>Всего</th></tr>
-                <tr><td>Лайки</td><td id="todayLikes">+0</td><td id="totalLikes"></td></tr>
-                <tr><td>XP</td><td id="todayExp">+0</td><td id="totalExp"></td></tr>
-                <tr><td>Рейтинг</td><td id="todayRP">+0</td><td id="totalRP"></td></tr>
-            </table>
-
-            <button onclick="closeModal()" style="width:100%;margin-top:20px;">Закрыть</button>
+            <!-- 2 ЭКРАН — СТАТИСТИКА -->
+            <div id="statsScreen" style="display:none;">
+                <div class="xp-panels">
+                    <div class="xp-panel"><h3>🔥 Текущий опыт</h3><h2 id="currentExp">0</h2></div>
+                    <div class="xp-panel"><h3>До следующего уровня</h3><h2 id="toNext">0</h2><div class="progress-bar"><div id="progressNext" class="bar" style="width:0%"></div></div></div>
+                    <div class="xp-panel"><h3>До 100 уровня</h3><h2 id="to100">0</h2></div>
+                </div>
+                <p style="text-align:center;font-size:1.3em;margin:20px 0;"><strong id="levelText">Уровень X (до Y уровня) [ZZZ очков]</strong></p>
+                <h3>📊 За сегодня</h3>
+                <table>
+                    <tr><th>Параметр</th><th>Прирост</th><th>Всего</th></tr>
+                    <tr><td>Лайки</td><td id="todayLikes">+0</td><td id="totalLikes"></td></tr>
+                    <tr><td>XP</td><td id="todayExp">+0</td><td id="totalExp"></td></tr>
+                    <tr><td>Рейтинг</td><td id="todayRP">+0</td><td id="totalRP"></td></tr>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
         const API = "https://flash-player-info.vercel.app/info?uid=";
         const KEY = "&key=Flash";
-
-        // === ТВОИ 4 АККАУНТА (замени UID) ===
         let accounts = [
             {uid: "9900005554", nick: "Загрузка..."},
             {uid: "13777777733", nick: "Загрузка..."},
-            {uid: "14830000000", nick: "Загрузка..."},
+            {uid: "14380000000", nick: "Загрузка..."},
             {uid: "14507770000", nick: "Загрузка..."}
         ];
+        let currentIndex = -1;
+        let currentTab = 0;
+        let cachedData = {};
 
-        // === ТАБЛИЦА XP ИЗ ТВОЕГО СКРИНА (полная 1-100) ===
-        const xpToReach = [
-            0,0,48,202,544,1012,1844,2790,3802,4870,6004,7192,8448,9760,11140,12566,
-            14060,15610,17224,18902,20632,22424,24278,26192,28166,30200,32294,34448,
-            37804,41274,44870,48582,53394,58566,64096,69994,76480,83506,91128,99322,
-            108092,120144,133266,147472,162760,179126,196572,215368,235516,257010,
-            279860,304056,348318,394982,444044,495508,549364,633756,721744,813336,
-            908522,1041438,1180352,1325286,1476184,1634300,1840946,2056594,2281242,
-            2514880,2757530,3059506,3372284,3699456,4041030,4397002,4829104,5282204,
-            5756304,6251404,6767502,7381324,8043154,8752982,9510808,10316638,11277190,
-            12291748,13360304,14482858,15659418,17026708,18453570,19941280,21488570,
-            23095858,24743138,26490428,28277708,30124996,32023284
-        ];
+        // ТАБЛИЦА XP (из твоего первого скрина)
+        const xpToReach = [0,0,48,202,544,1012,1844,2790,3802,4870,6004,7192,8448,9760,11140,12566,14060,15610,17224,18902,20632,22424,24278,26192,28166,30200,32294,34448,37804,41274,44870,48582,53394,58566,64096,69994,76480,83506,91128,99322,108092,120144,133266,147472,162760,179126,196572,215368,235516,257010,279860,304056,348318,394982,444044,495508,549364,633756,721744,813336,908522,1041438,1180352,1325286,1476184,1634300,1840946,2056594,2281242,2514880,2757530,3059506,3372284,3699456,4041030,4397002,4829104,5282204,5756304,6251404,6767502,7381324,8043154,8752982,9510808,10316638,11277190,12291748,13360304,14482858,15659418,17026708,18453570,19941280,21488570,23095858,24743138,26490428,28277708,30124996,32023284];
 
-        let previousData = {};
+        function getRankTitle(points) {
+            return points >= 3600 ? "ЗНАК МАСТЕРА" : "ЗНАК ЭКСПЕРТА";
+        }
 
         async function updateAll() {
             const grid = document.getElementById("accountsGrid");
@@ -158,60 +132,112 @@
             for (let i = 0; i < accounts.length; i++) {
                 const res = await fetch(API + accounts[i].uid + KEY).then(r => r.json()).catch(()=>null);
                 if (!res?.basicInfo) continue;
+                cachedData[accounts[i].uid] = res;
                 const info = res.basicInfo;
-
-                const minutesAgo = Math.floor((Date.now()/1000 - info.lastLoginAt)/60);
-                const status = minutesAgo < 10 ? "Онлайн" : "Офлайн";
-
-                // сохраняем прирост
-                const prev = previousData[accounts[i].uid] || {};
-                previousData[accounts[i].uid] = {likes: info.liked, exp: info.exp, rp: info.rankingPoints};
+                const clan = res.clanBasicInfo ? res.clanBasicInfo.clanName : "Без гильдии";
 
                 const card = document.createElement("div");
                 card.className = "card";
                 card.innerHTML = `
                     <img src="https://picsum.photos/id/${i+50}/300" class="avatar">
                     <h3>${info.nickname}</h3>
-                    <p>Уровень ${info.level} | Лайки ${info.liked}</p>
-                    <p class="status \( {status==='Онлайн'?'online':'offline'}"> \){status}</p>
+                    <p>Ур. ${info.level} | Гильдия: ${clan}</p>
+                    <p>Рейтинг: ${info.rankingPoints}</p>
                 `;
-                card.onclick = () => openProfile(i, info);
+                card.onclick = () => openProfile(i);
                 grid.appendChild(card);
+            }
+
+            // Если модалка открыта — обновляем её
+            if (document.getElementById("modal").style.display === "block" && currentIndex >= 0) {
+                const freshData = cachedData[accounts[currentIndex].uid];
+                if (freshData) updateModal(freshData);
             }
         }
 
-        function openProfile(index, info) {
+        function openProfile(index) {
+            currentIndex = index;
+            const data = cachedData[accounts[index].uid];
+            if (!data) return;
             document.getElementById("modal").style.display = "block";
+            updateModal(data);
+            switchTab(currentTab);
+        }
+
+        function updateModal(data) {
+            const info = data.basicInfo;
+            const clan = data.clanBasicInfo ? data.clanBasicInfo.clanName : "Без гильдии";
             document.getElementById("modalNickname").textContent = info.nickname;
 
+            // === 1 ЭКРАН (FF стиль) ===
+            const ffHTML = `
+                <div class="ff-top">FREE FIRE</div>
+                <div class="ff-bar">
+                    <div class="ff-avatar">⭐</div>
+                    <div class="ff-info">
+                        <h1>⭐ ${info.nickname}</h1>
+                        <div class="ff-icons">📅 ⏰ 🎯</div>
+                    </div>
+                    <div class="likes">👍 ${info.liked}</div>
+                </div>
+                <div class="level-badge">Ур.${info.level}</div>
+                <div class="uid">UID: ${info.accountId}</div>
+                <div class="guild-bar">→ ${clan}</div>
+                <div class="badges">
+                    <div class="badge">
+                        <div class="badge-icon purple">👑</div>
+                        <p>${info.rankingPoints}</p>
+                        <p>ОЧКИ</p>
+                    </div>
+                    <div class="badge">
+                        <div class="badge-icon wing">🪽</div>
+                        <p>${getRankTitle(info.rankingPoints)}</p>
+                    </div>
+                    <div class="badge">
+                        <div class="badge-icon gun">🔫</div>
+                        <p>СТРЕЛОК</p>
+                        <p>4</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById("ffProfile").innerHTML = ffHTML;
+
+            // === 2 ЭКРАН (статистика) ===
             const lvl = info.level;
             const exp = info.exp || 0;
-
-            // Расчёты
             const nextXP = xpToReach[lvl + 1] || xpToReach[100];
             const missingNext = Math.max(0, nextXP - exp);
-            const progress = lvl >= 100 ? 100 : Math.min(100, Math.floor(((exp - xpToReach[lvl]) / (nextXP - xpToReach[lvl])) * 100));
-
+            const progress = lvl >= 100 ? 100 : Math.min(100, Math.floor(((exp - (xpToReach[lvl] || 0)) / (nextXP - (xpToReach[lvl] || 0))) * 100));
             const missing100 = Math.max(0, xpToReach[100] - exp);
 
-            // Заполняем панели
             document.getElementById("currentExp").textContent = exp.toLocaleString('ru-RU');
             document.getElementById("toNext").textContent = missingNext.toLocaleString('ru-RU');
             document.getElementById("progressNext").style.width = progress + "%";
             document.getElementById("to100").textContent = missing100.toLocaleString('ru-RU');
 
-            // Прирост за сегодня
-            const prev = previousData[accounts[index].uid] || {};
-            document.getElementById("todayLikes").textContent = "+" + (info.liked - (prev.likes || 0));
-            document.getElementById("todayExp").textContent = "+" + (info.exp - (prev.exp || 0));
-            document.getElementById("todayRP").textContent = "+" + (info.rankingPoints - (prev.rp || 0));
+            document.getElementById("levelText").innerHTML = `Уровень <b>\( {lvl}</b> (до <b> \){lvl+1}</b> уровня) [<b>${exp.toLocaleString('ru-RU')}</b> очков]`;
 
+            const prev = cachedData[accounts[currentIndex].uid] || {};
+            document.getElementById("todayLikes").textContent = "+" + (info.liked - (prev.basicInfo?.liked || 0));
+            document.getElementById("todayExp").textContent = "+" + (info.exp - (prev.basicInfo?.exp || 0));
+            document.getElementById("todayRP").textContent = "+" + (info.rankingPoints - (prev.basicInfo?.rankingPoints || 0));
             document.getElementById("totalLikes").textContent = info.liked;
             document.getElementById("totalExp").textContent = info.exp;
             document.getElementById("totalRP").textContent = info.rankingPoints;
         }
 
-        function closeModal() { document.getElementById("modal").style.display = "none"; }
+        function switchTab(n) {
+            currentTab = n;
+            document.getElementById("profileScreen").style.display = n===0 ? "block" : "none";
+            document.getElementById("statsScreen").style.display = n===1 ? "block" : "none";
+            document.querySelectorAll(".tab").forEach((t,i) => t.classList.toggle("active", i===n));
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+            currentIndex = -1;
+        }
+
         function addAccount() {
             const uid = document.getElementById("newUid").value.trim();
             if (uid) { accounts[3] = {uid: uid, nick: "Загрузка..."}; updateAll(); }
