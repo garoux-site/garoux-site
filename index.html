@@ -65,7 +65,7 @@
         <input type="text" id="baseUrl" value="http://100.98.84.47:5000" placeholder="http://100.98.84.47:5000">
 
         <label>User ID:</label>
-        <input type="text" id="userId" value="9900005554" placeholder="123456789">
+        <input type="text" id="userId" value="12346080673" placeholder="123456789">
 
         <label>Duration (время):</label>
         <input type="number" id="duration" value="4" min="1">
@@ -76,13 +76,14 @@
             <button class="btn-status" onclick="sendStatus()">📊 STATUS</button>
         </div>
 
-        <div id="result">Результат появится здесь...</div>
+        <div id="result">Нажми кнопку, чтобы отправить запрос...</div>
     </div>
 
     <script>
         function getBaseUrl() {
             let url = document.getElementById('baseUrl').value.trim();
-            if (url && !url.endsWith('/')) url += '/';
+            if (!url) return '';
+            if (!url.endsWith('/')) url += '/';
             return url;
         }
 
@@ -90,50 +91,51 @@
             const div = document.getElementById('result');
             div.innerHTML = `<strong>${isError ? '❌ Ошибка' : '✅ Результат'}</strong><br><br>` + 
                             message.replace(/\n/g, '<br>');
-            div.className = isError ? 'error' : 'success';
+            div.style.color = isError ? '#d32f2f' : '#2e7d32';
         }
 
-        async function makeRequest(endpoint, params = '') {
+        function makeRequest(endpoint, params = '') {
             const base = getBaseUrl();
             if (!base) {
-                showResult('Укажи Base URL!', true);
+                showResult('Сначала укажи Base URL!', true);
                 return;
             }
 
+            // Правильно формируем URL
             let fullUrl = base + endpoint;
             if (params) {
                 fullUrl += (endpoint.includes('?') ? '&' : '?') + params;
             }
 
-            showResult(`Отправляю запрос:<br><code>${fullUrl}</code><br><br>Ожидай...`);
+            // Показываем реальный URL перед отправкой
+            showResult(`Отправляю запрос:<br><code>${fullUrl}</code><br><br>Подожди...`);
 
-            try {
-                // Пробуем с no-cors (часто работает для локальных IP на Android)
-                const response = await fetch(fullUrl, { 
-                    method: 'GET',
-                    mode: 'no-cors',
-                    cache: 'no-cache'
-                });
-
-                showResult(`✅ Запрос успешно отправлен!<br>URL: ${fullUrl}<br><br>Если сервер работает — действие должно выполниться.<br>Проверь логи своего сервера.`);
-            } catch (err) {
-                showResult(`❌ Не удалось отправить запрос.<br>URL: ${fullUrl}<br>Ошибка: ${err.message}`, true);
-            }
+            fetch(fullUrl, { 
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'no-cache'
+            })
+            .then(() => {
+                showResult(`✅ Запрос успешно отправлен!<br><br>Реальный URL:<br><code>${fullUrl}</code><br><br>Если сервер запущен — действие должно выполниться.<br>Проверь логи сервера.`);
+            })
+            .catch(err => {
+                showResult(`❌ Не удалось отправить запрос.<br><br>URL: ${fullUrl}<br>Ошибка: ${err.message}`, true);
+            });
         }
 
         function sendSpam() {
             const userId = document.getElementById('userId').value.trim();
             const duration = document.getElementById('duration').value.trim();
 
-            if (!userId) return showResult('Введи User ID!', true);
-            if (!duration) return showResult('Введи Duration!', true);
+            if (!userId) return showResult('Введите User ID!', true);
+            if (!duration) return showResult('Введите Duration!', true);
 
             makeRequest('spam', `user_id=\( {userId}&duration= \){duration}`);
         }
 
         function sendStop() {
             const userId = document.getElementById('userId').value.trim();
-            if (!userId) return showResult('Введи User ID!', true);
+            if (!userId) return showResult('Введите User ID!', true);
             makeRequest('stop', `user_id=${userId}`);
         }
 
@@ -141,7 +143,7 @@
             makeRequest('status');
         }
 
-        // Горячие клавиши (Enter в полях)
+        // Enter в поле User ID запускает SPAM
         document.getElementById('userId').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') sendSpam();
         });
