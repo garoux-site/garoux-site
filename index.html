@@ -76,13 +76,13 @@
         <label>User ID:</label>
         <input type="text" id="userId" value="12346080673" placeholder="Введите user_id">
 
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 25px;">
             <button class="btn-start" onclick="sendSpam()">▶️ START / SPAM</button>
             <button class="btn-stop" onclick="sendStop()">⏹️ STOP</button>
             <button class="btn-status" onclick="sendStatus()">📊 STATUS</button>
         </div>
 
-        <div id="result">Нажми кнопку...</div>
+        <div id="result">Нажми кнопку START / SPAM...</div>
     </div>
 
     <script>
@@ -99,7 +99,7 @@
             div.style.color = isError ? '#d32f2f' : '#2e7d32';
         }
 
-        function makeRequest(endpoint, userId = null) {
+        function makeRequest(endpoint, params = '') {
             const base = getBaseUrl();
             if (!base) {
                 showResult('<strong>❌ Ошибка:</strong> Укажите Base URL!', true);
@@ -107,8 +107,8 @@
             }
 
             let url = base + endpoint;
-            if (userId) {
-                url += `?user_id=${userId}`;
+            if (params) {
+                url += (endpoint.includes('?') ? '&' : '?') + params;
             }
 
             showResult(`<strong>Отправляю запрос:</strong><br><code>${url}</code>`);
@@ -120,28 +120,31 @@
             .then(() => {
                 showResult(`
                     <strong>✅ Запрос успешно отправлен!</strong><br><br>
-                    <strong>URL:</strong><br>
+                    <strong>Реальный URL:</strong><br>
                     <code>${url}</code><br><br>
-                    Проверь логи сервера.
+                    Проверь логи своего сервера.
                 `);
             })
             .catch(err => {
                 showResult(`
-                    <strong>❌ Ошибка отправки</strong><br><br>
+                    <strong>❌ Не удалось отправить запрос</strong><br><br>
                     URL: ${url}<br>
                     Ошибка: ${err.message}
                 `, true);
             });
         }
 
-        // START / SPAM — только user_id
+        // START / SPAM — с duration=4 в конце
         function sendSpam() {
             const userId = document.getElementById('userId').value.trim();
             if (!userId) {
                 showResult('<strong>❌ Ошибка:</strong> Введите User ID!', true);
                 return;
             }
-            makeRequest('spam', userId);
+            
+            // Здесь добавляем duration=4 автоматически
+            const params = `user_id=${userId}&duration=4`;
+            makeRequest('spam', params);
         }
 
         // STOP — только user_id
@@ -151,7 +154,7 @@
                 showResult('<strong>❌ Ошибка:</strong> Введите User ID!', true);
                 return;
             }
-            makeRequest('stop', userId);
+            makeRequest('stop', `user_id=${userId}`);
         }
 
         // STATUS
