@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель управления спамом</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            padding: 15px;
-            margin: 0;
-        }
+        body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 15px; margin: 0; }
         .container {
             background: white;
             padding: 20px;
@@ -31,7 +26,7 @@
         }
         button {
             margin: 12px 6px 12px 0;
-            padding: 14px 20px;
+            padding: 14px 22px;
             font-size: 16px;
             border: none;
             border-radius: 8px;
@@ -48,7 +43,7 @@
             background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 8px;
-            min-height: 120px;
+            min-height: 130px;
             white-space: pre-wrap;
             word-break: break-all;
             font-family: monospace;
@@ -61,13 +56,13 @@
     <div class="container">
         <h1>🔧 Панель управления</h1>
 
-        <label>Base URL (меняется каждый раз):</label>
+        <label>Base URL:</label>
         <input type="text" id="baseUrl" value="http://100.98.84.47:5000" placeholder="http://100.98.84.47:5000">
 
         <label>User ID:</label>
         <input type="text" id="userId" value="12346080673" placeholder="123456789">
 
-        <label>Duration (время):</label>
+        <label>Duration:</label>
         <input type="number" id="duration" value="4" min="1">
 
         <div>
@@ -76,7 +71,7 @@
             <button class="btn-status" onclick="sendStatus()">📊 STATUS</button>
         </div>
 
-        <div id="result">Нажми кнопку, чтобы отправить запрос...</div>
+        <div id="result">Нажми кнопку для отправки...</div>
     </div>
 
     <script>
@@ -87,66 +82,76 @@
             return url;
         }
 
-        function showResult(message, isError = false) {
+        function showResult(html, isError = false) {
             const div = document.getElementById('result');
-            div.innerHTML = `<strong>${isError ? '❌ Ошибка' : '✅ Результат'}</strong><br><br>` + 
-                            message.replace(/\n/g, '<br>');
+            div.innerHTML = html;
             div.style.color = isError ? '#d32f2f' : '#2e7d32';
         }
 
-        function makeRequest(endpoint, params = '') {
+        function makeRequest(endpoint, queryString = '') {
             const base = getBaseUrl();
             if (!base) {
-                showResult('Сначала укажи Base URL!', true);
+                showResult('<strong>❌ Ошибка:</strong><br>Укажи Base URL!', true);
                 return;
             }
 
-            // Правильно формируем URL
             let fullUrl = base + endpoint;
-            if (params) {
-                fullUrl += (endpoint.includes('?') ? '&' : '?') + params;
+            if (queryString) {
+                fullUrl += (endpoint.includes('?') ? '&' : '?') + queryString;
             }
 
-            // Показываем реальный URL перед отправкой
-            showResult(`Отправляю запрос:<br><code>${fullUrl}</code><br><br>Подожди...`);
+            showResult(`<strong>Отправляю...</strong><br><code>${fullUrl}</code>`);
 
-            fetch(fullUrl, { 
-                method: 'GET',
-                mode: 'no-cors',
-                cache: 'no-cache'
-            })
+            fetch(fullUrl, { method: 'GET', mode: 'no-cors' })
             .then(() => {
-                showResult(`✅ Запрос успешно отправлен!<br><br>Реальный URL:<br><code>${fullUrl}</code><br><br>Если сервер запущен — действие должно выполниться.<br>Проверь логи сервера.`);
+                showResult(`
+                    <strong>✅ Запрос успешно отправлен!</strong><br><br>
+                    <strong>Реальный URL:</strong><br>
+                    <code>${fullUrl}</code><br><br>
+                    Проверь логи своего сервера.
+                `);
             })
             .catch(err => {
-                showResult(`❌ Не удалось отправить запрос.<br><br>URL: ${fullUrl}<br>Ошибка: ${err.message}`, true);
+                showResult(`
+                    <strong>❌ Не удалось отправить запрос</strong><br><br>
+                    URL: ${fullUrl}<br>
+                    Ошибка: ${err.message}
+                `, true);
             });
         }
 
+        // ================== START / SPAM ==================
         function sendSpam() {
             const userId = document.getElementById('userId').value.trim();
             const duration = document.getElementById('duration').value.trim();
 
-            if (!userId) return showResult('Введите User ID!', true);
-            if (!duration) return showResult('Введите Duration!', true);
+            if (!userId) {
+                showResult('<strong>❌ Ошибка:</strong><br>Введите User ID!', true);
+                return;
+            }
+            if (!duration) {
+                showResult('<strong>❌ Ошибка:</strong><br>Введите Duration!', true);
+                return;
+            }
 
-            makeRequest('spam', `user_id=\( {userId}&duration= \){duration}`);
+            const params = `user_id=\( {userId}&duration= \){duration}`;
+            makeRequest('spam', params);
         }
 
+        // ================== STOP ==================
         function sendStop() {
             const userId = document.getElementById('userId').value.trim();
-            if (!userId) return showResult('Введите User ID!', true);
+            if (!userId) {
+                showResult('<strong>❌ Ошибка:</strong><br>Введите User ID!', true);
+                return;
+            }
             makeRequest('stop', `user_id=${userId}`);
         }
 
+        // ================== STATUS ==================
         function sendStatus() {
             makeRequest('status');
         }
-
-        // Enter в поле User ID запускает SPAM
-        document.getElementById('userId').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendSpam();
-        });
     </script>
 </body>
 </html>
