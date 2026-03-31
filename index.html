@@ -7,70 +7,49 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { 
-      background: #0a0a0a; 
-      color: #ddd; 
-      font-family: system-ui, sans-serif; 
-      margin: 0;
-      padding: 0;
-    }
-    .card { 
-      background: #111111; 
-      border-radius: 16px; 
-    }
-    .progress-container { 
-      background: #1f1f1f; 
-      height: 10px; 
-      border-radius: 9999px; 
-      overflow: hidden; 
-    }
-    .progress-bar { 
-      height: 100%; 
-      background: linear-gradient(90deg, #22c55e, #4ade80); 
-      transition: width 0.6s ease; 
-    }
-    .live-dot { 
-      animation: pulse 2s infinite; 
-    }
-    @keyframes pulse { 
-      0%, 100% { opacity: 1; } 
-      50% { opacity: 0.3; } 
-    }
+    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
+    .card { background: #111111; border-radius: 16px; }
+    .progress-container { background: #1f1f1f; height: 10px; border-radius: 9999px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.6s ease; }
+    .live-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
 </head>
 <body class="min-h-screen pb-12">
 
 <div class="max-w-xl mx-auto pt-8 px-4">
 
+  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-xl">🔥</div>
       <h1 class="text-3xl font-bold tracking-tighter">FFLEVEL.PRO</h1>
     </div>
-    <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
+    <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm font-medium">
       <i class="fa-solid fa-rotate"></i> Refresh All
     </button>
   </div>
 
+  <!-- Добавление нового UID -->
+  <div class="mb-8 flex gap-3">
+    <input id="uidInput" type="text" placeholder="Добавить новый UID" 
+           class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
+    <button onclick="addNewAccount()" 
+            class="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
+      Добавить
+    </button>
+  </div>
+
+  <!-- Карточки аккаунтов -->
   <div id="mainAccounts" class="space-y-8"></div>
 
-  <div class="my-10">
-    <div class="flex gap-3">
-      <input id="uidInput" type="text" placeholder="Добавить новый UID" 
-             class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
-      <button onclick="addNewAccount()" 
-              class="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
-        Добавить
-      </button>
-    </div>
-  </div>
 </div>
 
 <script>
 // ==================== EXP TABLE ====================
-const EXP_TABLE = {
-  1: [0,48], 2:[48,154], 3:[202,342], 4:[544,468], 5:[1012,832],
-  6:[1844,948], 7:[2792,1008], 8:[3800,1070], 9:[4870,1134], 10:[6004,1188],
+const EXP_TABLE = { /* Полная таблица */ 
+  1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
+  6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
   11:[7192,1256],12:[8448,1328],13:[9776,1364],14:[11140,1426],15:[12566,1494],
   16:[14060,1550],17:[15610,1614],18:[17224,1678],19:[18902,1730],20:[20632,1792],
   21:[22424,2304],22:[24728,1464],23:[26192,1974],24:[28166,2034],25:[30200,2094],
@@ -95,15 +74,14 @@ let accounts = [];
 
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
-  if (saved) {
-    accounts = JSON.parse(saved);
-  } else {
+  if (saved) accounts = JSON.parse(saved);
+  else {
     accounts = [
-      { uid: "9900005554", initialExp: 0, lastExp: 0, gainedExp: 0, sessionStart: Date.now(), nickname: "GX GarouX", level: 63 },
-      { uid: "13777777733", initialExp: 0, lastExp: 0, gainedExp: 0, sessionStart: Date.now(), nickname: "Loading...", level: 1 }
+      { uid: "9900005554", initialExp: 0, lastExp: 0, gainedExp: 0, nickname: "GX GarouX", level: 63 },
+      { uid: "13777777733", initialExp: 0, lastExp: 0, gainedExp: 0, nickname: "Loading...", level: 1 }
     ];
   }
-  renderMainAccounts();
+  renderAccounts();
 }
 
 function saveAccounts() {
@@ -112,24 +90,21 @@ function saveAccounts() {
 
 function calculateProgress(totalExp) {
   let level = 1;
-  let baseExp = 0;
-  let needForNext = 48;
-
+  let base = 0;
+  let need = 48;
   for (let lvl = 1; lvl <= 100; lvl++) {
     if (EXP_TABLE[lvl]) {
       if (totalExp >= EXP_TABLE[lvl][0]) {
         level = lvl;
-        baseExp = EXP_TABLE[lvl][0];
-        needForNext = EXP_TABLE[lvl][1] || 0;
+        base = EXP_TABLE[lvl][0];
+        need = EXP_TABLE[lvl][1] || 0;
       } else break;
     }
   }
-
-  const currentInLevel = totalExp - baseExp;
-  const remaining = Math.max(0, needForNext - currentInLevel);
-  const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
-
-  return { level, progress: progress.toFixed(2), currentInLevel, remaining, needForNext };
+  const current = totalExp - base;
+  const remaining = Math.max(0, need - current);
+  const progress = need > 0 ? (current / need) * 100 : 100;
+  return { level, progress: progress.toFixed(2), current, remaining, need };
 }
 
 async function updateAccount(index) {
@@ -141,35 +116,32 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const totalExpNow = parseInt(captain.exp || raw.AccountInfo?.AccountEXP) || acc.lastExp;
 
-    const nickname = captain.nickname || acc.nickname || "Unknown";
-
-    // Фиксируем начальное значение при первом обновлении
-    if (acc.initialExp === 0 && totalExpNow > 0) {
+    // Фиксируем начальное значение только один раз
+    if (acc.initialExp === 0) {
       acc.initialExp = totalExpNow;
     }
 
-    // Считаем набранное
+    // Считаем сколько добавилось
     acc.gainedExp = totalExpNow - acc.initialExp;
 
-    // Обновляем данные
-    const levelInfo = calculateProgress(totalExpNow);
+    const info = calculateProgress(totalExpNow);
+
     acc.lastExp = totalExpNow;
-    acc.nickname = nickname;
-    acc.level = levelInfo.level;
-    acc.progress = levelInfo.progress;
-    acc.currentInLevel = levelInfo.currentInLevel;
-    acc.remaining = levelInfo.remaining;
-    acc.needForNext = levelInfo.needForNext;
+    acc.nickname = captain.nickname || acc.nickname;
+    acc.level = info.level;
+    acc.progress = info.progress;
+    acc.current = info.current;
+    acc.remaining = info.remaining;
+    acc.need = info.need;
 
     saveAccounts();
-    renderMainAccounts();
-
-  } catch (e) {
-    console.error("Ошибка обновления UID " + acc.uid, e);
+    renderAccounts();
+  } catch(e) {
+    console.error(e);
   }
 }
 
-function renderMainAccounts() {
+function renderAccounts() {
   const container = document.getElementById('mainAccounts');
   container.innerHTML = '';
 
@@ -193,7 +165,7 @@ function renderMainAccounts() {
         <div>
           <div class="flex justify-between text-sm mb-1">
             <span class="text-green-400 font-semibold">${acc.progress || 0}% Progress</span>
-            <span class="text-zinc-400">${(acc.currentInLevel || 0)} / ${(acc.needForNext || 48)} EXP</span>
+            <span class="text-zinc-400">${(acc.current || 0)} / ${(acc.need || 48)} EXP</span>
           </div>
           <div class="progress-container">
             <div class="progress-bar" style="width: ${acc.progress || 0}%"></div>
@@ -241,7 +213,7 @@ function deleteAccount(index) {
   if (confirm("Удалить этот аккаунт?")) {
     accounts.splice(index, 1);
     saveAccounts();
-    renderMainAccounts();
+    renderAccounts();
   }
 }
 
@@ -255,17 +227,12 @@ function addNewAccount() {
     initialExp: 0,
     lastExp: 0,
     gainedExp: 0,
-    sessionStart: Date.now(),
     nickname: "Загрузка...",
-    level: 1,
-    progress: 0,
-    currentInLevel: 0,
-    remaining: 48,
-    needForNext: 48
+    level: 1
   });
 
   saveAccounts();
-  renderMainAccounts();
+  renderAccounts();
   updateAccount(accounts.length - 1);
 }
 
