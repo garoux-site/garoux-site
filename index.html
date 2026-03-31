@@ -3,142 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FFLevel.pro</title>
+  <title>FFLevel.pro - Live Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body {
-      background: #0a0a0a;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #ddd;
-    }
-    .card {
-      background: #111111;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-    .progress-bg {
-      background: #1f1f1f;
-    }
+    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
+    .card { background: #111; border-radius: 16px; }
+    .progress-container { background: #1f1f1f; height: 12px; border-radius: 9999px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.6s ease; }
+    .live { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
   </style>
 </head>
-<body class="min-h-screen pb-8">
+<body class="min-h-screen pb-12">
 
-  <div class="max-w-2xl mx-auto pt-6 px-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg">
-          🔥
-        </div>
-        <div>
-          <h1 class="text-3xl font-bold tracking-tighter">FFLEVEL.PRO</h1>
-        </div>
-      </div>
+<div class="max-w-2xl mx-auto pt-6 px-4">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-2xl">🔥</div>
+      <h1 class="text-3xl font-bold tracking-tight">FFLEVEL.PRO</h1>
     </div>
-
-    <!-- Search -->
-    <div class="mb-8">
-      <div class="relative">
-        <input 
-          id="uidInput"
-          type="text" 
-          placeholder="Введите UID (например: 9900005554)"
-          class="w-full bg-zinc-900 border border-zinc-700 focus:border-emerald-500 rounded-3xl px-7 py-5 text-lg outline-none transition-all"
-          onkeypress="if(event.key === 'Enter') fetchPlayer()">
-        <button 
-          onclick="fetchPlayer()"
-          class="absolute right-3 top-1/2 -translate-y-1/2 bg-emerald-600 hover:bg-emerald-500 px-10 py-4 rounded-3xl font-semibold transition-colors">
-          Поиск
-        </button>
-      </div>
-    </div>
-
-    <!-- Результат -->
-    <div id="result" class="hidden card p-8"></div>
-
-    <!-- Заглушка -->
-    <div id="placeholder" class="card p-12 text-center text-zinc-400">
-      <i class="fa-solid fa-user-magnifying-glass text-7xl mb-6 opacity-40"></i>
-      <p class="text-xl font-medium">Введите UID игрока Free Fire</p>
-      <p class="text-sm mt-3">Данные берутся с gojoinfoapi-mu.vercel.app</p>
+    <div class="flex gap-4">
+      <button onclick="refreshData()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-5 py-2 rounded-2xl text-sm">
+        <i class="fa-solid fa-rotate"></i> Refresh
+      </button>
     </div>
   </div>
 
-  <script>
-    async function fetchPlayer() {
-      let uid = document.getElementById('uidInput').value.trim();
-      if (!uid) {
-        alert("Введите UID игрока!");
-        return;
-      }
+  <!-- Search -->
+  <div class="mb-8">
+    <div class="relative">
+      <input id="uidInput" type="text" placeholder="Введите UID (например: 15200904087)" 
+             class="w-full bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-5 text-lg outline-none">
+      <button onclick="startTracking()" 
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-green-600 hover:bg-green-500 px-8 py-4 rounded-3xl font-semibold">
+        Поиск
+      </button>
+    </div>
+  </div>
 
-      const url = `https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`;
-      const resultDiv = document.getElementById('result');
-      const placeholder = document.getElementById('placeholder');
+  <!-- Result -->
+  <div id="result" class="hidden card p-6 space-y-6">
 
-      resultDiv.classList.remove('hidden');
-      placeholder.classList.add('hidden');
-
-      resultDiv.innerHTML = `
-        <div class="flex justify-center py-16">
-          <div class="animate-spin w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
+    <!-- Player Header -->
+    <div class="flex items-center gap-5">
+      <img id="avatar" src="https://via.placeholder.com/100/1f2937/22c55e?text=FF" 
+           class="w-20 h-20 rounded-2xl border-2 border-zinc-700 object-cover">
+      <div class="flex-1">
+        <div class="flex items-center gap-3">
+          <h2 id="nickname" class="text-3xl font-bold">GarouX¹⁸¹⁴⁰</h2>
+          <span id="liveBadge" class="hidden bg-green-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-white rounded-full live"></span> LIVE
+          </span>
         </div>
-      `;
+        <p id="uidDisplay" class="text-green-400">UID: 15200904087</p>
+        <p id="levelText" class="text-2xl text-emerald-400">Level 27</p>
+      </div>
+    </div>
 
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
+    <!-- Progress -->
+    <div>
+      <div class="flex justify-between text-sm mb-2">
+        <span id="progressPercent" class="font-bold text-green-400">21.19% Progress</span>
+        <span id="expInfo" class="text-zinc-400">711 / 3356 EXP</span>
+      </div>
+      <div class="progress-container">
+        <div id="progressBar" class="progress-bar" style="width: 21.19%"></div>
+      </div>
+      <div class="flex justify-between text-xs mt-3 text-zinc-500">
+        <div><i class="fa-solid fa-bolt"></i> <span id="xpPerMin">0</span> XP/min</div>
+        <div id="eta">ETA \~ 45m</div>
+      </div>
+    </div>
 
-        // Поддержка двух возможных структур ответа API
-        let nickname = "Неизвестно";
-        let level = "?";
-        let totalExp = "0";
-        let avatarUrl = "https://via.placeholder.com/120/1f2937/ffffff?text=FF";
+    <!-- EXP Stats -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-zinc-900 rounded-3xl p-5">
+        <p class="text-xs text-zinc-500">Current EXP</p>
+        <p id="currentExp" class="text-4xl font-bold">35159</p>
+      </div>
+      <div class="bg-zinc-900 rounded-3xl p-5">
+        <p class="text-xs text-zinc-500">Remaining XP</p>
+        <p id="remainingExp" class="text-4xl font-bold text-orange-400">2645</p>
+      </div>
+    </div>
 
-        if (data.AccountInfo || data.captainBasicInfo) {
-          // Основная структура (как у 9900005554)
-          nickname = data.captainBasicInfo?.nickname || data.AccountInfo?.AccountName || "Unknown";
-          level = data.captainBasicInfo?.level || data.AccountInfo?.AccountLevel || "?";
-          totalExp = data.captainBasicInfo?.exp || data.AccountInfo?.AccountEXP || "0";
-        } else if (data.nickname) {
-          // Альтернативная структура (как у 9900005551)
-          nickname = data.nickname;
-          level = data.level || "?";
-          totalExp = data.total_exp || data.exp_current_xp || "0";
-        }
+    <!-- Token & Today -->
+    <div class="bg-zinc-900 rounded-3xl p-5 text-sm">
+      <div class="flex justify-between items-center">
+        <div>
+          <span class="text-green-400">Token Expires:</span> 
+          <span id="tokenTime">7h 59m (at 07:28)</span>
+        </div>
+        <span class="bg-green-600 px-5 py-1 rounded-full text-xs font-bold">SUCCESS</span>
+      </div>
+    </div>
 
-        resultDiv.innerHTML = `
-          <div class="flex items-center gap-6 mb-8">
-            <img src="${avatarUrl}" alt="avatar" class="w-24 h-24 rounded-3xl border-4 border-zinc-700 object-cover">
-            <div class="flex-1">
-              <h2 class="text-3xl font-bold">${nickname}</h2>
-              <p class="text-emerald-400 text-xl mt-1">Уровень ${level}</p>
-              <p class="text-zinc-500 text-sm mt-2">UID: ${uid}</p>
-            </div>
-          </div>
+    <div class="bg-zinc-900 rounded-3xl p-5">
+      <p id="totalToday" class="text-green-400 font-medium">Total +35K (+35,111) EXP</p>
+      <p class="text-sm text-zinc-500">Level 2 → 27</p>
+    </div>
 
-          <div class="bg-zinc-900 rounded-3xl p-6 mb-6">
-            <p class="text-zinc-400 text-sm">Всего ачков уровня (EXP)</p>
-            <p class="text-4xl font-bold text-white mt-2">${Number(totalExp).toLocaleString('ru-RU')}</p>
-          </div>
+    <!-- Buttons -->
+    <div class="flex gap-3 pt-4">
+      <button class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl flex items-center justify-center gap-2">
+        <i class="fa-solid fa-bell"></i> Notify
+      </button>
+      <button onclick="togglePause()" id="pauseBtn"
+              class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl flex items-center justify-center gap-2">
+        <i class="fa-solid fa-pause"></i> Pause
+      </button>
+      <button class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl flex items-center justify-center gap-2">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    </div>
+  </div>
 
-          <div class="text-xs text-zinc-500 flex justify-between">
-            <p>Регион: RU</p>
-            <p>Данные обновлены только что</p>
-          </div>
-        `;
+  <!-- Placeholder -->
+  <div id="placeholder" class="card p-12 text-center text-zinc-500">
+    <i class="fa-solid fa-magnifying-glass text-6xl mb-6 opacity-40"></i>
+    <p class="text-xl">Введите UID Free Fire</p>
+    <p class="text-sm mt-2">Данные из gojoinfoapi-mu.vercel.app (region RU)</p>
+  </div>
+</div>
 
-      } catch (error) {
-        resultDiv.innerHTML = `
-          <div class="text-red-400 text-center py-12">
-            <i class="fa-solid fa-circle-exclamation text-5xl mb-4"></i>
-            <p class="text-xl">Ошибка загрузки</p>
-            <p class="text-sm mt-2">Проверьте правильность UID или подключение к интернету</p>
-          </div>
-        `;
+<script>
+// EXP таблица из твоего файла (упрощённая версия до \~100 уровня)
+const EXP_TABLE = {
+  1: [0, 48], 2: [48, 154], 3: [202, 342], 4: [544, 468], 5: [1012, 832],
+  6: [1844, 948], 7: [2792, 1008], 8: [3800, 1070], 9: [4870, 1134], 10: [6004, 1188],
+  11: [7192, 1256], 12: [8448, 1328], 13: [9776, 1364], 14: [11140, 1426], 15: [12566, 1494],
+  16: [14060, 1550], 17: [15610, 1614], 18: [17224, 1678], 19: [18902, 1730], 20: [20632, 1792],
+  21: [22424, 2304], 22: [24728, 1464], 23: [26192, 1974], 24: [28166, 2034], 25: [30200, 2094],
+  26: [32294, 2154], 27: [34448, 3356], 28: [37804, 3370], 29: [41174, 3696], 30: [44870, 3982],
+  // ... можно добавить дальше при необходимости
+};
+
+let currentUid = null;
+let isPaused = false;
+
+async function fetchPlayerData(uid) {
+  try {
+    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
+    const data = await res.json();
+
+    const nickname = data.nickname || "Unknown";
+    let level = parseInt(data.level) || 1;
+    let totalExp = parseInt(data.exp) || 0;
+
+    // Расчёт текущего уровня и remaining XP по таблице
+    let baseExp = 0;
+    let needForNext = 0;
+    for (let lvl in EXP_TABLE) {
+      if (totalExp >= EXP_TABLE[lvl][0]) {
+        level = parseInt(lvl);
+        baseExp = EXP_TABLE[lvl][0];
+        needForNext = EXP_TABLE[lvl][1] || 0;
+      } else {
+        break;
       }
     }
-  </script>
+
+    const currentInLevel = totalExp - baseExp;
+    const remaining = Math.max(0, needForNext - currentInLevel);
+    const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
+
+    // Обновляем UI
+    document.getElementById("nickname").textContent = nickname;
+    document.getElementById("uidDisplay").textContent = `UID: ${uid}`;
+    document.getElementById("levelText").textContent = `Level ${level}`;
+    document.getElementById("currentExp").textContent = totalExp.toLocaleString('ru-RU');
+    document.getElementById("remainingExp").textContent = remaining.toLocaleString('ru-RU');
+    document.getElementById("progressPercent").textContent = `${progress.toFixed(2)}% Progress`;
+    document.getElementById("expInfo").textContent = `${currentInLevel} / ${needForNext} EXP`;
+    document.getElementById("progressBar").style.width = `${progress}%`;
+
+    document.getElementById("liveBadge").classList.remove("hidden");
+
+    // Показываем результат
+    document.getElementById("result").classList.remove("hidden");
+    document.getElementById("placeholder").classList.add("hidden");
+
+  } catch (err) {
+    alert("Ошибка загрузки данных. Проверьте UID.");
+    console.error(err);
+  }
+}
+
+function startTracking() {
+  currentUid = document.getElementById("uidInput").value.trim();
+  if (!currentUid) return alert("Введите UID!");
+  fetchPlayerData(currentUid);
+}
+
+function refreshData() {
+  if (currentUid) fetchPlayerData(currentUid);
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  const btn = document.getElementById("pauseBtn");
+  btn.innerHTML = isPaused 
+    ? `<i class="fa-solid fa-play"></i> Resume` 
+    : `<i class="fa-solid fa-pause"></i> Pause`;
+}
+
+// Авто-refresh каждые 12 секунд (как на скриншоте)
+setInterval(() => {
+  if (currentUid && !isPaused) refreshData();
+}, 12000);
+
+</script>
 </body>
 </html>
