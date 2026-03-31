@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FFLEVEL.PRO</title>
+  <title>FFGarouX.lvl</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -22,7 +22,7 @@
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-xl">🔥</div>
-      <h1 class="text-3xl font-bold tracking-tighter">FFLEVEL.PRO</h1>
+      <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
     </div>
     <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
       <i class="fa-solid fa-rotate"></i> Refresh All
@@ -71,11 +71,8 @@ let accounts = [];
 
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
-  if (saved) {
-    accounts = JSON.parse(saved);
-  } else {
-    accounts = [];
-  }
+  if (saved) accounts = JSON.parse(saved);
+  else accounts = [];
   renderMainAccounts();
 }
 
@@ -105,6 +102,17 @@ function calculateProgress(totalExp) {
   return { level, progress: progress.toFixed(2), currentInLevel, remaining, needForNext };
 }
 
+function getTimeUntilReset(sessionStart) {
+  const now = Date.now();
+  const resetTime = sessionStart + 24 * 60 * 60 * 1000;
+  const remaining = Math.max(0, resetTime - now);
+  
+  const hours = Math.floor(remaining / (1000 * 60 * 60));
+  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours}ч ${minutes}м`;
+}
+
 async function updateAccount(index) {
   const acc = accounts[index];
   try {
@@ -112,22 +120,23 @@ async function updateAccount(index) {
     const raw = await res.json();
 
     const captain = raw.captainBasicInfo || {};
-    const totalExpNow = parseInt(captain.exp || raw.AccountInfo?.AccountEXP) || acc.lastExp;
+    const accountInfo = raw.AccountInfo || {};
 
-    const nickname = captain.nickname || acc.nickname;
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp;
+    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname;
+    const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
-    // Проверка: прошло ли 24 часа с последнего сброса?
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
+    // Сброс каждые 24 часа
     if (hoursPassed >= 24) {
-      // Сброс сессии каждые 24 часа
       acc.sessionStart = now;
-      acc.sessionStartExp = totalExpNow;   // Новое "Было при добавлении"
+      acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
-    // Расчёт набранного EXP за текущие 24 часа
+    // Расчёт EXP за текущие сутки
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -136,14 +145,11 @@ async function updateAccount(index) {
 
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
+    acc.likes = likes;
     acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
-    acc.level = levelInfo.level;
-    acc.progress = levelInfo.progress;
-    acc.currentInLevel = levelInfo.currentInLevel;
-    acc.remaining = levelInfo.remaining;
-    acc.needForNext = levelInfo.needForNext;
+    Object.assign(acc, levelInfo);
 
     saveAccounts();
     renderMainAccounts();
@@ -159,6 +165,7 @@ function renderMainAccounts() {
 
   accounts.forEach((acc, index) => {
     const startExp = acc.sessionStartExp || acc.lastExp || 0;
+    const timerText = getTimeUntilReset(acc.sessionStart);
 
     const cardHTML = `
       <div class="card p-6 space-y-6">
@@ -210,6 +217,14 @@ function renderMainAccounts() {
             <span class="text-zinc-400">На данный момент:</span>
             <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
           </div>
+          <div class="flex justify-between border-t border-zinc-700 pt-3">
+            <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
+            <span class="font-bold text-pink-400">${acc.likes ? acc.likes.toLocaleString('ru-RU') : '0'}</span>
+          </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-3xl p-4 text-center text-sm text-amber-400">
+          До сброса сессии: <span class="font-semibold">${timerText}</span>
         </div>
 
         <div class="flex gap-3">
@@ -242,7 +257,7 @@ function addNewAccount() {
     todayExp: 0,
     sessionStart: now,
     sessionStartExp: 0,
-    lastUpdateTime: now,
+    likes: 0,
     nickname: "Загрузка...",
     level: 1,
     progress: 0,
@@ -264,8 +279,15 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 30 секунд
-setInterval(refreshAll, 30000);
+// Автообновление каждые 30 секунд + обновление таймера
+setInterval(() => {
+  refreshAll();
+}, 30000);
+
+// Обновление таймера каждые 60 секунд (без полного запроса к API)
+setInterval(() => {
+  renderMainAccounts();
+}, 60000);
 </script>
 </body>
 </html>
