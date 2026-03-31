@@ -2,36 +2,46 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>FFLevel Tracker - GarouX</title>
+<title>FFLevel Tracker</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    body { margin:0; font-family: 'Segoe UI', sans-serif; background:#0a0f1c; color:#e0e0e0; }
-    .container { max-width: 640px; margin: 20px auto; padding: 15px; }
-    header { text-align:center; margin-bottom:20px; }
-    .title { font-size:28px; font-weight:bold; color:#00ff9d; }
-    .subtitle { color:#888; font-size:14px; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#0a0f1c; color:#e0e7ff; font-family:Segoe UI, sans-serif; }
+    .container { max-width:650px; margin:15px auto; padding:10px; }
 
-    .card { background:#121a2a; border-radius:16px; padding:18px; margin-bottom:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4); }
-    .player-info { display:flex; align-items:center; gap:15px; margin-bottom:15px; }
-    .avatar { width:80px; height:80px; border-radius:12px; background:#333; overflow:hidden; }
+    header { text-align:center; padding:15px 0; background:#111827; border-radius:16px; margin-bottom:15px; }
+    .title { font-size:26px; font-weight:800; color:#22ffaa; letter-spacing:1px; }
+
+    .search { display:flex; gap:10px; margin:15px 0; }
+    .search input { flex:1; padding:14px; background:#1f2937; border:none; border-radius:12px; color:white; font-size:16px; }
+    .search button { padding:14px 24px; background:#22ffaa; color:#111827; border:none; border-radius:12px; font-weight:bold; cursor:pointer; }
+
+    .main-card { background:#111827; border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
+    .player-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+    .avatar { width:90px; height:90px; border-radius:16px; background:#1f2937; overflow:hidden; border:3px solid #22ffaa; }
     .avatar img { width:100%; height:100%; object-fit:cover; }
-    .nickname { font-size:24px; font-weight:bold; color:#00ff9d; }
-    .uid { color:#aaa; font-size:15px; }
 
-    .progress-container { margin:20px 0; }
-    .progress-bar-bg { height:18px; background:#1e2a44; border-radius:999px; overflow:hidden; }
-    .progress-bar { height:100%; background:linear-gradient(90deg, #00ff9d, #00cc7a); transition: width 0.6s ease; }
-    .progress-text { display:flex; justify-content:space-between; margin-top:6px; font-size:15px; }
+    .info { flex:1; }
+    .nickname { font-size:28px; font-weight:700; color:#22ffaa; }
+    .uid { color:#94a3b8; font-size:15px; }
 
-    .stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .stat { background:#1e2a44; padding:12px; border-radius:12px; text-align:center; }
-    .stat-label { font-size:13px; color:#888; }
-    .stat-value { font-size:22px; font-weight:bold; color:#fff; margin-top:4px; }
+    .level-big { text-align:center; font-size:68px; font-weight:900; color:#fff; line-height:1; margin:10px 0; }
+    .level-label { text-align:center; color:#22ffaa; font-size:18px; font-weight:600; letter-spacing:2px; }
 
-    .live { background:#00ff9d; color:#000; padding:4px 12px; border-radius:999px; font-size:14px; font-weight:bold; display:inline-flex; align-items:center; gap:5px; }
+    .progress-area { margin:25px 0; }
+    .progress-bg { height:22px; background:#1e2937; border-radius:999px; overflow:hidden; }
+    .progress-fill { height:100%; background:linear-gradient(90deg, #22ffaa, #00cc77); transition:width 0.8s ease; }
+    .progress-info { display:flex; justify-content:space-between; margin-top:8px; font-size:15px; font-weight:500; }
 
-    .log { margin-top:20px; background:#0a0f1c; border-radius:12px; padding:12px; height:180px; overflow:auto; font-family:monospace; font-size:13px; color:#0f0; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
+    .stat-box { background:#1e2937; padding:16px; border-radius:14px; text-align:center; }
+    .stat-label { font-size:13px; color:#94a3b8; }
+    .stat-value { font-size:26px; font-weight:700; color:#fff; margin-top:4px; }
+
+    .live-badge { background:#22ffaa; color:#111; padding:4px 14px; border-radius:999px; font-size:14px; font-weight:bold; display:inline-flex; align-items:center; gap:6px; }
+
+    .log { margin-top:20px; background:#0a0f1c; border-radius:12px; padding:12px; height:160px; overflow:auto; font-family:monospace; font-size:13px; color:#67e8a5; }
 </style>
 </head>
 <body>
@@ -39,60 +49,58 @@
 <div class="container">
     <header>
         <div class="title">FFLEVEL TRACKER</div>
-        <div class="subtitle">Реальное время • Обновление каждые 5 сек</div>
     </header>
 
-    <div class="card">
-        <div class="player-info">
+    <div class="search">
+        <input type="text" id="uidInput" placeholder="Введите UID (например: 15200904095)" value="15200904095">
+        <button onclick="startTracking()">ПОКАЗАТЬ ИНФО</button>
+    </div>
+
+    <div class="main-card" id="mainCard" style="display:none;">
+        <div class="player-header">
             <div class="avatar">
-                <!-- Можно добавить аватар позже -->
-                <img src="https://via.placeholder.com/80/1e2a44/00ff9d?text=FF" alt="avatar">
+                <img id="avatar" src="https://via.placeholder.com/90/1f2937/22ffaa?text=FF" alt="avatar">
             </div>
-            <div>
-                <div class="nickname" id="nickname">GarouX<span class="live" id="live" style="display:none;">LIVE</span></div>
-                <div class="uid">UID: <span id="uid">-</span></div>
+            <div class="info">
+                <div class="nickname" id="nickname">-</div>
+                <div class="uid">UID: <span id="uidDisplay">-</span></div>
                 <div style="margin-top:8px;">
-                    <span style="background:#1e2a44; padding:4px 10px; border-radius:8px; font-size:14px;" id="region">RU</span>
+                    <span class="live-badge" id="liveBadge" style="display:none;">● LIVE</span>
                 </div>
             </div>
-        </div>
-
-        <div style="text-align:center; margin:15px 0;">
-            <div style="font-size:48px; font-weight:bold; color:#fff;" id="level">22</div>
-            <div style="color:#00ff9d; font-size:18px;">LEVEL</div>
-        </div>
-
-        <div class="progress-container">
-            <div class="progress-bar-bg">
-                <div class="progress-bar" id="progressBar" style="width:90%"></div>
+            <div style="text-align:right;">
+                <div style="font-size:14px; color:#94a3b8;">Регион</div>
+                <div style="font-size:20px; font-weight:bold;" id="region">RU</div>
             </div>
-            <div class="progress-text">
+        </div>
+
+        <div class="level-big" id="level">22</div>
+        <div class="level-label">LEVEL</div>
+
+        <div class="progress-area">
+            <div class="progress-bg">
+                <div class="progress-fill" id="progressFill" style="width:90%"></div>
+            </div>
+            <div class="progress-info">
                 <span id="currentExp">1731</span>
-                <span id="percent">90.44%</span>
+                <span id="progressPercent">90.44%</span>
                 <span id="needExp">1914</span>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-label">EXP в минуту</div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">EXP / мин</div>
                 <div class="stat-value" id="expPerMin">146</div>
             </div>
-            <div class="stat">
-                <div class="stat-label">Осталось до уровня</div>
-                <div class="stat-value" id="remaining">183</div>
+            <div class="stat-box">
+                <div class="stat-label">Осталось XP</div>
+                <div class="stat-value" id="remainingXP">183</div>
             </div>
         </div>
 
-        <div style="margin-top:15px; text-align:center; color:#888; font-size:15px;">
-            Примерное время: <span id="eta" style="color:#00ff9d; font-weight:bold;">2m</span>
-        </div>
-    </div>
-
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div><strong>Сегодня получено EXP:</strong></div>
-            <div style="font-size:24px; color:#00ff9d;" id="totalToday">0</div>
+        <div style="text-align:center; margin-top:15px; color:#94a3b8;">
+            До следующего уровня ≈ <span id="eta" style="color:#22ffaa; font-weight:bold;">2 мин</span>
         </div>
     </div>
 
@@ -100,44 +108,40 @@
 </div>
 
 <script>
-// ==================== EXP ТАБЛИЦА ====================
-const EXP_TABLE = { /* Вставь сюда весь твой EXP объект из предыдущих сообщений */ 
-1:[0,48],2:[48,154], /* ... продолжай до 100 */ };
+// ==================== EXP TABLE (вставь полностью из первого файла) ====================
+const EXP = { /* ... твой большой объект EXP ... */ }; // ← Замени на полный EXP из первого сообщения
 
-// ==================== ПЕРЕМЕННЫЕ ====================
-let uid = "15200904095"; // Можно менять
+let currentUID = "";
 let lastExp = null;
-let totalSessionGain = 0;
-let lastUpdateTime = Date.now();
+let sessionStart = Date.now();
+let totalGain = 0;
 let timer = null;
 
-// ==================== LOG ====================
-function log(text) {
+// Log function
+function log(msg) {
     const logEl = document.getElementById("log");
-    logEl.innerHTML += `<span style="color:#0f0">[${new Date().toLocaleTimeString()}]</span> ${text}<br>`;
+    logEl.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
     logEl.scrollTop = logEl.scrollHeight;
 }
 
-// ==================== РАСЧЁТ УРОВНЯ И ПРОГРЕССА ====================
-function calculateLevelAndProgress(exp) {
+function calculateProgress(exp) {
     let level = 1;
-    for (let lvl in EXP_TABLE) {
-        if (exp >= EXP_TABLE[lvl][0]) level = parseInt(lvl);
+    for (let l in EXP) {
+        if (exp >= EXP[l][0]) level = parseInt(l);
         else break;
     }
-    const base = EXP_TABLE[level] ? EXP_TABLE[level][0] : 0;
-    const need = EXP_TABLE[level] ? EXP_TABLE[level][1] : 0;
-    const currentInLevel = exp - base;
-    const percent = need > 0 ? Math.min(100, (currentInLevel / need) * 100) : 100;
-    const remaining = Math.max(0, need - currentInLevel);
+    const base = EXP[level] ? EXP[level][0] : 0;
+    const need = EXP[level] ? EXP[level][1] : 0;
+    const current = exp - base;
+    const percent = need ? (current / need * 100) : 100;
+    const remaining = Math.max(0, need - current);
 
-    return { level, currentInLevel, need, percent: percent.toFixed(2), remaining };
+    return { level, current, need, percent: percent.toFixed(2), remaining };
 }
 
-// ==================== ЗАПРОС К API ====================
-async function fetchPlayerData() {
+async function fetchData() {
     try {
-        const url = `https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`;
+        const url = `https://gojoinfoapi-mu.vercel.app/get?uid=${currentUID}&region=RU`;
         const res = await fetch(url);
         const data = await res.json();
 
@@ -145,71 +149,76 @@ async function fetchPlayerData() {
         const cap = data.captainBasicInfo || {};
 
         const exp = parseInt(acc.AccountEXP) || parseInt(cap.exp) || 0;
-        const nickname = cap.nickname || "Unknown";
-        const playerUid = uid;
+        const nickname = cap.nickname || acc.AccountName || "Unknown";
+        const region = acc.AccountRegion || cap.region || "RU";
+        const levelInfo = calculateProgress(exp);
 
-        // Расчёт прогресса
-        const prog = calculateLevelAndProgress(exp);
-
-        // Обновление интерфейса
+        // Обновляем интерфейс
         document.getElementById("nickname").textContent = nickname;
-        document.getElementById("uid").textContent = playerUid;
-        document.getElementById("level").textContent = prog.level;
-        document.getElementById("currentExp").textContent = prog.currentInLevel;
-        document.getElementById("needExp").textContent = prog.need;
-        document.getElementById("percent").textContent = prog.percent + "%";
-        document.getElementById("remaining").textContent = prog.remaining;
-        document.getElementById("progressBar").style.width = prog.percent + "%";
+        document.getElementById("uidDisplay").textContent = currentUID;
+        document.getElementById("region").textContent = region.toUpperCase();
+        document.getElementById("level").textContent = levelInfo.level;
+        document.getElementById("currentExp").textContent = levelInfo.current;
+        document.getElementById("needExp").textContent = levelInfo.need;
+        document.getElementById("progressPercent").textContent = levelInfo.percent + "%";
+        document.getElementById("progressFill").style.width = levelInfo.percent + "%";
+        document.getElementById("remainingXP").textContent = levelInfo.remaining;
 
-        // EXP за минуту
-        const now = Date.now();
-        const minutesPassed = (now - lastUpdateTime) / 60000;
+        // EXP per minute
         let expPerMin = 0;
-        if (lastExp !== null && minutesPassed > 0) {
+        if (lastExp !== null) {
             const gained = exp - lastExp;
             if (gained > 0) {
-                totalSessionGain += gained;
-                expPerMin = Math.round(gained / minutesPassed);
+                totalGain += gained;
+                const minutes = (Date.now() - sessionStart) / 60000;
+                expPerMin = minutes > 0 ? Math.round(totalGain / minutes) : 0;
             }
         }
-        document.getElementById("expPerMin").textContent = expPerMin || "-";
+        document.getElementById("expPerMin").textContent = expPerMin || "0";
 
-        // Примерное время до уровня (ETA)
-        let eta = "—";
-        if (expPerMin > 0) {
-            const minutesLeft = Math.ceil(prog.remaining / expPerMin);
-            eta = minutesLeft < 60 ? `\( {minutesLeft}m` : ` \){Math.floor(minutesLeft/60)}h ${minutesLeft%60}m`;
+        // ETA
+        let etaText = "—";
+        if (expPerMin > 0 && levelInfo.remaining > 0) {
+            const minLeft = Math.ceil(levelInfo.remaining / expPerMin);
+            etaText = minLeft + " мин";
         }
-        document.getElementById("eta").textContent = eta;
+        document.getElementById("eta").textContent = etaText;
 
-        document.getElementById("totalToday").textContent = totalSessionGain.toLocaleString();
-
-        if (lastExp !== null && exp > lastExp) {
-            log(`+${exp - lastExp} EXP`);
-        }
+        document.getElementById("liveBadge").style.display = "inline-flex";
 
         lastExp = exp;
-        lastUpdateTime = now;
+        log(`Обновлено: Level ${levelInfo.level} • ${levelInfo.percent}%`);
 
-        // Показываем LIVE
-        document.getElementById("live").style.display = "inline-flex";
-
-    } catch (err) {
-        log("Ошибка получения данных");
-        console.error(err);
+    } catch (e) {
+        log("Ошибка API: " + e.message);
+        console.error(e);
     }
 }
 
-// ==================== ЗАПУСК ====================
 function startTracking() {
+    currentUID = document.getElementById("uidInput").value.trim();
+    if (!currentUID) {
+        alert("Введите UID!");
+        return;
+    }
+
     if (timer) clearInterval(timer);
-    log("🚀 Отслеживание запущено (обновление каждые 5 сек)");
-    fetchPlayerData();
-    timer = setInterval(fetchPlayerData, 5000); // каждые 5 секунд
+
+    document.getElementById("mainCard").style.display = "block";
+    document.getElementById("log").innerHTML = "";
+
+    log("Запуск отслеживания для UID: " + currentUID);
+    sessionStart = Date.now();
+    totalGain = 0;
+    lastExp = null;
+
+    fetchData();
+    timer = setInterval(fetchData, 5000); // каждые 5 секунд
 }
 
+// Автозапуск с примером
 window.onload = () => {
-    startTracking();
+    log("Сайт готов. Введите UID сверху и нажмите кнопку.");
 };
 </script>
 </body>
