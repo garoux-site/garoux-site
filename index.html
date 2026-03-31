@@ -21,7 +21,8 @@
 
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-xl">🔥</div>
+      <!-- Новый логотип сайта -->
+      <img src="GAROUXa.jpg" alt="GarouX" class="w-9 h-9 rounded-2xl object-cover">
       <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
     </div>
     <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
@@ -105,12 +106,15 @@ function calculateProgress(totalExp) {
 function getTimeUntilReset(sessionStart) {
   const now = Date.now();
   const resetTime = sessionStart + 24 * 60 * 60 * 1000;
-  const remaining = Math.max(0, resetTime - now);
-  
+  let remaining = Math.max(0, resetTime - now);
+
   const hours = Math.floor(remaining / (1000 * 60 * 60));
-  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-  
-  return `${hours}ч ${minutes}м`;
+  remaining %= (1000 * 60 * 60);
+  const minutes = Math.floor(remaining / (1000 * 60));
+  remaining %= (1000 * 60);
+  const seconds = Math.floor(remaining / 1000);
+
+  return `\( {hours.toString().padStart(2, '0')}: \){minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 async function updateAccount(index) {
@@ -129,14 +133,12 @@ async function updateAccount(index) {
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
-    // Сброс каждые 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
-    // Расчёт EXP за текущие сутки
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -170,7 +172,8 @@ function renderMainAccounts() {
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <div class="w-20 h-20 bg-zinc-800 rounded-2xl flex items-center justify-center text-5xl border border-zinc-700">🔥</div>
+          <!-- Новый аватар аккаунта -->
+          <img src="avag.jpg" alt="Avatar" class="w-20 h-20 rounded-2xl object-cover border border-zinc-700">
           <div class="flex-1">
             <div class="flex items-center gap-3">
               <h2 class="text-2xl font-bold">${acc.nickname}</h2>
@@ -223,8 +226,8 @@ function renderMainAccounts() {
           </div>
         </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-4 text-center text-sm text-amber-400">
-          До сброса сессии: <span class="font-semibold">${timerText}</span>
+        <div class="bg-zinc-900 rounded-3xl p-4 text-center text-sm text-amber-400 font-medium">
+          До сброса сессии: <span class="font-mono text-lg">${timerText}</span>
         </div>
 
         <div class="flex gap-3">
@@ -279,15 +282,13 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 30 секунд + обновление таймера
-setInterval(() => {
-  refreshAll();
-}, 30000);
+// Автообновление данных каждые 30 секунд
+setInterval(refreshAll, 30000);
 
-// Обновление таймера каждые 60 секунд (без полного запроса к API)
+// Обновление только таймера каждую секунду
 setInterval(() => {
   renderMainAccounts();
-}, 60000);
+}, 1000);
 </script>
 </body>
 </html>
