@@ -44,9 +44,9 @@
 
 <script>
 // ==================== EXP TABLE ====================
-const EXP_TABLE = { /* Полная таблица до 100 уровня */ 
-  1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
-  6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
+const EXP_TABLE = {
+  1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],6:[1844,948],
+  7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
   11:[7192,1256],12:[8448,1328],13:[9776,1364],14:[11140,1426],15:[12566,1494],
   16:[14060,1550],17:[15610,1614],18:[17224,1678],19:[18902,1730],20:[20632,1792],
   21:[22424,2304],22:[24728,1464],23:[26192,1974],24:[28166,2034],25:[30200,2094],
@@ -74,8 +74,8 @@ function loadAccounts() {
   if (saved) accounts = JSON.parse(saved);
   else {
     accounts = [
-      { uid: "9900005554", lastExp: 0, todayExp: 0, sessionStart: Date.now(), nickname: "GX GarouX", level: 63 },
-      { uid: "13777777733", lastExp: 0, todayExp: 0, sessionStart: Date.now(), nickname: "Loading...", level: 1 }
+      { uid: "9900005554", initialExp: 0, lastExp: 0, gainedExp: 0, sessionStart: Date.now(), nickname: "GX GarouX", level: 63 },
+      { uid: "13777777733", initialExp: 0, lastExp: 0, gainedExp: 0, sessionStart: Date.now(), nickname: "Loading...", level: 1 }
     ];
   }
   renderMainAccounts();
@@ -119,16 +119,13 @@ async function updateAccount(index) {
     const nickname = captain.nickname || acc.nickname;
     const levelInfo = calculateProgress(totalExpNow);
 
-    // Сброс каждые 24 часа
-    if (Date.now() - acc.sessionStart > 86400000) {
-      acc.todayExp = 0;
-      acc.sessionStart = Date.now();
+    // Первый раз фиксируем начальное значение
+    if (acc.initialExp === 0) {
+      acc.initialExp = totalExpNow;
     }
 
-    // Добавляем набранные EXP
-    if (totalExpNow > acc.lastExp) {
-      acc.todayExp += (totalExpNow - acc.lastExp);
-    }
+    // Считаем сколько добавилось с момента добавления аккаунта
+    acc.gainedExp = totalExpNow - acc.initialExp;
 
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
@@ -188,15 +185,15 @@ function renderMainAccounts() {
           </div>
         </div>
 
-        <!-- Новый улучшенный Total блок -->
-        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3">
+        <!-- Улучшенный блок по твоему запросу -->
+        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3 text-sm">
           <div class="flex justify-between">
             <span class="text-zinc-400">Было при добавлении:</span>
-            <span class="font-medium">${acc.sessionStartExp ? acc.sessionStartExp.toLocaleString('ru-RU') : acc.lastExp.toLocaleString('ru-RU')}</span>
+            <span class="font-medium">${acc.initialExp.toLocaleString('ru-RU')}</span>
           </div>
-          <div class="flex justify-between text-green-400">
+          <div class="flex justify-between text-green-400 font-medium">
             <span>Добавилось за сессию:</span>
-            <span class="font-bold">+${acc.todayExp.toLocaleString('ru-RU')}</span>
+            <span>+${acc.gainedExp.toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">На данный момент:</span>
@@ -228,10 +225,10 @@ function addNewAccount() {
 
   accounts.push({
     uid: uid,
+    initialExp: 0,
     lastExp: 0,
-    todayExp: 0,
+    gainedExp: 0,
     sessionStart: Date.now(),
-    sessionStartExp: 0,
     nickname: "Загрузка...",
     level: 1,
     progress: 0,
@@ -242,7 +239,7 @@ function addNewAccount() {
 
   saveAccounts();
   renderMainAccounts();
-  updateAccount(accounts.length - 1);
+  updateAccount(accounts.length - 1); // сразу загружаем данные
 }
 
 function refreshAll() {
@@ -253,8 +250,8 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 25 секунд
-setInterval(refreshAll, 25000);
+// Автообновление каждые 30 секунд
+setInterval(refreshAll, 30000);
 
 </script>
 </body>
