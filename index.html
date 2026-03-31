@@ -71,12 +71,10 @@ let accounts = [];
 
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
-  if (saved) accounts = JSON.parse(saved);
-  else {
-    accounts = [
-      { uid: "9900005554", lastExp: 0, todayExp: 0, sessionStartExp: 0, lastUpdateTime: Date.now(), nickname: "GX GarouX", level: 63 },
-      { uid: "13777777733", lastExp: 0, todayExp: 0, sessionStartExp: 0, lastUpdateTime: Date.now(), nickname: "Loading...", level: 1 }
-    ];
+  if (saved) {
+    accounts = JSON.parse(saved);
+  } else {
+    accounts = [];
   }
   renderMainAccounts();
 }
@@ -118,22 +116,27 @@ async function updateAccount(index) {
 
     const nickname = captain.nickname || acc.nickname;
 
-    // Фиксируем EXP при первом обновлении
-    if (!acc.sessionStartExp || acc.sessionStartExp === 0) {
-      acc.sessionStartExp = totalExpNow;
+    // Проверка: прошло ли 24 часа с последнего сброса?
+    const now = Date.now();
+    const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+
+    if (hoursPassed >= 24) {
+      // Сброс сессии каждые 24 часа
+      acc.sessionStart = now;
+      acc.sessionStartExp = totalExpNow;   // Новое "Было при добавлении"
+      acc.todayExp = 0;
     }
 
-    // Расчёт EXP, набранного с момента добавления
+    // Расчёт набранного EXP за текущие 24 часа
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
       acc.todayExp = 0;
     }
 
-    // Обновляем время последнего обновления
-    acc.lastUpdateTime = Date.now();
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
+    acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
     acc.level = levelInfo.level;
@@ -155,7 +158,7 @@ function renderMainAccounts() {
   container.innerHTML = '';
 
   accounts.forEach((acc, index) => {
-    const startExp = acc.sessionStartExp || acc.lastExp;
+    const startExp = acc.sessionStartExp || acc.lastExp || 0;
 
     const cardHTML = `
       <div class="card p-6 space-y-6">
@@ -231,12 +234,15 @@ function addNewAccount() {
   if (!uid) return alert("Введите UID!");
   if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
 
+  const now = Date.now();
+
   accounts.push({
     uid: uid,
     lastExp: 0,
     todayExp: 0,
+    sessionStart: now,
     sessionStartExp: 0,
-    lastUpdateTime: Date.now(),
+    lastUpdateTime: now,
     nickname: "Загрузка...",
     level: 1,
     progress: 0,
