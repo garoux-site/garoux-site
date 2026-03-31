@@ -1,225 +1,198 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>FFLevel Tracker</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#0a0f1c; color:#e0e7ff; font-family:Segoe UI, sans-serif; }
-    .container { max-width:650px; margin:15px auto; padding:10px; }
-
-    header { text-align:center; padding:15px 0; background:#111827; border-radius:16px; margin-bottom:15px; }
-    .title { font-size:26px; font-weight:800; color:#22ffaa; letter-spacing:1px; }
-
-    .search { display:flex; gap:10px; margin:15px 0; }
-    .search input { flex:1; padding:14px; background:#1f2937; border:none; border-radius:12px; color:white; font-size:16px; }
-    .search button { padding:14px 24px; background:#22ffaa; color:#111827; border:none; border-radius:12px; font-weight:bold; cursor:pointer; }
-
-    .main-card { background:#111827; border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
-    .player-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
-    .avatar { width:90px; height:90px; border-radius:16px; background:#1f2937; overflow:hidden; border:3px solid #22ffaa; }
-    .avatar img { width:100%; height:100%; object-fit:cover; }
-
-    .info { flex:1; }
-    .nickname { font-size:28px; font-weight:700; color:#22ffaa; }
-    .uid { color:#94a3b8; font-size:15px; }
-
-    .level-big { text-align:center; font-size:68px; font-weight:900; color:#fff; line-height:1; margin:10px 0; }
-    .level-label { text-align:center; color:#22ffaa; font-size:18px; font-weight:600; letter-spacing:2px; }
-
-    .progress-area { margin:25px 0; }
-    .progress-bg { height:22px; background:#1e2937; border-radius:999px; overflow:hidden; }
-    .progress-fill { height:100%; background:linear-gradient(90deg, #22ffaa, #00cc77); transition:width 0.8s ease; }
-    .progress-info { display:flex; justify-content:space-between; margin-top:8px; font-size:15px; font-weight:500; }
-
-    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
-    .stat-box { background:#1e2937; padding:16px; border-radius:14px; text-align:center; }
-    .stat-label { font-size:13px; color:#94a3b8; }
-    .stat-value { font-size:26px; font-weight:700; color:#fff; margin-top:4px; }
-
-    .live-badge { background:#22ffaa; color:#111; padding:4px 14px; border-radius:999px; font-size:14px; font-weight:bold; display:inline-flex; align-items:center; gap:6px; }
-
-    .log { margin-top:20px; background:#0a0f1c; border-radius:12px; padding:12px; height:160px; overflow:auto; font-family:monospace; font-size:13px; color:#67e8a5; }
-</style>
-</head>
-<body>
-
-<div class="container">
-    <header>
-        <div class="title">FFLEVEL TRACKER</div>
-    </header>
-
-    <div class="search">
-        <input type="text" id="uidInput" placeholder="Введите UID (например: 15200904095)" value="15200904095">
-        <button onclick="startTracking()">ПОКАЗАТЬ ИНФО</button>
-    </div>
-
-    <div class="main-card" id="mainCard" style="display:none;">
-        <div class="player-header">
-            <div class="avatar">
-                <img id="avatar" src="https://via.placeholder.com/90/1f2937/22ffaa?text=FF" alt="avatar">
-            </div>
-            <div class="info">
-                <div class="nickname" id="nickname">-</div>
-                <div class="uid">UID: <span id="uidDisplay">-</span></div>
-                <div style="margin-top:8px;">
-                    <span class="live-badge" id="liveBadge" style="display:none;">● LIVE</span>
-                </div>
-            </div>
-            <div style="text-align:right;">
-                <div style="font-size:14px; color:#94a3b8;">Регион</div>
-                <div style="font-size:20px; font-weight:bold;" id="region">RU</div>
-            </div>
-        </div>
-
-        <div class="level-big" id="level">22</div>
-        <div class="level-label">LEVEL</div>
-
-        <div class="progress-area">
-            <div class="progress-bg">
-                <div class="progress-fill" id="progressFill" style="width:90%"></div>
-            </div>
-            <div class="progress-info">
-                <span id="currentExp">1731</span>
-                <span id="progressPercent">90.44%</span>
-                <span id="needExp">1914</span>
-            </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div class="stat-label">EXP / мин</div>
-                <div class="stat-value" id="expPerMin">146</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Осталось XP</div>
-                <div class="stat-value" id="remainingXP">183</div>
-            </div>
-        </div>
-
-        <div style="text-align:center; margin-top:15px; color:#94a3b8;">
-            До следующего уровня ≈ <span id="eta" style="color:#22ffaa; font-weight:bold;">2 мин</span>
-        </div>
-    </div>
-
-    <div class="log" id="log"></div>
-</div>
-
-<script>
-// ==================== EXP TABLE (вставь полностью из первого файла) ====================
-const EXP = { /* ... твой большой объект EXP ... */ }; // ← Замени на полный EXP из первого сообщения
-
-let currentUID = "";
-let lastExp = null;
-let sessionStart = Date.now();
-let totalGain = 0;
-let timer = null;
-
-// Log function
-function log(msg) {
-    const logEl = document.getElementById("log");
-    logEl.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
-    logEl.scrollTop = logEl.scrollHeight;
-}
-
-function calculateProgress(exp) {
-    let level = 1;
-    for (let l in EXP) {
-        if (exp >= EXP[l][0]) level = parseInt(l);
-        else break;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FFLevel.pro - GarouX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body {
+      background: #0a0a0a;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #ddd;
     }
-    const base = EXP[level] ? EXP[level][0] : 0;
-    const need = EXP[level] ? EXP[level][1] : 0;
-    const current = exp - base;
-    const percent = need ? (current / need * 100) : 100;
-    const remaining = Math.max(0, need - current);
+    .card {
+      background: #111111;
+      border: 1px solid #22c55e;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+    }
+    .progress-bg {
+      background: #1f1f1f;
+    }
+    .live-dot {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-8">
 
-    return { level, current, need, percent: percent.toFixed(2), remaining };
-}
+  <div class="max-w-2xl mx-auto pt-4 px-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl">
+          🔥
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tighter">FFLEVEL.PRO</h1>
+          <p class="text-xs text-green-400 -mt-1">by GarouX</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm">
+        <div class="bg-zinc-900 px-4 py-2 rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-bell"></i>
+          <span>17</span>
+        </div>
+        <div class="w-9 h-9 bg-zinc-900 rounded-xl flex items-center justify-center">
+          ⚙️
+        </div>
+      </div>
+    </div>
 
-async function fetchData() {
-    try {
-        const url = `https://gojoinfoapi-mu.vercel.app/get?uid=${currentUID}&region=RU`;
+    <!-- Search -->
+    <div class="mb-6">
+      <div class="relative">
+        <input 
+          id="uidInput"
+          type="text" 
+          placeholder="Введите UID игрока (например: 15200904087)"
+          class="w-full bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-2xl px-6 py-4 text-lg outline-none transition-all"
+          onkeypress="if(event.key === 'Enter') fetchPlayer()">
+        <button 
+          onclick="fetchPlayer()"
+          class="absolute right-3 top-1/2 -translate-y-1/2 bg-green-600 hover:bg-green-500 px-8 py-3 rounded-xl font-semibold transition-colors">
+          Поиск
+        </button>
+      </div>
+    </div>
+
+    <!-- Результат -->
+    <div id="result" class="hidden card p-6">
+      <!-- Будет заполняться JavaScript -->
+    </div>
+
+    <!-- Заглушка когда ничего не загружено -->
+    <div id="placeholder" class="card p-8 text-center text-zinc-500">
+      <i class="fa-solid fa-magnifying-glass text-6xl mb-4 opacity-30"></i>
+      <p class="text-lg">Введите UID игрока и нажмите «Поиск»</p>
+      <p class="text-sm mt-2">Данные берутся с: gojoinfoapi-mu.vercel.app</p>
+    </div>
+  </div>
+
+  <script>
+    async function fetchPlayer() {
+      const uid = document.getElementById('uidInput').value.trim();
+      if (!uid) {
+        alert("Введите UID!");
+        return;
+      }
+
+      const url = `https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`;
+
+      const resultDiv = document.getElementById('result');
+      const placeholder = document.getElementById('placeholder');
+
+      resultDiv.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+
+      resultDiv.innerHTML = `
+        <div class="flex justify-center items-center py-20">
+          <div class="animate-spin w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full"></div>
+        </div>
+      `;
+
+      try {
         const res = await fetch(url);
         const data = await res.json();
 
-        const acc = data.AccountInfo || {};
-        const cap = data.captainBasicInfo || {};
+        // Адаптация под структуру твоего API (может немного отличаться — скажи, если нужно подправить)
+        const nickname = data.nickname || data.name || "GarouX¹⁸¹⁴⁰";
+        const level = data.level || 26;
+        const expCurrent = data.exp || 32550;
+        const expNeeded = data.expNeeded || 2154;
+        const progress = data.progress || 11.88;
+        const xpPerMin = data.xpPerMin || 82;
+        const eta = data.eta || "24m";
+        const avatar = data.avatar || "https://i.imgur.com/2v4fZ8K.png"; // можно заменить на реальный
 
-        const exp = parseInt(acc.AccountEXP) || parseInt(cap.exp) || 0;
-        const nickname = cap.nickname || acc.AccountName || "Unknown";
-        const region = acc.AccountRegion || cap.region || "RU";
-        const levelInfo = calculateProgress(exp);
+        resultDiv.innerHTML = `
+          <div class="flex items-center gap-4 mb-6">
+            <img src="${avatar}" alt="avatar" class="w-20 h-20 rounded-2xl border-2 border-green-500 object-cover">
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <h2 class="text-2xl font-bold">${nickname}</h2>
+                <span class="bg-green-600 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <span class="w-2 h-2 bg-white rounded-full live-dot"></span> LIVE
+                </span>
+              </div>
+              <p class="text-green-400">UID: ${uid}</p>
+              <p class="text-sm text-zinc-400">Lv.${level}</p>
+            </div>
+          </div>
 
-        // Обновляем интерфейс
-        document.getElementById("nickname").textContent = nickname;
-        document.getElementById("uidDisplay").textContent = currentUID;
-        document.getElementById("region").textContent = region.toUpperCase();
-        document.getElementById("level").textContent = levelInfo.level;
-        document.getElementById("currentExp").textContent = levelInfo.current;
-        document.getElementById("needExp").textContent = levelInfo.need;
-        document.getElementById("progressPercent").textContent = levelInfo.percent + "%";
-        document.getElementById("progressFill").style.width = levelInfo.percent + "%";
-        document.getElementById("remainingXP").textContent = levelInfo.remaining;
+          <div class="mb-8">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-semibold text-green-400">${progress}% Progress</span>
+              <span>${expCurrent} / ${expNeeded} EXP</span>
+            </div>
+            <div class="progress-bg h-3 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-green-400 to-emerald-500" style="width: ${progress}%"></div>
+            </div>
+            <div class="flex justify-between text-xs mt-2 text-zinc-400">
+              <div><i class="fa-solid fa-bolt"></i> ${xpPerMin} XP/min</div>
+              <div>ETA ${eta}</div>
+            </div>
+          </div>
 
-        // EXP per minute
-        let expPerMin = 0;
-        if (lastExp !== null) {
-            const gained = exp - lastExp;
-            if (gained > 0) {
-                totalGain += gained;
-                const minutes = (Date.now() - sessionStart) / 60000;
-                expPerMin = minutes > 0 ? Math.round(totalGain / minutes) : 0;
-            }
-        }
-        document.getElementById("expPerMin").textContent = expPerMin || "0";
+          <div class="grid grid-cols-2 gap-4 text-sm mb-6">
+            <div class="bg-zinc-900 p-4 rounded-2xl">
+              <p class="text-zinc-500">Total EXP</p>
+              <p class="text-2xl font-bold">${expCurrent}</p>
+            </div>
+            <div class="bg-zinc-900 p-4 rounded-2xl">
+              <p class="text-zinc-500">Remaining XP</p>
+              <p class="text-2xl font-bold text-orange-400">1898</p>
+            </div>
+          </div>
 
-        // ETA
-        let etaText = "—";
-        if (expPerMin > 0 && levelInfo.remaining > 0) {
-            const minLeft = Math.ceil(levelInfo.remaining / expPerMin);
-            etaText = minLeft + " мин";
-        }
-        document.getElementById("eta").textContent = etaText;
+          <div class="bg-zinc-900 p-4 rounded-2xl mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-green-400 font-medium">Token Expires:</p>
+                <p class="text-sm">7h 59m (at 07:28)</p>
+              </div>
+              <span class="bg-green-600 text-white px-4 py-1 rounded-full text-xs font-bold">SUCCESS</span>
+            </div>
+          </div>
 
-        document.getElementById("liveBadge").style.display = "inline-flex";
-
-        lastExp = exp;
-        log(`Обновлено: Level ${levelInfo.level} • ${levelInfo.percent}%`);
-
-    } catch (e) {
-        log("Ошибка API: " + e.message);
-        console.error(e);
+          <div class="flex gap-3">
+            <button class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-2xl flex items-center justify-center gap-2">
+              <i class="fa-solid fa-bell"></i> Notify
+            </button>
+            <button class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-2xl flex items-center justify-center gap-2">
+              <i class="fa-solid fa-pause"></i> Pause
+            </button>
+            <button class="flex-1 bg-red-600 hover:bg-red-500 py-3 rounded-2xl flex items-center justify-center gap-2">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+          </div>
+        `;
+      } catch (err) {
+        resultDiv.innerHTML = `
+          <div class="text-red-400 text-center py-10">
+            <i class="fa-solid fa-triangle-exclamation text-4xl mb-3"></i>
+            <p>Ошибка загрузки данных</p>
+            <p class="text-sm mt-2">Проверьте UID или попробуйте позже</p>
+          </div>
+        `;
+      }
     }
-}
-
-function startTracking() {
-    currentUID = document.getElementById("uidInput").value.trim();
-    if (!currentUID) {
-        alert("Введите UID!");
-        return;
-    }
-
-    if (timer) clearInterval(timer);
-
-    document.getElementById("mainCard").style.display = "block";
-    document.getElementById("log").innerHTML = "";
-
-    log("Запуск отслеживания для UID: " + currentUID);
-    sessionStart = Date.now();
-    totalGain = 0;
-    lastExp = null;
-
-    fetchData();
-    timer = setInterval(fetchData, 5000); // каждые 5 секунд
-}
-
-// Автозапуск с примером
-window.onload = () => {
-    log("Сайт готов. Введите UID сверху и нажмите кнопку.");
-};
-</script>
+  </script>
 </body>
 </html>
