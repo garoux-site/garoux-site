@@ -9,7 +9,7 @@
   <style>
     body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
     .card { background: #111111; border-radius: 16px; }
-    .progress-container { background: #1f1f1f; height: 10px; border-radius: 9999px; overflow: hidden; }
+    .progress-container { background: #1f1f1f; height: 8px; border-radius: 9999px; overflow: hidden; }
     .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.6s ease; }
     .live-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -21,9 +21,12 @@
 
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
-      <!-- Новый логотип сайта -->
-      <img src="GAROUXa.jpg" alt="GarouX" class="w-9 h-9 rounded-2xl object-cover">
-      <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
+      <!-- Логотип сайта как на скрине -->
+      <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-2xl font-bold text-white shadow-lg">G</div>
+      <div>
+        <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
+        <p class="text-xs text-zinc-500 -mt-1">garoux.site</p>
+      </div>
     </div>
     <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
       <i class="fa-solid fa-rotate"></i> Refresh All
@@ -73,7 +76,7 @@ let accounts = [];
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
   if (saved) accounts = JSON.parse(saved);
-  else accounts = [];
+  else accounts = []; // Пустой список — без старых UID
   renderMainAccounts();
 }
 
@@ -172,8 +175,9 @@ function renderMainAccounts() {
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <!-- Новый аватар аккаунта -->
-          <img src="avag.jpg" alt="Avatar" class="w-20 h-20 rounded-2xl object-cover border border-zinc-700">
+          <!-- Аватар как на скрине -->
+          <div class="w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center text-5xl font-bold text-white shadow-lg border border-red-500">G</div>
+          
           <div class="flex-1">
             <div class="flex items-center gap-3">
               <h2 class="text-2xl font-bold">${acc.nickname}</h2>
@@ -181,15 +185,15 @@ function renderMainAccounts() {
                 <span class="w-2.5 h-2.5 bg-white rounded-full live-dot"></span> LIVE
               </span>
             </div>
-            <p class="text-emerald-400">UID: ${acc.uid}</p>
-            <p class="text-emerald-400 text-xl">Level ${acc.level}</p>
+            <p class="text-emerald-400 text-sm">UID: ${acc.uid}</p>
+            <p class="text-emerald-400 text-xl font-semibold">Level ${acc.level}</p>
           </div>
         </div>
 
         <div>
           <div class="flex justify-between text-sm mb-1">
             <span class="text-green-400 font-semibold">${acc.progress || 0}% Progress</span>
-            <span class="text-zinc-400">${(acc.currentInLevel || 0)} / ${(acc.needForNext || 48)} EXP</span>
+            <span class="text-zinc-400">${(acc.currentInLevel || 0).toLocaleString('ru-RU')} / ${(acc.needForNext || 48).toLocaleString('ru-RU')} EXP</span>
           </div>
           <div class="progress-container">
             <div class="progress-bar" style="width: ${acc.progress || 0}%"></div>
@@ -207,7 +211,7 @@ function renderMainAccounts() {
           </div>
         </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3">
+        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3 text-sm">
           <div class="flex justify-between">
             <span class="text-zinc-400">Было при добавлении:</span>
             <span class="font-medium">${startExp.toLocaleString('ru-RU')}</span>
@@ -226,12 +230,13 @@ function renderMainAccounts() {
           </div>
         </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-4 text-center text-sm text-amber-400 font-medium">
-          До сброса сессии: <span class="font-mono text-lg">${timerText}</span>
+        <div class="bg-zinc-900 rounded-3xl p-4 text-center">
+          <p class="text-amber-400 text-sm">До сброса сессии:</p>
+          <p class="font-mono text-2xl font-bold text-amber-300 tracking-widest">${timerText}</p>
         </div>
 
         <div class="flex gap-3">
-          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 py-4 rounded-2xl text-sm">Обновить</button>
+          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl text-sm">Обновить</button>
           <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Delete</button>
         </div>
       </div>`;
@@ -285,7 +290,7 @@ refreshAll();
 // Автообновление данных каждые 30 секунд
 setInterval(refreshAll, 30000);
 
-// Обновление только таймера каждую секунду
+// Обновление таймера каждую секунду
 setInterval(() => {
   renderMainAccounts();
 }, 1000);
