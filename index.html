@@ -21,8 +21,8 @@
 
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
-      <!-- Логотип сайта как на скрине -->
-      <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-2xl font-bold text-white shadow-lg">G</div>
+      <!-- Логотип сайта — квадрат с острыми углами -->
+      <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-2xl font-bold text-white shadow-lg border-2 border-red-500">G</div>
       <div>
         <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
         <p class="text-xs text-zinc-500 -mt-1">garoux.site</p>
@@ -76,7 +76,7 @@ let accounts = [];
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
   if (saved) accounts = JSON.parse(saved);
-  else accounts = []; // Пустой список — без старых UID
+  else accounts = []; // Пустой список при первом запуске
   renderMainAccounts();
 }
 
@@ -175,8 +175,10 @@ function renderMainAccounts() {
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <!-- Аватар как на скрине -->
-          <div class="w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center text-5xl font-bold text-white shadow-lg border border-red-500">G</div>
+          <!-- Квадратный аватар с острыми углами и красной рамкой -->
+          <div class="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center text-5xl font-bold text-white shadow-lg border-4 border-red-500 overflow-hidden">
+            G
+          </div>
           
           <div class="flex-1">
             <div class="flex items-center gap-3">
@@ -231,8 +233,8 @@ function renderMainAccounts() {
         </div>
 
         <div class="bg-zinc-900 rounded-3xl p-4 text-center">
-          <p class="text-amber-400 text-sm">До сброса сессии:</p>
-          <p class="font-mono text-2xl font-bold text-amber-300 tracking-widest">${timerText}</p>
+          <p class="text-amber-400 text-sm mb-1">До сброса сессии:</p>
+          <p class="font-mono text-3xl font-bold text-amber-300 tracking-widest">${timerText}</p>
         </div>
 
         <div class="flex gap-3">
