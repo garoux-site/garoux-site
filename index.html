@@ -29,10 +29,10 @@
     </button>
   </div>
 
-  <!-- Два главных аккаунта -->
+  <!-- Главные аккаунты -->
   <div id="mainAccounts" class="space-y-8"></div>
 
-  <!-- Добавить новый -->
+  <!-- Добавить новый UID -->
   <div class="my-10">
     <div class="flex gap-3">
       <input id="uidInput" type="text" placeholder="Добавить новый UID" 
@@ -46,7 +46,7 @@
 
 <script>
 // ==================== EXP TABLE ====================
-const EXP_TABLE = { /* полная таблица до 100 уровня */ 
+const EXP_TABLE = {
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],6:[1844,948],
   7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
   11:[7192,1256],12:[8448,1328],13:[9776,1364],14:[11140,1426],15:[12566,1494],
@@ -71,15 +71,15 @@ const EXP_TABLE = { /* полная таблица до 100 уровня */
 
 let accounts = [];
 
-// Загрузка из памяти браузера
+// Загрузка
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
   if (saved) {
     accounts = JSON.parse(saved);
   } else {
     accounts = [
-      { uid: "9900005554", lastExp: 1406300, todayExp: 0, lastUpdate: Date.now(), nickname: "GX GarouX", level: 63 },
-      { uid: "13777777733", lastExp: 0, todayExp: 0, lastUpdate: Date.now(), nickname: "Loading...", level: 1 }
+      { uid: "9900005554", lastExp: 1406300, todayExp: 0, sessionStart: Date.now(), nickname: "GX GarouX", level: 63 },
+      { uid: "13777777733", lastExp: 0, todayExp: 0, sessionStart: Date.now(), nickname: "Loading...", level: 1 }
     ];
   }
   renderMainAccounts();
@@ -89,37 +89,31 @@ function saveAccounts() {
   localStorage.setItem('fflevel_accounts', JSON.stringify(accounts));
 }
 
-// Проверка нового дня в 07:00 по Кыргызстану (UTC+6)
-function isNewDay() {
-  const now = new Date();
-  const kyrgyzTime = new Date(now.getTime() + 6 * 60 * 60 * 1000); // +6 часов
-  return kyrgyzTime.getUTCHours() >= 7;
-}
-
-// Обновление одного аккаунта
+// Обновление аккаунта
 async function updateAccount(index) {
   const acc = accounts[index];
   try {
     const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
-    const data = await res.json();
+    const raw = await res.json();
 
-    const captain = data.captainBasicInfo || {};
-    const totalExpNow = parseInt(captain.exp || data.AccountInfo?.AccountEXP) || acc.lastExp;
+    const captain = raw.captainBasicInfo || {};
+    const totalExpNow = parseInt(captain.exp || raw.AccountInfo?.AccountEXP) || acc.lastExp;
+
     const nickname = captain.nickname || acc.nickname;
     const level = parseInt(captain.level) || acc.level;
 
-    // Сброс в 07:00
-    if (isNewDay() && (Date.now() - acc.lastUpdate > 3600000)) {
+    // Сброс каждые 24 часа с момента запуска сессии
+    if (Date.now() - acc.sessionStart > 86400000) {  // 24 часа
       acc.todayExp = 0;
+      acc.sessionStart = Date.now();
     }
 
-    // Добавляем новые EXP
+    // Добавляем набранные EXP
     if (totalExpNow > acc.lastExp) {
       acc.todayExp += (totalExpNow - acc.lastExp);
     }
 
     acc.lastExp = totalExpNow;
-    acc.lastUpdate = Date.now();
     acc.nickname = nickname;
     acc.level = level;
 
@@ -127,7 +121,7 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка для " + acc.uid, e);
+    console.error(e);
   }
 }
 
@@ -136,7 +130,7 @@ function renderMainAccounts() {
   container.innerHTML = '';
 
   accounts.forEach((acc, index) => {
-    const card = `
+    const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
           <div class="w-20 h-20 bg-zinc-800 rounded-2xl flex items-center justify-center text-5xl border border-zinc-700">🔥</div>
@@ -152,17 +146,41 @@ function renderMainAccounts() {
           </div>
         </div>
 
+        <!-- Прогресс бар (как на твоих старых скринах) -->
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-green-400 font-semibold">53.70% Progress</span>
+            <span class="text-zinc-400">81047 / 150928 EXP</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 53.7%"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-zinc-900 rounded-3xl p-5">
+            <p class="text-zinc-400 text-xs">Current EXP</p>
+            <p class="text-3xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
+          </div>
+          <div class="bg-zinc-900 rounded-3xl p-5">
+            <p class="text-zinc-400 text-xs">Remaining XP</p>
+            <p class="text-3xl font-bold text-orange-400">69881</p>
+          </div>
+        </div>
+
+        <!-- Total Today -->
         <div class="bg-zinc-900 rounded-3xl p-5">
           <p class="text-green-400 font-medium">Total +${acc.todayExp.toLocaleString('ru-RU')} EXP today</p>
-          <p class="text-xs text-zinc-500">Сброс каждый день в 07:00 по Кыргызстану</p>
+          <p class="text-xs text-zinc-500">Сброс через 24 часа с момента запуска</p>
         </div>
 
         <div class="flex gap-3">
-          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 py-4 rounded-2xl">Обновить</button>
-          <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl">Delete</button>
+          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 py-4 rounded-2xl text-sm">Обновить</button>
+          <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Delete</button>
         </div>
-      </div>`;
-    container.innerHTML += card;
+      </div>
+    `;
+    container.innerHTML += cardHTML;
   });
 }
 
@@ -179,7 +197,15 @@ function addNewAccount() {
   if (!uid) return alert("Введите UID!");
   if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
 
-  accounts.push({ uid, lastExp: 0, todayExp: 0, lastUpdate: Date.now(), nickname: "Загрузка...", level: 1 });
+  accounts.push({
+    uid: uid,
+    lastExp: 0,
+    todayExp: 0,
+    sessionStart: Date.now(),
+    nickname: "Загрузка...",
+    level: 1
+  });
+
   saveAccounts();
   renderMainAccounts();
   updateAccount(accounts.length - 1);
