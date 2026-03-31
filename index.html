@@ -7,70 +7,38 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { 
-      background: #0a0a0a; 
-      color: #ddd; 
-      font-family: system-ui, sans-serif; 
-    }
-    .card { 
-      background: #111111; 
-      border-radius: 20px;
-      border: 1px solid #222;
-    }
-    .progress-container { 
-      background: #1f1f1f; 
-      height: 12px; 
-      border-radius: 9999px; 
-      overflow: hidden; 
-    }
-    .progress-bar { 
-      height: 100%; 
-      background: linear-gradient(90deg, #22c55e, #4ade80); 
-      transition: width 0.8s ease; 
-    }
-    .live-dot { 
-      animation: pulse 2s infinite; 
-    }
-    @keyframes pulse { 
-      0%, 100% { opacity: 1; } 
-      50% { opacity: 0.4; } 
-    }
-    .avatar {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 16px;
-      border: 3px solid #22c55e;
-    }
+    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
+    .card { background: #111111; border-radius: 16px; }
+    .progress-container { background: #1f1f1f; height: 8px; border-radius: 9999px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.6s ease; }
+    .live-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
 </head>
 <body class="min-h-screen pb-12">
 
-<div class="max-w-2xl mx-auto pt-8 px-4">
+<div class="max-w-xl mx-auto pt-8 px-4">
 
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-8">
-    <div class="flex items-center gap-4">
-      <img src="GAROUXa.jpg" alt="GarouX" class="w-12 h-12 rounded-2xl object-cover border border-orange-500">
-      <h1 class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-        FFGarouX.lvl
-      </h1>
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <img src="GAROUXa.jpg" alt="GarouX" class="w-10 h-10 rounded-xl object-cover border-2 border-red-500 shadow-lg">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
+        <p class="text-xs text-zinc-500 -mt-1">garoux.site</p>
+      </div>
     </div>
-    <button onclick="refreshAll()" 
-            class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl text-sm font-medium transition">
-      <i class="fa-solid fa-rotate"></i> Обновить все
+    <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
+      <i class="fa-solid fa-rotate"></i> Refresh All
     </button>
   </div>
 
   <div id="mainAccounts" class="space-y-8"></div>
 
-  <!-- Добавление нового UID -->
-  <div class="my-12 bg-zinc-900 rounded-3xl p-8 border border-zinc-700">
+  <div class="my-10">
     <div class="flex gap-3">
-      <input id="uidInput" type="text" placeholder="Введите UID аккаунта" 
-             class="flex-1 bg-zinc-950 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-5 text-lg outline-none">
-      <button onclick="addNewAccount()" 
-              class="bg-green-500 hover:bg-green-600 px-12 py-5 rounded-3xl font-semibold text-black transition">
+      <input id="uidInput" type="text" placeholder="Добавить новый UID" 
+             class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
+      <button onclick="addNewAccount()" class="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
         Добавить
       </button>
     </div>
@@ -80,8 +48,6 @@
 <script>
 // ==================== EXP TABLE ====================
 const EXP_TABLE = { 
-  1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
-  // ... (твоя таблица полностью, я её не сокращал для удобства)
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
   6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
   11:[7192,1256],12:[8448,1328],13:[9776,1364],14:[11140,1426],15:[12566,1494],
@@ -107,14 +73,29 @@ const EXP_TABLE = {
 let accounts = [];
 
 function loadAccounts() {
-  const saved = localStorage.getItem('ffgaroux_accounts');
+  const saved = localStorage.getItem('fflevel_accounts');
   if (saved) accounts = JSON.parse(saved);
   else accounts = [];
   renderMainAccounts();
 }
 
 function saveAccounts() {
-  localStorage.setItem('ffgaroux_accounts', JSON.stringify(accounts));
+  localStorage.setItem('fflevel_accounts', JSON.stringify(accounts));
+}
+
+// ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ТАЙМЕРА ====================
+function getTimeUntilReset(sessionStart) {
+  const now = Date.now();
+  const resetTime = sessionStart + 24 * 60 * 60 * 1000;
+  let remaining = Math.max(0, resetTime - now);
+
+  const hours = Math.floor(remaining / (1000 * 60 * 60));
+  remaining %= (1000 * 60 * 60);
+  const minutes = Math.floor(remaining / (1000 * 60));
+  remaining %= (1000 * 60);
+  const seconds = Math.floor(remaining / 1000);
+
+  return `\( {hours.toString().padStart(2, '0')}: \){minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function calculateProgress(totalExp) {
@@ -139,19 +120,6 @@ function calculateProgress(totalExp) {
   return { level, progress: progress.toFixed(1), currentInLevel, remaining, needForNext };
 }
 
-function getTimeUntilReset(acc) {
-  const now = Date.now();
-  const nextReset = acc.sessionStart + 24 * 60 * 60 * 1000;
-  const timeLeft = nextReset - now;
-
-  if (timeLeft <= 0) return "Сброс сейчас";
-
-  const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-  
-  return `${hours}ч ${minutes}м до сброса`;
-}
-
 async function updateAccount(index) {
   const acc = accounts[index];
   try {
@@ -159,15 +127,16 @@ async function updateAccount(index) {
     const raw = await res.json();
 
     const captain = raw.captainBasicInfo || {};
-    const totalExpNow = parseInt(captain.exp || raw.AccountInfo?.AccountEXP) || acc.lastExp;
-    const likes = parseInt(captain.likes || 0);
+    const accountInfo = raw.AccountInfo || {};
 
-    const nickname = captain.nickname || acc.nickname;
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp || 0;
+    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Неизвестно";
+    const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
-    // Сброс каждые 24 часа
+    // Автосброс сессии каждые 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
@@ -176,11 +145,13 @@ async function updateAccount(index) {
 
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
+    } else {
+      acc.todayExp = 0;
     }
 
     acc.lastExp = totalExpNow;
-    acc.likes = likes;
     acc.nickname = nickname;
+    acc.likes = likes;
     acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
@@ -190,7 +161,7 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка обновления:", e);
+    console.error("Ошибка обновления аккаунта:", e);
   }
 }
 
@@ -199,78 +170,76 @@ function renderMainAccounts() {
   container.innerHTML = '';
 
   accounts.forEach((acc, index) => {
-    const timeToReset = getTimeUntilReset(acc);
+    const timerText = getTimeUntilReset(acc.sessionStart);
 
     const cardHTML = `
       <div class="card p-6 space-y-6">
-        <div class="flex items-center gap-5">
-          <img src="avag.jpg" alt="Avatar" class="avatar">
-          <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-4">
+          <img src="avag.jpg" alt="Avatar" 
+               class="w-20 h-20 rounded-2xl object-cover border-4 border-red-500 shadow-lg">
+          
+          <div class="flex-1">
             <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-bold truncate">${acc.nickname}</h2>
-              <span class="bg-emerald-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5 whitespace-nowrap">
+              <h2 class="text-2xl font-bold">${acc.nickname}</h2>
+              <span class="bg-emerald-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5">
                 <span class="w-2.5 h-2.5 bg-white rounded-full live-dot"></span> LIVE
               </span>
             </div>
             <p class="text-emerald-400 text-sm">UID: ${acc.uid}</p>
-            <p class="text-2xl font-semibold text-green-400">Level ${acc.level}</p>
+            <p class="text-emerald-400 text-xl font-semibold">Level ${acc.level}</p>
           </div>
         </div>
 
-        <!-- Прогресс -->
         <div>
-          <div class="flex justify-between text-sm mb-2">
-            <span class="text-green-400 font-semibold">${acc.progress}%</span>
-            <span class="text-zinc-400">${(acc.currentInLevel || 0).toLocaleString('ru-RU')} / ${(acc.needForNext || 48).toLocaleString('ru-RU')}</span>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-green-400 font-semibold">${acc.progress || 0}% Progress</span>
+            <span class="text-zinc-400">${(acc.currentInLevel || 0).toLocaleString('ru-RU')} / ${(acc.needForNext || 48).toLocaleString('ru-RU')} EXP</span>
           </div>
           <div class="progress-container">
-            <div class="progress-bar" style="width: ${acc.progress}%"></div>
+            <div class="progress-bar" style="width: ${acc.progress || 0}%"></div>
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-4">
-          <div class="bg-zinc-900 rounded-3xl p-5 text-center">
-            <p class="text-zinc-400 text-xs">EXP</p>
-            <p class="text-2xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-zinc-900 rounded-3xl p-5">
+            <p class="text-zinc-400 text-xs">Current EXP</p>
+            <p class="text-3xl font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</p>
           </div>
-          <div class="bg-zinc-900 rounded-3xl p-5 text-center">
-            <p class="text-zinc-400 text-xs">Лайки</p>
-            <p class="text-2xl font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</p>
-          </div>
-          <div class="bg-zinc-900 rounded-3xl p-5 text-center">
-            <p class="text-zinc-400 text-xs">До сброса</p>
-            <p class="text-xl font-medium text-orange-400">${timeToReset}</p>
+          <div class="bg-zinc-900 rounded-3xl p-5">
+            <p class="text-zinc-400 text-xs">Remaining XP</p>
+            <p class="text-3xl font-bold text-orange-400">${(acc.remaining || 0).toLocaleString('ru-RU')}</p>
           </div>
         </div>
 
-        <!-- Статистика сессии -->
-        <div class="bg-zinc-900 rounded-3xl p-6 space-y-4 text-sm">
+        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3 text-sm">
           <div class="flex justify-between">
             <span class="text-zinc-400">Было при добавлении:</span>
-            <span>${(acc.sessionStartExp || 0).toLocaleString('ru-RU')}</span>
+            <span class="font-medium">${(acc.sessionStartExp || 0).toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between text-green-400">
-            <span>Набрано за сессию:</span>
+            <span>Добавилось за сессию:</span>
             <span class="font-bold">+${(acc.todayExp || 0).toLocaleString('ru-RU')}</span>
           </div>
-          <div class="flex justify-between border-t border-zinc-700 pt-4">
-            <span class="text-zinc-400">Сейчас:</span>
-            <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
+          <div class="flex justify-between border-t border-zinc-700 pt-3">
+            <span class="text-zinc-400">На данный момент:</span>
+            <span class="font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</span>
           </div>
+          <div class="flex justify-between border-t border-zinc-700 pt-3">
+            <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
+            <span class="font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
+          </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-3xl p-4 text-center">
+          <p class="text-amber-400 text-sm mb-1">До сброса сессии:</p>
+          <p class="font-mono text-3xl font-bold tracking-widest text-amber-300">${timerText}</p>
         </div>
 
         <div class="flex gap-3">
-          <button onclick="updateAccount(${index})" 
-                  class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl transition text-sm font-medium">
-            Обновить
-          </button>
-          <button onclick="deleteAccount(${index})" 
-                  class="flex-1 bg-red-600 hover:bg-red-700 py-4 rounded-2xl transition text-sm font-medium">
-            Удалить
-          </button>
+          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl text-sm">Обновить</button>
+          <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Удалить</button>
         </div>
       </div>`;
-    
     container.innerHTML += cardHTML;
   });
 }
@@ -294,13 +263,12 @@ function addNewAccount() {
     uid: uid,
     lastExp: 0,
     todayExp: 0,
-    likes: 0,
     sessionStart: now,
     sessionStartExp: 0,
-    lastUpdateTime: now,
+    likes: 0,
     nickname: "Загрузка...",
     level: 1,
-    progress: "0",
+    progress: 0,
     currentInLevel: 0,
     remaining: 48,
     needForNext: 48
@@ -315,12 +283,17 @@ function refreshAll() {
   accounts.forEach((_, i) => updateAccount(i));
 }
 
-// Инициализация
+// Запуск
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 30 секунд
+// Автообновление данных каждые 30 секунд
 setInterval(refreshAll, 30000);
+
+// Обновление таймера каждую секунду
+setInterval(() => {
+  renderMainAccounts();
+}, 1000);
 </script>
 </body>
 </html>
