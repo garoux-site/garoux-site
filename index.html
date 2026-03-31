@@ -44,9 +44,9 @@
 
 <script>
 // ==================== EXP TABLE ====================
-const EXP_TABLE = {
-  1: [0,48], 2:[48,154], 3:[202,342], 4:[544,468], 5:[1012,832],
-  6:[1844,948], 7:[2792,1008], 8:[3800,1070], 9:[4870,1134], 10:[6004,1188],
+const EXP_TABLE = { /* Полная таблица до 100 уровня */ 
+  1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
+  6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
   11:[7192,1256],12:[8448,1328],13:[9776,1364],14:[11140,1426],15:[12566,1494],
   16:[14060,1550],17:[15610,1614],18:[17224,1678],19:[18902,1730],20:[20632,1792],
   21:[22424,2304],22:[24728,1464],23:[26192,1974],24:[28166,2034],25:[30200,2094],
@@ -85,7 +85,6 @@ function saveAccounts() {
   localStorage.setItem('fflevel_accounts', JSON.stringify(accounts));
 }
 
-// Получение текущего уровня, прогресса и remaining
 function calculateProgress(totalExp) {
   let level = 1;
   let baseExp = 0;
@@ -97,9 +96,7 @@ function calculateProgress(totalExp) {
         level = lvl;
         baseExp = EXP_TABLE[lvl][0];
         needForNext = EXP_TABLE[lvl][1] || 0;
-      } else {
-        break;
-      }
+      } else break;
     }
   }
 
@@ -120,7 +117,7 @@ async function updateAccount(index) {
     const totalExpNow = parseInt(captain.exp || raw.AccountInfo?.AccountEXP) || acc.lastExp;
 
     const nickname = captain.nickname || acc.nickname;
-    const { level, progress, currentInLevel, remaining, needForNext } = calculateProgress(totalExpNow);
+    const levelInfo = calculateProgress(totalExpNow);
 
     // Сброс каждые 24 часа
     if (Date.now() - acc.sessionStart > 86400000) {
@@ -135,11 +132,11 @@ async function updateAccount(index) {
 
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
-    acc.level = level;
-    acc.progress = progress;
-    acc.currentInLevel = currentInLevel;
-    acc.remaining = remaining;
-    acc.needForNext = needForNext;
+    acc.level = levelInfo.level;
+    acc.progress = levelInfo.progress;
+    acc.currentInLevel = levelInfo.currentInLevel;
+    acc.remaining = levelInfo.remaining;
+    acc.needForNext = levelInfo.needForNext;
 
     saveAccounts();
     renderMainAccounts();
@@ -191,9 +188,20 @@ function renderMainAccounts() {
           </div>
         </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-5">
-          <p class="text-green-400 font-medium">Total +${acc.todayExp.toLocaleString('ru-RU')} EXP today</p>
-          <p class="text-xs text-zinc-500">Сброс через 24 часа после добавления</p>
+        <!-- Новый улучшенный Total блок -->
+        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3">
+          <div class="flex justify-between">
+            <span class="text-zinc-400">Было при добавлении:</span>
+            <span class="font-medium">${acc.sessionStartExp ? acc.sessionStartExp.toLocaleString('ru-RU') : acc.lastExp.toLocaleString('ru-RU')}</span>
+          </div>
+          <div class="flex justify-between text-green-400">
+            <span>Добавилось за сессию:</span>
+            <span class="font-bold">+${acc.todayExp.toLocaleString('ru-RU')}</span>
+          </div>
+          <div class="flex justify-between border-t border-zinc-700 pt-3">
+            <span class="text-zinc-400">На данный момент:</span>
+            <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
+          </div>
         </div>
 
         <div class="flex gap-3">
@@ -223,6 +231,7 @@ function addNewAccount() {
     lastExp: 0,
     todayExp: 0,
     sessionStart: Date.now(),
+    sessionStartExp: 0,
     nickname: "Загрузка...",
     level: 1,
     progress: 0,
@@ -233,7 +242,7 @@ function addNewAccount() {
 
   saveAccounts();
   renderMainAccounts();
-  updateAccount(accounts.length - 1);   // сразу обновляем данные
+  updateAccount(accounts.length - 1);
 }
 
 function refreshAll() {
