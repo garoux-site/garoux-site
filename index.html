@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FFLevel.pro - GarouX</title>
+  <title>FFLevel.pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -14,87 +14,66 @@
     }
     .card {
       background: #111111;
-      border: 1px solid #22c55e;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
     .progress-bg {
       background: #1f1f1f;
-    }
-    .live-dot {
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
     }
   </style>
 </head>
 <body class="min-h-screen pb-8">
 
-  <div class="max-w-2xl mx-auto pt-4 px-4">
+  <div class="max-w-2xl mx-auto pt-6 px-4">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl">
+        <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg">
           🔥
         </div>
         <div>
-          <h1 class="text-2xl font-bold tracking-tighter">FFLEVEL.PRO</h1>
-          <p class="text-xs text-green-400 -mt-1">by GarouX</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-4 text-sm">
-        <div class="bg-zinc-900 px-4 py-2 rounded-xl flex items-center gap-2">
-          <i class="fa-solid fa-bell"></i>
-          <span>17</span>
-        </div>
-        <div class="w-9 h-9 bg-zinc-900 rounded-xl flex items-center justify-center">
-          ⚙️
+          <h1 class="text-3xl font-bold tracking-tighter">FFLEVEL.PRO</h1>
         </div>
       </div>
     </div>
 
     <!-- Search -->
-    <div class="mb-6">
+    <div class="mb-8">
       <div class="relative">
         <input 
           id="uidInput"
           type="text" 
-          placeholder="Введите UID игрока (например: 15200904087)"
-          class="w-full bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-2xl px-6 py-4 text-lg outline-none transition-all"
+          placeholder="Введите UID (например: 9900005554)"
+          class="w-full bg-zinc-900 border border-zinc-700 focus:border-emerald-500 rounded-3xl px-7 py-5 text-lg outline-none transition-all"
           onkeypress="if(event.key === 'Enter') fetchPlayer()">
         <button 
           onclick="fetchPlayer()"
-          class="absolute right-3 top-1/2 -translate-y-1/2 bg-green-600 hover:bg-green-500 px-8 py-3 rounded-xl font-semibold transition-colors">
+          class="absolute right-3 top-1/2 -translate-y-1/2 bg-emerald-600 hover:bg-emerald-500 px-10 py-4 rounded-3xl font-semibold transition-colors">
           Поиск
         </button>
       </div>
     </div>
 
     <!-- Результат -->
-    <div id="result" class="hidden card p-6">
-      <!-- Будет заполняться JavaScript -->
-    </div>
+    <div id="result" class="hidden card p-8"></div>
 
-    <!-- Заглушка когда ничего не загружено -->
-    <div id="placeholder" class="card p-8 text-center text-zinc-500">
-      <i class="fa-solid fa-magnifying-glass text-6xl mb-4 opacity-30"></i>
-      <p class="text-lg">Введите UID игрока и нажмите «Поиск»</p>
-      <p class="text-sm mt-2">Данные берутся с: gojoinfoapi-mu.vercel.app</p>
+    <!-- Заглушка -->
+    <div id="placeholder" class="card p-12 text-center text-zinc-400">
+      <i class="fa-solid fa-user-magnifying-glass text-7xl mb-6 opacity-40"></i>
+      <p class="text-xl font-medium">Введите UID игрока Free Fire</p>
+      <p class="text-sm mt-3">Данные берутся с gojoinfoapi-mu.vercel.app</p>
     </div>
   </div>
 
   <script>
     async function fetchPlayer() {
-      const uid = document.getElementById('uidInput').value.trim();
+      let uid = document.getElementById('uidInput').value.trim();
       if (!uid) {
-        alert("Введите UID!");
+        alert("Введите UID игрока!");
         return;
       }
 
       const url = `https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`;
-
       const resultDiv = document.getElementById('result');
       const placeholder = document.getElementById('placeholder');
 
@@ -102,8 +81,8 @@
       placeholder.classList.add('hidden');
 
       resultDiv.innerHTML = `
-        <div class="flex justify-center items-center py-20">
-          <div class="animate-spin w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full"></div>
+        <div class="flex justify-center py-16">
+          <div class="animate-spin w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
         </div>
       `;
 
@@ -111,84 +90,51 @@
         const res = await fetch(url);
         const data = await res.json();
 
-        // Адаптация под структуру твоего API (может немного отличаться — скажи, если нужно подправить)
-        const nickname = data.nickname || data.name || "GarouX¹⁸¹⁴⁰";
-        const level = data.level || 26;
-        const expCurrent = data.exp || 32550;
-        const expNeeded = data.expNeeded || 2154;
-        const progress = data.progress || 11.88;
-        const xpPerMin = data.xpPerMin || 82;
-        const eta = data.eta || "24m";
-        const avatar = data.avatar || "https://i.imgur.com/2v4fZ8K.png"; // можно заменить на реальный
+        // Поддержка двух возможных структур ответа API
+        let nickname = "Неизвестно";
+        let level = "?";
+        let totalExp = "0";
+        let avatarUrl = "https://via.placeholder.com/120/1f2937/ffffff?text=FF";
+
+        if (data.AccountInfo || data.captainBasicInfo) {
+          // Основная структура (как у 9900005554)
+          nickname = data.captainBasicInfo?.nickname || data.AccountInfo?.AccountName || "Unknown";
+          level = data.captainBasicInfo?.level || data.AccountInfo?.AccountLevel || "?";
+          totalExp = data.captainBasicInfo?.exp || data.AccountInfo?.AccountEXP || "0";
+        } else if (data.nickname) {
+          // Альтернативная структура (как у 9900005551)
+          nickname = data.nickname;
+          level = data.level || "?";
+          totalExp = data.total_exp || data.exp_current_xp || "0";
+        }
 
         resultDiv.innerHTML = `
-          <div class="flex items-center gap-4 mb-6">
-            <img src="${avatar}" alt="avatar" class="w-20 h-20 rounded-2xl border-2 border-green-500 object-cover">
+          <div class="flex items-center gap-6 mb-8">
+            <img src="${avatarUrl}" alt="avatar" class="w-24 h-24 rounded-3xl border-4 border-zinc-700 object-cover">
             <div class="flex-1">
-              <div class="flex items-center gap-3">
-                <h2 class="text-2xl font-bold">${nickname}</h2>
-                <span class="bg-green-600 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <span class="w-2 h-2 bg-white rounded-full live-dot"></span> LIVE
-                </span>
-              </div>
-              <p class="text-green-400">UID: ${uid}</p>
-              <p class="text-sm text-zinc-400">Lv.${level}</p>
+              <h2 class="text-3xl font-bold">${nickname}</h2>
+              <p class="text-emerald-400 text-xl mt-1">Уровень ${level}</p>
+              <p class="text-zinc-500 text-sm mt-2">UID: ${uid}</p>
             </div>
           </div>
 
-          <div class="mb-8">
-            <div class="flex justify-between text-sm mb-1">
-              <span class="font-semibold text-green-400">${progress}% Progress</span>
-              <span>${expCurrent} / ${expNeeded} EXP</span>
-            </div>
-            <div class="progress-bg h-3 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-green-400 to-emerald-500" style="width: ${progress}%"></div>
-            </div>
-            <div class="flex justify-between text-xs mt-2 text-zinc-400">
-              <div><i class="fa-solid fa-bolt"></i> ${xpPerMin} XP/min</div>
-              <div>ETA ${eta}</div>
-            </div>
+          <div class="bg-zinc-900 rounded-3xl p-6 mb-6">
+            <p class="text-zinc-400 text-sm">Всего ачков уровня (EXP)</p>
+            <p class="text-4xl font-bold text-white mt-2">${Number(totalExp).toLocaleString('ru-RU')}</p>
           </div>
 
-          <div class="grid grid-cols-2 gap-4 text-sm mb-6">
-            <div class="bg-zinc-900 p-4 rounded-2xl">
-              <p class="text-zinc-500">Total EXP</p>
-              <p class="text-2xl font-bold">${expCurrent}</p>
-            </div>
-            <div class="bg-zinc-900 p-4 rounded-2xl">
-              <p class="text-zinc-500">Remaining XP</p>
-              <p class="text-2xl font-bold text-orange-400">1898</p>
-            </div>
-          </div>
-
-          <div class="bg-zinc-900 p-4 rounded-2xl mb-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-green-400 font-medium">Token Expires:</p>
-                <p class="text-sm">7h 59m (at 07:28)</p>
-              </div>
-              <span class="bg-green-600 text-white px-4 py-1 rounded-full text-xs font-bold">SUCCESS</span>
-            </div>
-          </div>
-
-          <div class="flex gap-3">
-            <button class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-2xl flex items-center justify-center gap-2">
-              <i class="fa-solid fa-bell"></i> Notify
-            </button>
-            <button class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-2xl flex items-center justify-center gap-2">
-              <i class="fa-solid fa-pause"></i> Pause
-            </button>
-            <button class="flex-1 bg-red-600 hover:bg-red-500 py-3 rounded-2xl flex items-center justify-center gap-2">
-              <i class="fa-solid fa-trash"></i> Delete
-            </button>
+          <div class="text-xs text-zinc-500 flex justify-between">
+            <p>Регион: RU</p>
+            <p>Данные обновлены только что</p>
           </div>
         `;
-      } catch (err) {
+
+      } catch (error) {
         resultDiv.innerHTML = `
-          <div class="text-red-400 text-center py-10">
-            <i class="fa-solid fa-triangle-exclamation text-4xl mb-3"></i>
-            <p>Ошибка загрузки данных</p>
-            <p class="text-sm mt-2">Проверьте UID или попробуйте позже</p>
+          <div class="text-red-400 text-center py-12">
+            <i class="fa-solid fa-circle-exclamation text-5xl mb-4"></i>
+            <p class="text-xl">Ошибка загрузки</p>
+            <p class="text-sm mt-2">Проверьте правильность UID или подключение к интернету</p>
           </div>
         `;
       }
