@@ -19,7 +19,6 @@
 
 <div class="max-w-xl mx-auto pt-8 px-4">
 
-  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-xl">🔥</div>
@@ -30,28 +29,26 @@
     </button>
   </div>
 
-  <!-- Two Main Accounts -->
+  <!-- Два главных аккаунта -->
   <div id="mainAccounts" class="space-y-8"></div>
 
-  <!-- Add New -->
+  <!-- Добавить новый -->
   <div class="my-10">
     <div class="flex gap-3">
       <input id="uidInput" type="text" placeholder="Добавить новый UID" 
              class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
-      <button onclick="addNewAccount()" 
-              class="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
+      <button onclick="addNewAccount()" class="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
         Добавить
       </button>
     </div>
   </div>
-
 </div>
 
 <script>
 // ==================== EXP TABLE ====================
-const EXP_TABLE = {
-  1: [0,48], 2:[48,154], 3:[202,342], 4:[544,468], 5:[1012,832],
-  6:[1844,948], 7:[2792,1008], 8:[3800,1070], 9:[4870,1134], 10:[6004,1188],
+const EXP_TABLE = { /* полная таблица до 100 уровня */ 
+  1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],6:[1844,948],
+  7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
   11:[7192,1256],12:[8448,1328],13:[9776,1364],14:[11140,1426],15:[12566,1494],
   16:[14060,1550],17:[15610,1614],18:[17224,1678],19:[18902,1730],20:[20632,1792],
   21:[22424,2304],22:[24728,1464],23:[26192,1974],24:[28166,2034],25:[30200,2094],
@@ -74,15 +71,14 @@ const EXP_TABLE = {
 
 let accounts = [];
 
-// Загрузка сохранённых данных
-function loadSavedAccounts() {
-  const saved = localStorage.getItem('fflevel_main_accounts');
+// Загрузка из памяти браузера
+function loadAccounts() {
+  const saved = localStorage.getItem('fflevel_accounts');
   if (saved) {
     accounts = JSON.parse(saved);
   } else {
-    // Два аккаунта по умолчанию
     accounts = [
-      { uid: "9900005554", lastExp: 0, todayExp: 0, lastUpdate: Date.now(), nickname: "GX GarouX", level: 63 },
+      { uid: "9900005554", lastExp: 1406300, todayExp: 0, lastUpdate: Date.now(), nickname: "GX GarouX", level: 63 },
       { uid: "13777777733", lastExp: 0, todayExp: 0, lastUpdate: Date.now(), nickname: "Loading...", level: 1 }
     ];
   }
@@ -90,38 +86,39 @@ function loadSavedAccounts() {
 }
 
 function saveAccounts() {
-  localStorage.setItem('fflevel_main_accounts', JSON.stringify(accounts));
+  localStorage.setItem('fflevel_accounts', JSON.stringify(accounts));
 }
 
-// Обновление данных аккаунта
-async function updateAccount(uid, index) {
+// Проверка нового дня в 07:00 по Кыргызстану (UTC+6)
+function isNewDay() {
+  const now = new Date();
+  const kyrgyzTime = new Date(now.getTime() + 6 * 60 * 60 * 1000); // +6 часов
+  return kyrgyzTime.getUTCHours() >= 7;
+}
+
+// Обновление одного аккаунта
+async function updateAccount(index) {
+  const acc = accounts[index];
   try {
-    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
-    const raw = await res.json();
+    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
+    const data = await res.json();
 
-    const captain = raw.captainBasicInfo || {};
-    const accountInfo = raw.AccountInfo || {};
+    const captain = data.captainBasicInfo || {};
+    const totalExpNow = parseInt(captain.exp || data.AccountInfo?.AccountEXP) || acc.lastExp;
+    const nickname = captain.nickname || acc.nickname;
+    const level = parseInt(captain.level) || acc.level;
 
-    const nickname = captain.nickname || accountInfo.AccountName || accounts[index].nickname;
-    const totalExp = parseInt(captain.exp || accountInfo.AccountEXP) || 0;
-    const level = parseInt(captain.level || accountInfo.AccountLevel) || accounts[index].level;
-
-    const acc = accounts[index];
-
-    // Расчёт EXP за сегодня (сброс в 07:00 по Кыргызстану)
-    const now = new Date();
-    const kyrgyzTime = new Date(now.getTime() + 6 * 60 * 60 * 1000); // UTC+6
-    const currentHour = kyrgyzTime.getUTCHours();
-
-    const isNewDay = currentHour >= 7 && (Date.now() - acc.lastUpdate > 3600000); // прошло больше часа
-
-    if (isNewDay) {
+    // Сброс в 07:00
+    if (isNewDay() && (Date.now() - acc.lastUpdate > 3600000)) {
       acc.todayExp = 0;
-    } else if (totalExp > acc.lastExp) {
-      acc.todayExp += (totalExp - acc.lastExp);
     }
 
-    acc.lastExp = totalExp;
+    // Добавляем новые EXP
+    if (totalExpNow > acc.lastExp) {
+      acc.todayExp += (totalExpNow - acc.lastExp);
+    }
+
+    acc.lastExp = totalExpNow;
     acc.lastUpdate = Date.now();
     acc.nickname = nickname;
     acc.level = level;
@@ -130,75 +127,47 @@ async function updateAccount(uid, index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка обновления:", e);
+    console.error("Ошибка для " + acc.uid, e);
   }
 }
 
-// Рендер двух главных аккаунтов
 function renderMainAccounts() {
   const container = document.getElementById('mainAccounts');
   container.innerHTML = '';
 
   accounts.forEach((acc, index) => {
-    const progress = 53.70; // можно улучшить расчёт позже
-
-    const cardHTML = `
+    const card = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <div class="w-20 h-20 bg-zinc-800 rounded-2xl flex-shrink-0 border border-zinc-700 overflow-hidden">
-            <div class="w-full h-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-5xl">🔥</div>
-          </div>
-          <div class="flex-1 min-w-0">
+          <div class="w-20 h-20 bg-zinc-800 rounded-2xl flex items-center justify-center text-5xl border border-zinc-700">🔥</div>
+          <div class="flex-1">
             <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-bold truncate">${acc.nickname}</h2>
-              <span class="bg-emerald-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5 whitespace-nowrap">
+              <h2 class="text-2xl font-bold">${acc.nickname}</h2>
+              <span class="bg-emerald-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5">
                 <span class="w-2.5 h-2.5 bg-white rounded-full live-dot"></span> LIVE
               </span>
             </div>
-            <p class="text-emerald-400 text-sm">UID: ${acc.uid}</p>
+            <p class="text-emerald-400">UID: ${acc.uid}</p>
             <p class="text-emerald-400 text-xl">Level ${acc.level}</p>
-          </div>
-        </div>
-
-        <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="text-green-400 font-semibold">53.70% Progress</span>
-            <span class="text-zinc-400">81047 / 150928 EXP</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 53.7%"></div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-zinc-900 rounded-3xl p-5">
-            <p class="text-zinc-400 text-xs">Current EXP</p>
-            <p class="text-3xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
-          </div>
-          <div class="bg-zinc-900 rounded-3xl p-5">
-            <p class="text-zinc-400 text-xs">Remaining XP</p>
-            <p class="text-3xl font-bold text-orange-400">69881</p>
           </div>
         </div>
 
         <div class="bg-zinc-900 rounded-3xl p-5">
           <p class="text-green-400 font-medium">Total +${acc.todayExp.toLocaleString('ru-RU')} EXP today</p>
-          <p class="text-xs text-zinc-500">Сброс в 07:00 по времени Кыргызстана</p>
+          <p class="text-xs text-zinc-500">Сброс каждый день в 07:00 по Кыргызстану</p>
         </div>
 
         <div class="flex gap-3">
-          <button onclick="updateAccount('${acc.uid}', ${index})" class="flex-1 bg-zinc-800 py-4 rounded-2xl text-sm">Refresh</button>
-          <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Delete</button>
+          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 py-4 rounded-2xl">Обновить</button>
+          <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl">Delete</button>
         </div>
-      </div>
-    `;
-
-    container.innerHTML += cardHTML;
+      </div>`;
+    container.innerHTML += card;
   });
 }
 
 function deleteAccount(index) {
-  if (confirm("Удалить этот аккаунт из главных?")) {
+  if (confirm("Удалить этот аккаунт?")) {
     accounts.splice(index, 1);
     saveAccounts();
     renderMainAccounts();
@@ -210,26 +179,18 @@ function addNewAccount() {
   if (!uid) return alert("Введите UID!");
   if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
 
-  accounts.push({
-    uid: uid,
-    lastExp: 0,
-    todayExp: 0,
-    lastUpdate: Date.now(),
-    nickname: "Загрузка...",
-    level: 1
-  });
-
+  accounts.push({ uid, lastExp: 0, todayExp: 0, lastUpdate: Date.now(), nickname: "Загрузка...", level: 1 });
   saveAccounts();
   renderMainAccounts();
-  updateAccount(uid, accounts.length - 1);
+  updateAccount(accounts.length - 1);
 }
 
 function refreshAll() {
-  accounts.forEach((acc, i) => updateAccount(acc.uid, i));
+  accounts.forEach((_, i) => updateAccount(i));
 }
 
-// Инициализация
-loadSavedAccounts();
+// Запуск
+loadAccounts();
 refreshAll();
 
 // Автообновление каждые 25 секунд
