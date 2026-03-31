@@ -105,14 +105,15 @@ function calculateProgress(totalExp) {
   return { level, progress: progress.toFixed(2), currentInLevel, remaining, needForNext };
 }
 
+// Исправленная и упрощённая функция таймера (только часы и минуты)
 function getTimeUntilReset(sessionStart) {
   const now = Date.now();
-  const resetTime = sessionStart + 24 * 60 * 60 * 1000;
-  let remaining = Math.max(0, resetTime - now);
+  const resetTime = sessionStart + 24 * 60 * 60 * 1000; // 24 часа
+  let remainingMs = Math.max(0, resetTime - now);
 
-  const hours = Math.floor(remaining / (1000 * 60 * 60));
-  remaining %= (1000 * 60 * 60);
-  const minutes = Math.floor(remaining / (1000 * 60));
+  const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+  remainingMs %= (1000 * 60 * 60);
+  const minutes = Math.floor(remainingMs / (1000 * 60));
 
   return `\( {hours.toString().padStart(2, '0')}: \){minutes.toString().padStart(2, '0')}`;
 }
@@ -126,14 +127,14 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp;
-    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname;
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp || 0;
+    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Загрузка...";
     const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
     const now = Date.now();
-    const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+    const hoursPassed = (now - (acc.sessionStart || now)) / (1000 * 60 * 60);
 
-    if (hoursPassed >= 24) {
+    if (hoursPassed >= 24 || !acc.sessionStart) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
@@ -167,7 +168,7 @@ function renderMainAccounts() {
 
   accounts.forEach((acc, index) => {
     const startExp = acc.sessionStartExp || acc.lastExp || 0;
-    const timerText = getTimeUntilReset(acc.sessionStart);
+    const timerText = getTimeUntilReset(acc.sessionStart || Date.now());
 
     const cardHTML = `
       <div class="card p-6 space-y-6">
@@ -183,7 +184,7 @@ function renderMainAccounts() {
               </span>
             </div>
             <p class="text-emerald-400 text-sm">UID: ${acc.uid}</p>
-            <p class="text-emerald-400 text-xl font-semibold">Level ${acc.level}</p>
+            <p class="text-emerald-400 text-xl font-semibold">Level ${acc.level || 1}</p>
           </div>
         </div>
 
@@ -200,7 +201,7 @@ function renderMainAccounts() {
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Current EXP</p>
-            <p class="text-3xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
+            <p class="text-3xl font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</p>
           </div>
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Remaining XP</p>
@@ -219,11 +220,11 @@ function renderMainAccounts() {
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">На данный момент:</span>
-            <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
+            <span class="font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
-            <span class="font-bold text-pink-400">${acc.likes ? acc.likes.toLocaleString('ru-RU') : '0'}</span>
+            <span class="font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
           </div>
         </div>
 
@@ -284,13 +285,8 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление данных каждые 30 секунд
+// Автообновление каждые 30 секунд
 setInterval(refreshAll, 30000);
-
-// Обновление таймера каждые 30 секунд (достаточно для минут)
-setInterval(() => {
-  renderMainAccounts();
-}, 30000);
 </script>
 </body>
 </html>
