@@ -117,7 +117,13 @@ function calculateProgress(totalExp) {
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
 
-  return { level, progress: progress.toFixed(1), currentInLevel, remaining, needForNext };
+  return { 
+    level, 
+    progress: progress.toFixed(1), 
+    currentInLevel, 
+    remaining, 
+    needForNext 
+  };
 }
 
 async function updateAccount(index) {
