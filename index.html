@@ -1107,7 +1107,7 @@ function checkInactivity() {
 // ---------------- FETCH DATA ----------------
 async function fetchData() {
     try {
-        const r = await fetch(`https://danger-info-alpha.vercel.app/accinfo?uid=${uid}&key=DANGERxINFO`);
+        const r = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
         const d = await r.json();
         
         // API Error check
