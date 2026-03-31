@@ -7,12 +7,33 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
-    .card { background: #111111; border-radius: 16px; }
-    .progress-container { background: #1f1f1f; height: 8px; border-radius: 9999px; overflow: hidden; }
-    .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.6s ease; }
-    .live-dot { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    body { 
+      background: #0a0a0a; 
+      color: #ddd; 
+      font-family: system-ui, sans-serif; 
+    }
+    .card { 
+      background: #111111; 
+      border-radius: 16px; 
+    }
+    .progress-container { 
+      background: #1f1f1f; 
+      height: 8px; 
+      border-radius: 9999px; 
+      overflow: hidden; 
+    }
+    .progress-bar { 
+      height: 100%; 
+      background: linear-gradient(90deg, #22c55e, #4ade80); 
+      transition: width 0.6s ease; 
+    }
+    .live-dot { 
+      animation: pulse 2s infinite; 
+    }
+    @keyframes pulse { 
+      0%, 100% { opacity: 1; } 
+      50% { opacity: 0.3; } 
+    }
   </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -21,6 +42,7 @@
 
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
+      <!-- Логотип сайта -->
       <img src="GAROUXa.jpg" alt="GarouX" class="w-10 h-10 rounded-xl object-cover border-2 border-red-500 shadow-lg">
       <div>
         <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
@@ -102,10 +124,18 @@ function calculateProgress(totalExp) {
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
 
-  return { level, progress: progress.toFixed(2), currentInLevel, remaining, needForNext };
+  return { 
+    level, 
+    progress: progress.toFixed(1), 
+    currentInLevel, 
+    remaining, 
+    needForNext 
+  };
 }
 
 function getTimeUntilReset(sessionStart) {
+  if (!sessionStart) return "00:00:00";
+
   const now = Date.now();
   const resetTime = sessionStart + 24 * 60 * 60 * 1000;
   let remaining = Math.max(0, resetTime - now);
@@ -121,6 +151,8 @@ function getTimeUntilReset(sessionStart) {
 
 async function updateAccount(index) {
   const acc = accounts[index];
+  if (!acc) return;
+
   try {
     const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
     const raw = await res.json();
@@ -128,14 +160,15 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp;
-    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname;
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp || 0;
+    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Unknown";
     const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
     const now = Date.now();
-    const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+    const hoursPassed = (now - (acc.sessionStart || now)) / (1000 * 60 * 60);
 
-    if (hoursPassed >= 24) {
+    // Сброс сессии каждые 24 часа
+    if (hoursPassed >= 24 || !acc.sessionStart) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
@@ -159,7 +192,7 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка обновления:", e);
+    console.error("Ошибка обновления аккаунта:", e);
   }
 }
 
@@ -179,13 +212,13 @@ function renderMainAccounts() {
           
           <div class="flex-1">
             <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-bold">${acc.nickname}</h2>
+              <h2 class="text-2xl font-bold">${acc.nickname || 'Загрузка...'}</h2>
               <span class="bg-emerald-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5">
                 <span class="w-2.5 h-2.5 bg-white rounded-full live-dot"></span> LIVE
               </span>
             </div>
             <p class="text-emerald-400 text-sm">UID: ${acc.uid}</p>
-            <p class="text-emerald-400 text-xl font-semibold">Level ${acc.level}</p>
+            <p class="text-emerald-400 text-xl font-semibold">Level ${acc.level || 1}</p>
           </div>
         </div>
 
@@ -202,7 +235,7 @@ function renderMainAccounts() {
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Current EXP</p>
-            <p class="text-3xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
+            <p class="text-3xl font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</p>
           </div>
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Remaining XP</p>
@@ -221,11 +254,11 @@ function renderMainAccounts() {
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">На данный момент:</span>
-            <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
+            <span class="font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
-            <span class="font-bold text-pink-400">${acc.likes ? acc.likes.toLocaleString('ru-RU') : '0'}</span>
+            <span class="font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
           </div>
         </div>
 
@@ -239,6 +272,7 @@ function renderMainAccounts() {
           <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Delete</button>
         </div>
       </div>`;
+
     container.innerHTML += cardHTML;
   });
 }
@@ -275,7 +309,7 @@ function addNewAccount() {
 
   saveAccounts();
   renderMainAccounts();
-  updateAccount(accounts.length - 1);
+  updateAccount(accounts.length - 1); // сразу обновляем данные
 }
 
 function refreshAll() {
