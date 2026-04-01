@@ -6,156 +6,107 @@
   <title>FFGarouX</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  
   <style>
-    body { 
-      background: #0a0a0a; 
-      color: #ddd; 
-      font-family: system-ui, sans-serif; 
-    }
-    
-    .card { 
-      background: #111111; 
-      border-radius: 16px; 
-      perspective: 1000px; 
-      position: relative;
-      height: 580px;                    /* Уменьшил для мобильных */
-      min-height: 580px;
-    }
+    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
+    .card { background: #111111; border-radius: 16px; perspective: 1000px; position: relative; }
 
     .flip-card {
-      width: 100%;
-      height: 100%;
       transition: transform 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transform-style: preserve-3d;
     }
-    .flipped .flip-card { 
-      transform: rotateY(180deg); 
-    }
+    .flipped .flip-card { transform: rotateY(180deg); }
 
     .flip-card-front, .flip-card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
       backface-visibility: hidden;
       border-radius: 16px;
-      overflow: hidden;
     }
-    
-    .flip-card-front {
-      background: #111;
-      padding: 20px;
-    }
-    
     .flip-card-back {
       transform: rotateY(180deg);
       background: #0f172a;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
+      overflow-y: auto;
     }
 
     .site-title {
-      font-size: 2.2rem;
+      font-size: 2.85rem;
       font-weight: 900;
-      letter-spacing: -1.5px;
-      background: linear-gradient(135deg, #fbbf24, #f59e0b, #fb923c, #f97316);
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #fb923c, #f97316, #fbbf24);
+      background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      animation: titleDiagonal 7s linear infinite;
+    }
+    @keyframes titleDiagonal {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
     }
 
     .glow-avatar {
-      width: 72px; 
-      height: 72px;
-      border-radius: 8px;
+      width: 80px; height: 80px;
+      border-radius: 0;
       overflow: hidden;
       border: 2px solid #374151;
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 8px rgba(55, 65, 81, 0.5);
     }
+    .glow-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .progress-container { 
-      background: #1f1f1f; 
-      height: 8px; 
-      border-radius: 9999px; 
-      overflow: hidden; 
-    }
+    .progress-container { background: #1f1f1f; height: 10px; border-radius: 9999px; overflow: hidden; }
     .progress-bar { 
       height: 100%; 
-      background: linear-gradient(90deg, #4ade80, #22c55e);
+      background: linear-gradient(90deg, #166534, #4ade80, #22c55e, #4ade80);
+      background-size: 200% 100%;
       animation: progressFlow 3s linear infinite;
     }
-    @keyframes progressFlow { 
-      0% { background-position: 0% 50%; } 
-      100% { background-position: 200% 50%; } 
-    }
+    @keyframes progressFlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
-    .glow-btn { 
-      position: relative; 
-      overflow: hidden; 
-      transition: all 0.3s ease; 
+    .glow-btn { position: relative; overflow: hidden; transition: all 0.3s ease; }
+    .glow-btn::before {
+      content: ''; position: absolute; top: -50%; left: -100%;
+      width: 40%; height: 200%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent);
+      transition: 0.8s;
     }
+    .glow-btn:hover::before { left: 200%; }
+
+    .btn-green:hover { box-shadow: 0 0 20px #4ade80; transform: translateY(-2px); }
+    .btn-red:hover   { box-shadow: 0 0 20px #ef4444; transform: translateY(-2px); }
+    .btn-orange:hover{ box-shadow: 0 0 20px #f59e0b; transform: translateY(-2px); }
 
     .live-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
     .info-btn {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 16px;
+      right: 16px;
       z-index: 20;
-    }
-
-    .full-info-container {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 8px;
-      scrollbar-width: thin;
-    }
-    .full-info-container::-webkit-scrollbar {
-      width: 5px;
-    }
-    .full-info-container::-webkit-scrollbar-thumb {
-      background: #4b5563;
-      border-radius: 10px;
-    }
-
-    pre {
-      background: #1e2937;
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 12.5px;
-      line-height: 1.45;
-      white-space: pre-wrap;
     }
   </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-12">
 
-<div class="max-w-xl mx-auto pt-6 px-4">
+<div class="max-w-xl mx-auto pt-8 px-4">
 
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
+  <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-3">
-      <div class="w-11 h-11 rounded-2xl overflow-hidden border border-orange-500 shadow-lg">
+      <div class="w-10 h-10 rounded-2xl overflow-hidden border border-amber-500 shadow-[0_0_15px_#f59e0b]">
         <img src="GAROUXa.jpg" alt="GAROUX" class="w-full h-full object-cover">
       </div>
-      <h1 class="site-title text-3xl">FFGarouX</h1>
+      <h1 class="site-title">FFGarouX</h1>
     </div>
-    <button onclick="refreshAll()" 
-            class="glow-btn flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-5 py-2.5 rounded-2xl text-sm font-medium">
+    <button onclick="refreshAll()" class="glow-btn btn-orange flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl text-sm font-medium">
       <i class="fa-solid fa-rotate"></i> Refresh All
     </button>
   </div>
 
-  <div id="mainAccounts" class="space-y-6"></div>
+  <div id="mainAccounts" class="space-y-8"></div>
 
-  <!-- Добавить UID -->
-  <div class="my-8">
+  <div class="my-10">
     <div class="flex gap-3">
-      <input id="uidInput" type="text" placeholder="Введите UID" 
-             class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-orange-500 rounded-3xl px-5 py-4 text-base outline-none">
-      <button onclick="addNewAccount()" 
-              class="glow-btn bg-green-500 hover:bg-green-600 px-8 py-4 rounded-3xl font-semibold text-black text-sm">
+      <input id="uidInput" type="text" placeholder="Добавить новый UID" 
+             class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
+      <button onclick="addNewAccount()" class="glow-btn btn-green bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
         Добавить
       </button>
     </div>
@@ -163,7 +114,7 @@
 </div>
 
 <script>
-// ==================== EXP TABLE (без изменений) ====================
+// ==================== EXP TABLE ====================
 const EXP_TABLE = { 
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],6:[1844,948],7:[2792,1008],
   8:[3800,1070],9:[4870,1134],10:[6004,1188],11:[7192,1256],12:[8448,1328],13:[9776,1364],
@@ -239,24 +190,44 @@ async function getFullInfo(uid) {
 
 function formatFullProfile(uid, data) {
   const a = data.AccountInfo || {};
-  const outfits = (data.AccountProfileInfo?.EquippedOutfit || []).slice(0,3).join(", ") || "—";
-  
+  const p = data.AccountProfileInfo || {};
+  const g = data.GuildInfo || {};
+  const pet = data.petInfo || {};
+  const social = data.socialinfo || {};
+
+  const outfits = (p.EquippedOutfit || []).slice(0,3).join(", ") + ((p.EquippedOutfit || []).length > 3 ? "..." : "");
+  const skillsCount = p.EquippedSkills ? Math.floor(p.EquippedSkills.length / 4) : 0;
+
   return `
-    <div>
-      <b class="text-lg text-amber-400 block mb-3">👤 ПОДРОБНЫЙ ПРОФИЛЬ</b>
-      <pre>────────── GAROUX MODZ ──────────
-Никнейм   : ${a.AccountName || '—'}
-UID       : ${uid}
-Уровень   : ${a.AccountLevel || '—'}
-Exp       : ${a.AccountEXP || '—'}
-Лайки     : ${a.AccountLikes || '0'}
+    <div class="p-5 text-sm">
+      <b class="text-lg">👤 ПОДРОБНЫЙ ПРОФИЛЬ</b>
+      <pre class="mt-4 text-xs leading-relaxed whitespace-pre-wrap">
+──────────?? GAROUX MODZ 👾───────────
+🎮 Основная информация
+🔹 Никнейм   : ${a.AccountName || '—'}
+🆔 UID        : ${uid}
+🌍 Регион     : RU
+📈 Уровень    : ${a.AccountLevel || '—'} (Exp: ${a.AccountEXP || '—'})
+❤️ Лайки      : ${a.AccountLikes || '0'}
 
-Создан    : ${a.AccountCreateTime ? new Date(a.AccountCreateTime * 1000).toLocaleDateString('ru-RU') : '—'}
-Последний вход: ${a.AccountLastLogin ? new Date(a.AccountLastLogin * 1000).toLocaleString('ru-RU') : '—'}
+🕒 Активность
+📅 Создан     : ${a.AccountCreateTime ? new Date(a.AccountCreateTime * 1000).toLocaleString('ru-RU') : '—'}
+♻️ Последний вход : ${a.AccountLastLogin ? new Date(a.AccountLastLogin * 1000).toLocaleString('ru-RU') : '—'}
 
-КБ : ${a.BrRankPoint || '—'} | БО : ${a.CsRankPoint || '—'}
-Одежда    : ${outfits}
-Гильдия   : ${data.GuildInfo?.GuildName || 'Нет гильдии'}
+🏅 Рейтинг
+🏹 КБ : ${a.BrRankPoint || '—'}
+🔫 БО : ${a.CsRankPoint || '—'}
+
+🎨 Стиль
+🖼️ Аватар ID : ${a.AccountAvatarId || '—'}
+👕 Одежда     : ${outfits || '—'}
+⚡ Навыки     : ${skillsCount} комплектов
+
+🐾 Питомец
+🆔 ID : ${pet.id || '—'} | Уровень: ${pet.level || '—'}
+
+🏰 Гильдия
+🏷️ ${g.GuildName || 'Нет гильдии'}
       </pre>
     </div>`;
 }
@@ -266,88 +237,96 @@ function renderMainAccounts() {
   container.innerHTML = '';
 
   accounts.forEach((acc, index) => {
+    const startExp = acc.sessionStartExp || acc.lastExp || 0;
     const timerText = getTimeUntilReset(acc.sessionStart);
 
     const html = `
-      <div class="card" id="card-${index}">
+      <div class="card p-6" id="card-${index}">
         <div class="flip-card" id="flip-${index}">
 
-          <!-- FRONT -->
-          <div class="flip-card-front relative">
+          <!-- === FRONT === -->
+          <div class="flip-card-front bg-[#111] p-6 space-y-6 relative">
             <button onclick="toggleFlip(${index}); event.stopImmediatePropagation()" 
-                    class="info-btn bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-2xl text-xs flex items-center gap-1.5">
+                    class="info-btn bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-2xl text-sm flex items-center gap-2">
               <i class="fa-solid fa-info-circle"></i> Info
             </button>
 
-            <div class="flex items-center gap-4 mb-5">
+            <div class="flex items-center gap-4">
               <div class="glow-avatar flex-shrink-0">
                 <img src="avag.jpg" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
               </div>
-              <div class="flex-1">
+              <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <h2 class="text-xl font-bold truncate">${acc.nickname}</h2>
-                  <span class="bg-emerald-600 text-white text-[10px] px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 bg-white rounded-full live-dot"></span>LIVE
+                  <h2 class="text-2xl font-bold truncate">${acc.nickname}</h2>
+                  <span class="bg-emerald-600 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1 whitespace-nowrap">
+                    <span class="w-2 h-2 bg-white rounded-full live-dot"></span> LIVE
                   </span>
                 </div>
                 <p class="text-emerald-400 text-sm">UID: ${acc.uid}</p>
-                <p class="text-2xl font-semibold text-emerald-400">Level ${acc.level}</p>
+                <p class="text-emerald-400 text-2xl font-semibold">Level ${acc.level}</p>
               </div>
             </div>
 
-            <div class="mb-5">
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-green-400">${acc.progress}%</span>
-                <span class="text-zinc-400">${acc.currentInLevel} / ${acc.needForNext}</span>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-green-400 font-medium">${acc.progress}% Progress</span>
+                <span class="text-zinc-400">${acc.currentInLevel.toLocaleString('ru-RU')} / ${acc.needForNext.toLocaleString('ru-RU')}</span>
               </div>
               <div class="progress-container">
                 <div class="progress-bar" style="width: ${acc.progress}%"></div>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-center mb-5">
-              <div class="bg-zinc-900 rounded-2xl p-3">
-                <p class="text-zinc-400 text-xs">EXP сейчас</p>
-                <p class="text-lg font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
+            <div class="grid grid-cols-2 gap-4 text-center">
+              <div class="bg-zinc-900 rounded-3xl p-4">
+                <p class="text-zinc-400 text-xs">Current EXP</p>
+                <p class="text-2xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
               </div>
-              <div class="bg-zinc-900 rounded-2xl p-3">
-                <p class="text-zinc-400 text-xs">Осталось</p>
-                <p class="text-orange-400 text-lg font-bold">${acc.remaining.toLocaleString('ru-RU')}</p>
+              <div class="bg-zinc-900 rounded-3xl p-4">
+                <p class="text-zinc-400 text-xs">Remaining XP</p>
+                <p class="text-orange-400 text-2xl font-bold">${acc.remaining.toLocaleString('ru-RU')}</p>
               </div>
             </div>
 
-            <div class="bg-zinc-900 rounded-3xl p-4 text-sm space-y-2.5 mb-5">
+            <div class="bg-zinc-900 rounded-3xl p-5 space-y-3 text-sm">
               <div class="flex justify-between">
-                <span class="text-zinc-400">Добавилось:</span>
-                <span class="text-green-400 font-medium">+${(acc.todayExp || 0).toLocaleString('ru-RU')}</span>
+                <span class="text-zinc-400">Было при добавлении:</span>
+                <span class="font-medium">${startExp.toLocaleString('ru-RU')}</span>
               </div>
-              <div class="flex justify-between border-t border-zinc-700 pt-2">
-                <span class="text-zinc-400">Лайки:</span>
-                <span class="font-medium text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
+              <div class="flex justify-between text-green-400">
+                <span>Добавилось за сессию:</span>
+                <span class="font-bold">+${(acc.todayExp || 0).toLocaleString('ru-RU')}</span>
+              </div>
+              <div class="flex justify-between border-t border-zinc-700 pt-3">
+                <span class="text-zinc-400">На данный момент:</span>
+                <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
+              </div>
+              <div class="flex justify-between border-t border-zinc-700 pt-3">
+                <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
+                <span class="font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
               </div>
             </div>
 
-            <div class="text-center text-amber-400 text-xs mb-4">
-              Сброс сессии через: <span class="font-semibold">${timerText}</span>
+            <div class="bg-zinc-900 rounded-3xl p-4 text-center text-amber-400 text-sm">
+              До сброса сессии: <span class="font-semibold">${timerText}</span>
             </div>
 
-            <div class="flex gap-3">
+            <div class="flex gap-3 pt-2">
               <button onclick="updateAccount(${index}); event.stopImmediatePropagation()" 
-                      class="glow-btn flex-1 bg-zinc-800 hover:bg-zinc-700 py-3.5 rounded-2xl text-sm font-medium">Обновить</button>
+                      class="glow-btn btn-green flex-1 bg-zinc-800 py-4 rounded-2xl text-sm">Обновить</button>
               <button onclick="deleteAccount(${index}); event.stopImmediatePropagation()" 
-                      class="glow-btn flex-1 bg-red-600 hover:bg-red-700 py-3.5 rounded-2xl text-sm font-medium">Удалить</button>
+                      class="glow-btn btn-red flex-1 bg-red-600 py-4 rounded-2xl text-sm">Delete</button>
             </div>
           </div>
 
-          <!-- BACK -->
-          <div class="flip-card-back">
+          <!-- === BACK === -->
+          <div class="flip-card-back p-6" id="back-${index}">
             <button onclick="toggleFlip(${index})" 
-                    class="absolute top-4 right-4 bg-zinc-800 hover:bg-zinc-700 px-5 py-2 rounded-2xl text-xs z-10">
-              ← Назад
+                    class="absolute top-4 right-4 bg-zinc-800 hover:bg-zinc-700 px-5 py-2 rounded-2xl text-sm z-10">
+              ← Назад к уровню
             </button>
-            
-            <div class="pt-10 flex-1 full-info-container" id="full-info-${index}">
-              <p class="text-center text-zinc-500 mt-10">Загрузка информации...</p>
+            <div class="pt-12" id="full-info-${index}">
+              <p class="text-center text-zinc-500">Загрузка полной информации...</p>
             </div>
           </div>
 
@@ -367,24 +346,31 @@ function toggleFlip(index) {
     const container = document.getElementById(`full-info-${index}`);
     if (container.innerHTML.includes('Загрузка')) {
       getFullInfo(uid).then(data => {
-        container.innerHTML = data ? formatFullProfile(uid, data) : `<p class="text-red-400 text-center">Ошибка загрузки</p>`;
+        if (data) container.innerHTML = formatFullProfile(uid, data);
+        else container.innerHTML = `<p class="text-red-400 text-center">Ошибка загрузки</p>`;
       });
     }
   }
 }
 
+// ==================== Другие функции (без изменений) ====================
 async function updateAccount(index) {
   const acc = accounts[index];
   try {
     const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
     const raw = await res.json();
-    const a = raw.AccountInfo || raw.captainBasicInfo || {};
 
-    const totalExpNow = parseInt(a.AccountEXP || a.exp) || 0;
-    const nickname = a.AccountName || a.nickname || acc.nickname;
+    const captain = raw.captainBasicInfo || {};
+    const accountInfo = raw.AccountInfo || {};
+
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || 0;
+    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Unknown";
+    const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
     const now = Date.now();
-    if ((now - acc.sessionStart) / (1000*60*60) >= 24) {
+    const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+
+    if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
@@ -393,19 +379,21 @@ async function updateAccount(index) {
     acc.todayExp = Math.max(0, totalExpNow - (acc.sessionStartExp || totalExpNow));
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
-    acc.likes = parseInt(a.AccountLikes || 0);
+    acc.likes = likes;
 
     Object.assign(acc, calculateProgress(totalExpNow));
 
     saveAccounts();
     renderMainAccounts();
-  } catch(e) { console.error(e); }
+  } catch (e) {
+    console.error("Update error:", e);
+  }
 }
 
 async function addNewAccount() {
   let uid = document.getElementById('uidInput').value.trim();
   if (!uid) return alert("Введите UID!");
-  if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
+  if (accounts.some(a => a.uid === uid)) return alert("UID уже добавлен!");
 
   const now = Date.now();
   const newAcc = {
@@ -421,25 +409,30 @@ async function addNewAccount() {
   try {
     const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
     const raw = await res.json();
-    const a = raw.AccountInfo || raw.captainBasicInfo || {};
+    const captain = raw.captainBasicInfo || {};
+    const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(a.AccountEXP || a.exp) || 0;
-    newAcc.nickname = a.AccountName || a.nickname || "Unknown";
-    newAcc.likes = parseInt(a.AccountLikes || 0);
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || 0;
+    const nickname = captain.nickname || accountInfo.AccountName || "Unknown";
+    const likes = parseInt(accountInfo.AccountLikes || 0);
+
+    Object.assign(newAcc, calculateProgress(totalExpNow));
     newAcc.lastExp = totalExpNow;
     newAcc.sessionStartExp = totalExpNow;
-    Object.assign(newAcc, calculateProgress(totalExpNow));
+    newAcc.todayExp = 0;
+    newAcc.nickname = nickname;
+    newAcc.likes = likes;
 
     saveAccounts();
     renderMainAccounts();
-  } catch(e) {
-    newAcc.nickname = "Ошибка";
+  } catch (e) {
+    newAcc.nickname = "Ошибка загрузки";
     renderMainAccounts();
   }
 }
 
 function deleteAccount(index) {
-  if (confirm("Удалить этот аккаунт?")) {
+  if (confirm("Удалить аккаунт?")) {
     accounts.splice(index, 1);
     saveAccounts();
     renderMainAccounts();
@@ -454,6 +447,7 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 setInterval(refreshAll, 30000);
+setInterval(renderMainAccounts, 60000);
 </script>
 </body>
 </html>
