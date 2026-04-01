@@ -17,15 +17,15 @@
       border-radius: 16px; 
     }
 
-    /* === Аватар: серый ровный квадрат + диагональная анимация === */
+    /* === Аватар: тёмно-серый квадрат БЕЗ закруглений + бликовая анимация === */
     .glow-avatar {
       position: relative;
       width: 80px;
       height: 80px;
-      border-radius: 12px;           /* минимальное закругление для ровного вида */
+      border-radius: 0;                    /* полностью квадратный */
       overflow: hidden;
-      border: 3px solid #6b7280;     /* серая рамка */
-      box-shadow: 0 0 12px rgba(107, 114, 128, 0.5);
+      border: 3px solid #4b5563;           /* тёмно-серый */
+      box-shadow: 0 0 12px rgba(75, 85, 99, 0.6);
     }
     .glow-avatar img {
       width: 100%;
@@ -53,7 +53,7 @@
       100% { transform: translate(120%, 120%) rotate(30deg); }
     }
 
-    /* === Прогресс-бар: анимация вперёд (слева → направо) === */
+    /* === Прогресс-бар: анимация строго слева → направо === */
     .progress-container { 
       background: #1f1f1f; 
       height: 10px; 
@@ -62,17 +62,17 @@
     }
     .progress-bar { 
       height: 100%; 
-      background: linear-gradient(90deg, #166534, #4ade80, #22c55e);
-      background-size: 180% 100%;
-      animation: progressFlow 2.8s linear infinite;
+      background: linear-gradient(90deg, #166534, #4ade80, #22c55e, #4ade80);
+      background-size: 200% 100%;
+      animation: progressFlow 3s linear infinite;
       transition: width 0.7s ease;
     }
     @keyframes progressFlow {
       0%   { background-position: 0% 50%; }
-      100% { background-position: 180% 50%; }
+      100% { background-position: 200% 50%; }
     }
 
-    /* Кнопки с shine-эффектом */
+    /* Кнопки с эффектом переливания */
     .glow-btn {
       position: relative;
       overflow: hidden;
@@ -269,7 +269,7 @@ function renderMainAccounts() {
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <!-- Новый аватар: серый ровный квадрат -->
+          <!-- Тёмно-серый квадратный аватар без закруглений -->
           <div class="glow-avatar flex-shrink-0">
             <img src="avag.jpg" alt="Avatar" 
                  onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
