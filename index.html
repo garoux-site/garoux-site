@@ -17,15 +17,15 @@
       border-radius: 16px; 
     }
 
-    /* === Аватар: тёмно-серый квадрат БЕЗ закруглений + бликовая анимация === */
+    /* === Аватар: тонкая тёмная рамка + квадрат === */
     .glow-avatar {
       position: relative;
       width: 80px;
       height: 80px;
       border-radius: 0;                    /* полностью квадратный */
       overflow: hidden;
-      border: 3px solid #4b5563;           /* тёмно-серый */
-      box-shadow: 0 0 12px rgba(75, 85, 99, 0.6);
+      border: 2px solid #374151;           /* тонкая и темнее */
+      box-shadow: 0 0 8px rgba(55, 65, 81, 0.5);
     }
     .glow-avatar img {
       width: 100%;
@@ -53,7 +53,7 @@
       100% { transform: translate(120%, 120%) rotate(30deg); }
     }
 
-    /* === Прогресс-бар: анимация строго слева → направо === */
+    /* Прогресс-бар */
     .progress-container { 
       background: #1f1f1f; 
       height: 10px; 
@@ -72,7 +72,7 @@
       100% { background-position: 200% 50%; }
     }
 
-    /* Кнопки с эффектом переливания */
+    /* === Кнопки с цветным эффектом в зависимости от типа === */
     .glow-btn {
       position: relative;
       overflow: hidden;
@@ -96,8 +96,22 @@
     .glow-btn:hover::before {
       left: 200%;
     }
-    .glow-btn:hover {
-      box-shadow: 0 0 18px #4ade80;
+
+    /* Зелёный эффект для положительных кнопок */
+    .btn-green:hover {
+      box-shadow: 0 0 20px #4ade80;
+      transform: translateY(-2px);
+    }
+
+    /* Красный эффект для Delete */
+    .btn-red:hover {
+      box-shadow: 0 0 20px #ef4444;
+      transform: translateY(-2px);
+    }
+
+    /* Оранжевый эффект для Refresh */
+    .btn-orange:hover {
+      box-shadow: 0 0 20px #f59e0b;
       transform: translateY(-2px);
     }
 
@@ -123,7 +137,7 @@
       <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
     </div>
     <button onclick="refreshAll()" 
-            class="glow-btn flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm font-medium">
+            class="glow-btn btn-orange flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm font-medium">
       <i class="fa-solid fa-rotate"></i> Refresh All
     </button>
   </div>
@@ -136,7 +150,7 @@
       <input id="uidInput" type="text" placeholder="Добавить новый UID" 
              class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
       <button onclick="addNewAccount()" 
-              class="glow-btn bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
+              class="glow-btn btn-green bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
         Добавить
       </button>
     </div>
@@ -269,7 +283,7 @@ function renderMainAccounts() {
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <!-- Тёмно-серый квадратный аватар без закруглений -->
+          <!-- Тонкая тёмная рамка аватара -->
           <div class="glow-avatar flex-shrink-0">
             <img src="avag.jpg" alt="Avatar" 
                  onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
@@ -332,10 +346,12 @@ function renderMainAccounts() {
         </div>
 
         <div class="flex gap-3">
+          <!-- Обновить - зелёный эффект -->
           <button onclick="updateAccount(${index})" 
-                  class="glow-btn flex-1 bg-zinc-800 py-4 rounded-2xl text-sm font-medium">Обновить</button>
+                  class="glow-btn btn-green flex-1 bg-zinc-800 py-4 rounded-2xl text-sm font-medium">Обновить</button>
+          <!-- Delete - красный эффект -->
           <button onclick="deleteAccount(${index})" 
-                  class="glow-btn flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm font-medium">Delete</button>
+                  class="glow-btn btn-red flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm font-medium">Delete</button>
         </div>
       </div>`;
 
