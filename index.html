@@ -17,21 +17,22 @@
       border-radius: 16px; 
     }
 
-    /* Большое переливающееся название */
+    /* Название сайта с диагональной анимацией */
     .site-title {
-      font-size: 2.75rem;
+      font-size: 2.85rem;
       font-weight: 900;
-      background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24, #f97316);
-      background-size: 200% 100%;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #fb923c, #f97316, #fbbf24);
+      background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: titleGradient 6s linear infinite;
-      letter-spacing: -2px;
+      animation: titleDiagonal 7s linear infinite;
     }
 
-    @keyframes titleGradient {
-      0%   { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
+    @keyframes titleDiagonal {
+      0%   { background-position: 0% 0%; }
+      50%  { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
     }
 
     /* Аватар */
@@ -53,7 +54,13 @@
       content: '';
       position: absolute;
       inset: -150%;
-      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.55) 48%, rgba(255,255,255,0.30) 52%, transparent 60%);
+      background: linear-gradient(
+        135deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.55) 48%,
+        rgba(255, 255, 255, 0.30) 52%,
+        transparent 60%
+      );
       animation: avatarShine 4s linear infinite;
     }
 
@@ -111,7 +118,7 @@
 
 <div class="max-w-xl mx-auto pt-8 px-4">
 
-  <!-- Шапка с большим переливающимся названием -->
+  <!-- Шапка -->
   <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-2xl overflow-hidden border border-amber-500 flex-shrink-0 shadow-[0_0_15px_#f59e0b]">
@@ -371,11 +378,11 @@ function addNewAccount() {
   saveAccounts();
   renderMainAccounts();
 
-  // Автоматическое обновление через 10 секунд после добавления
+  // Автоматическое обновление через 5 секунд после добавления
   setTimeout(() => {
     const newIndex = accounts.length - 1;
     updateAccount(newIndex);
-  }, 10000);
+  }, 5000);
 }
 
 function refreshAll() {
@@ -386,9 +393,7 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 30 секунд
 setInterval(() => { refreshAll(); }, 30000);
-// Обновление таймера каждые 60 секунд
 setInterval(() => { renderMainAccounts(); }, 60000);
 </script>
 </body>
