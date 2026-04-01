@@ -48,56 +48,40 @@
 
     .flip-card-back {
       transform: rotateY(180deg);
-      background: #111827;        /* Изменено на тёмно-серый */
+      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
       overflow-y: auto;
       padding-bottom: 30px;
     }
 
-    /* === АНИМАЦИЯ СВЕТОВОЙ ВОЛНЫ === */
-    .glare-effect {
+    /* === СВЕТОВАЯ ВОЛНА (АНИМАЦИЯ БЛИКА) === */
+    .shine-effect {
       position: relative;
       overflow: hidden;
     }
 
-    .glare-effect::before {
-      content: '';
+    .shine-effect::after {
+      content: "";
       position: absolute;
-      top: -150%;
-      left: -150%;
-      width: 60px;
-      height: 300%;
+      top: -50%;
+      left: -100%;
+      width: 60%;
+      height: 200%;
       background: linear-gradient(
-        135deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.45) 50%,
-        rgba(255, 255, 255, 0.25) 55%,
-        transparent 70%
+        120deg,
+        transparent,
+        rgba(255,255,255,0.15),
+        rgba(255,255,255,0.4),
+        rgba(255,255,255,0.15),
+        transparent
       );
       transform: rotate(25deg);
-      animation: glareSweep 2.2s linear infinite;
+      animation: shineMove 2.5s linear infinite;
       pointer-events: none;
-      z-index: 10;
     }
 
-    @keyframes glareSweep {
-      0%   { transform: translate(-120%, -120%) rotate(25deg); }
-      100% { transform: translate(300%, 300%) rotate(25deg); }
-    }
-
-    /* Усиленная анимация для аватара */
-    .glow-avatar {
-      width: 80px; 
-      height: 80px;
-      border-radius: 0;
-      overflow: hidden;
-      border: 2px solid #374151;
-      box-shadow: 0 0 12px rgba(55, 65, 81, 0.6);
-      position: relative;
-    }
-
-    .glow-avatar .glare-effect {
-      width: 100%;
-      height: 100%;
+    @keyframes shineMove {
+      0% { left: -100%; }
+      100% { left: 200%; }
     }
 
     .site-title {
@@ -115,6 +99,21 @@
       0% { background-position: 0% 0%; }
       50% { background-position: 100% 100%; }
       100% { background-position: 0% 0%; }
+    }
+
+    .glow-avatar {
+      width: 80px; 
+      height: 80px;
+      border-radius: 0;
+      overflow: hidden;
+      border: 2px solid #374151;
+      box-shadow: 0 0 8px rgba(55, 65, 81, 0.5);
+    }
+
+    .glow-avatar img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
     }
 
     .progress-container { 
@@ -169,11 +168,12 @@
       z-index: 20;
     }
 
+    /* Скроллбар серый */
     .flip-card-back::-webkit-scrollbar {
       width: 6px;
     }
     .flip-card-back::-webkit-scrollbar-thumb {
-      background: #6b7280;   /* Серый цвет скроллбара */
+      background: #555;
       border-radius: 20px;
     }
   </style>
@@ -293,7 +293,7 @@ function formatFullProfile(uid, data) {
   const skillsCount = p.EquippedSkills ? Math.floor(p.EquippedSkills.length / 4) : 0;
 
   return `
-    <div class="p-5 text-sm glare-effect">
+    <div class="p-5 text-sm">
       <b class="text-lg">👤 ПОДРОБНЫЙ ПРОФИЛЬ</b>
       <pre class="mt-4 text-xs leading-relaxed whitespace-pre-wrap">
 ──────────?? GAROUX MODZ 👾───────────
@@ -346,7 +346,7 @@ function renderMainAccounts() {
             </button>
 
             <div class="flex items-center gap-4">
-              <div class="glow-avatar flex-shrink-0 glare-effect">
+              <div class="glow-avatar flex-shrink-0 shine-effect">
                 <img src="avag.jpg" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
               </div>
               <div class="flex-1 min-w-0">
@@ -414,7 +414,7 @@ function renderMainAccounts() {
           </div>
 
           <!-- === BACK === -->
-          <div class="flip-card-back p-6 glare-effect" id="back-${index}">
+          <div class="flip-card-back p-6 shine-effect" id="back-${index}">
             <button onclick="toggleFlip(${index})" 
                     class="absolute top-4 right-4 bg-zinc-800 hover:bg-zinc-700 px-5 py-2 rounded-2xl text-sm z-10">
               ← Назад к уровню
@@ -451,7 +451,6 @@ function toggleFlip(index) {
   }
 }
 
-// ==================== Остальные функции ====================
 async function updateAccount(index) {
   const acc = accounts[index];
   try {
