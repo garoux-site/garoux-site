@@ -17,14 +17,14 @@
       border-radius: 16px; 
     }
 
-    /* === Аватар: тонкая тёмная рамка + квадрат === */
+    /* Аватар: тонкая тёмная рамка, полностью квадратный */
     .glow-avatar {
       position: relative;
       width: 80px;
       height: 80px;
-      border-radius: 0;                    /* полностью квадратный */
+      border-radius: 0;
       overflow: hidden;
-      border: 2px solid #374151;           /* тонкая и темнее */
+      border: 2px solid #374151;
       box-shadow: 0 0 8px rgba(55, 65, 81, 0.5);
     }
     .glow-avatar img {
@@ -72,7 +72,7 @@
       100% { background-position: 200% 50%; }
     }
 
-    /* === Кнопки с цветным эффектом в зависимости от типа === */
+    /* Кнопки с цветным свечением */
     .glow-btn {
       position: relative;
       overflow: hidden;
@@ -85,50 +85,25 @@
       left: -100%;
       width: 40%;
       height: 200%;
-      background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,0.7),
-        transparent
-      );
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent);
       transition: 0.8s;
     }
     .glow-btn:hover::before {
       left: 200%;
     }
 
-    /* Зелёный эффект для положительных кнопок */
-    .btn-green:hover {
-      box-shadow: 0 0 20px #4ade80;
-      transform: translateY(-2px);
-    }
+    .btn-green:hover { box-shadow: 0 0 20px #4ade80; transform: translateY(-2px); }
+    .btn-red:hover   { box-shadow: 0 0 20px #ef4444; transform: translateY(-2px); }
+    .btn-orange:hover{ box-shadow: 0 0 20px #f59e0b; transform: translateY(-2px); }
 
-    /* Красный эффект для Delete */
-    .btn-red:hover {
-      box-shadow: 0 0 20px #ef4444;
-      transform: translateY(-2px);
-    }
-
-    /* Оранжевый эффект для Refresh */
-    .btn-orange:hover {
-      box-shadow: 0 0 20px #f59e0b;
-      transform: translateY(-2px);
-    }
-
-    .live-dot { 
-      animation: pulse 2s infinite; 
-    }
-    @keyframes pulse { 
-      0%, 100% { opacity: 1; } 
-      50% { opacity: 0.3; } 
-    }
+    .live-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
 </head>
 <body class="min-h-screen pb-12">
 
 <div class="max-w-xl mx-auto pt-8 px-4">
 
-  <!-- Шапка -->
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-2xl overflow-hidden border border-amber-500 flex-shrink-0 shadow-[0_0_12px_#eab308]">
@@ -144,7 +119,6 @@
 
   <div id="mainAccounts" class="space-y-8"></div>
 
-  <!-- Добавление UID -->
   <div class="my-10">
     <div class="flex gap-3">
       <input id="uidInput" type="text" placeholder="Добавить новый UID" 
@@ -237,19 +211,21 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp;
-    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname;
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp || 0;
+    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Unknown";
     const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
+    // Сброс сессии каждые 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
+    // Расчёт EXP за сессию
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -283,7 +259,6 @@ function renderMainAccounts() {
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <!-- Тонкая тёмная рамка аватара -->
           <div class="glow-avatar flex-shrink-0">
             <img src="avag.jpg" alt="Avatar" 
                  onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
@@ -346,10 +321,8 @@ function renderMainAccounts() {
         </div>
 
         <div class="flex gap-3">
-          <!-- Обновить - зелёный эффект -->
           <button onclick="updateAccount(${index})" 
                   class="glow-btn btn-green flex-1 bg-zinc-800 py-4 rounded-2xl text-sm font-medium">Обновить</button>
-          <!-- Delete - красный эффект -->
           <button onclick="deleteAccount(${index})" 
                   class="glow-btn btn-red flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm font-medium">Delete</button>
         </div>
@@ -377,9 +350,9 @@ function addNewAccount() {
   accounts.push({
     uid: uid,
     lastExp: 0,
-    todayExp: 0,
+    todayExp: 0,                    // ← Начинается строго с 0
     sessionStart: now,
-    sessionStartExp: 0,
+    sessionStartExp: 0,             // ← Важно: начинаем с 0
     likes: 0,
     nickname: "Загрузка...",
     level: 1,
@@ -391,6 +364,8 @@ function addNewAccount() {
 
   saveAccounts();
   renderMainAccounts();
+  
+  // Сразу обновляем данные с API
   updateAccount(accounts.length - 1);
 }
 
