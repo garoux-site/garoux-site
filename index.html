@@ -7,35 +7,64 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
-    .card { background: #111111; border-radius: 16px; }
-    .progress-container { background: #1f1f1f; height: 10px; border-radius: 9999px; overflow: hidden; }
-    .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.6s ease; }
-    .live-dot { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    body { 
+      background: #0a0a0a; 
+      color: #ddd; 
+      font-family: system-ui, sans-serif; 
+    }
+    .card { 
+      background: #111111; 
+      border-radius: 16px; 
+    }
+    .progress-container { 
+      background: #1f1f1f; 
+      height: 10px; 
+      border-radius: 9999px; 
+      overflow: hidden; 
+    }
+    .progress-bar { 
+      height: 100%; 
+      background: linear-gradient(90deg, #22c55e, #4ade80); 
+      transition: width 0.6s ease; 
+    }
+    .live-dot { 
+      animation: pulse 2s infinite; 
+    }
+    @keyframes pulse { 
+      0%, 100% { opacity: 1; } 
+      50% { opacity: 0.3; } 
+    }
   </style>
 </head>
 <body class="min-h-screen pb-12">
 
 <div class="max-w-xl mx-auto pt-8 px-4">
 
+  <!-- Шапка с новым логотипом -->
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-xl">🔥</div>
+      <div class="w-9 h-9 rounded-2xl overflow-hidden border border-zinc-700 flex-shrink-0">
+        <img src="GAROUXa.jpg" alt="GAROUX" 
+             class="w-full h-full object-cover"
+             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
+      </div>
       <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
     </div>
-    <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
+    <button onclick="refreshAll()" 
+            class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
       <i class="fa-solid fa-rotate"></i> Refresh All
     </button>
   </div>
 
   <div id="mainAccounts" class="space-y-8"></div>
 
+  <!-- Поле добавления нового UID -->
   <div class="my-10">
     <div class="flex gap-3">
       <input id="uidInput" type="text" placeholder="Добавить новый UID" 
              class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
-      <button onclick="addNewAccount()" class="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
+      <button onclick="addNewAccount()" 
+              class="bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
         Добавить
       </button>
     </div>
@@ -129,14 +158,12 @@ async function updateAccount(index) {
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
-    // Сброс каждые 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
-    // Расчёт EXP за текущие сутки
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -170,7 +197,13 @@ function renderMainAccounts() {
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <div class="w-20 h-20 bg-zinc-800 rounded-2xl flex items-center justify-center text-5xl border border-zinc-700">🔥</div>
+          <!-- Новый аватар аккаунта -->
+          <div class="w-20 h-20 bg-zinc-800 rounded-full overflow-hidden border border-zinc-700 flex-shrink-0">
+            <img src="avag.jpg" alt="Avatar" 
+                 class="w-full h-full object-cover"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
+          </div>
+          
           <div class="flex-1">
             <div class="flex items-center gap-3">
               <h2 class="text-2xl font-bold">${acc.nickname}</h2>
@@ -232,6 +265,7 @@ function renderMainAccounts() {
           <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Delete</button>
         </div>
       </div>`;
+
     container.innerHTML += cardHTML;
   });
 }
@@ -279,12 +313,12 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 30 секунд + обновление таймера
+// Автообновление каждые 30 секунд
 setInterval(() => {
   refreshAll();
 }, 30000);
 
-// Обновление таймера каждые 60 секунд (без полного запроса к API)
+// Обновление таймера каждые 60 секунд
 setInterval(() => {
   renderMainAccounts();
 }, 60000);
