@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FFGarouX.lvl</title>
+  <title>FFGarouX</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -17,7 +17,24 @@
       border-radius: 16px; 
     }
 
-    /* Аватар: тонкая тёмная рамка, полностью квадратный */
+    /* Большое переливающееся название */
+    .site-title {
+      font-size: 2.75rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24, #f97316);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: titleGradient 6s linear infinite;
+      letter-spacing: -2px;
+    }
+
+    @keyframes titleGradient {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    /* Аватар */
     .glow-avatar {
       position: relative;
       width: 80px;
@@ -36,15 +53,8 @@
       content: '';
       position: absolute;
       inset: -150%;
-      background: linear-gradient(
-        135deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.55) 48%,
-        rgba(255, 255, 255, 0.30) 52%,
-        transparent 60%
-      );
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.55) 48%, rgba(255,255,255,0.30) 52%, transparent 60%);
       animation: avatarShine 4s linear infinite;
-      pointer-events: none;
     }
 
     @keyframes avatarShine {
@@ -65,14 +75,13 @@
       background: linear-gradient(90deg, #166534, #4ade80, #22c55e, #4ade80);
       background-size: 200% 100%;
       animation: progressFlow 3s linear infinite;
-      transition: width 0.7s ease;
     }
     @keyframes progressFlow {
-      0%   { background-position: 0% 50%; }
+      0% { background-position: 0% 50%; }
       100% { background-position: 200% 50%; }
     }
 
-    /* Кнопки с цветным свечением */
+    /* Кнопки */
     .glow-btn {
       position: relative;
       overflow: hidden;
@@ -88,9 +97,7 @@
       background: linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent);
       transition: 0.8s;
     }
-    .glow-btn:hover::before {
-      left: 200%;
-    }
+    .glow-btn:hover::before { left: 200%; }
 
     .btn-green:hover { box-shadow: 0 0 20px #4ade80; transform: translateY(-2px); }
     .btn-red:hover   { box-shadow: 0 0 20px #ef4444; transform: translateY(-2px); }
@@ -104,15 +111,16 @@
 
 <div class="max-w-xl mx-auto pt-8 px-4">
 
-  <div class="flex items-center justify-between mb-6">
+  <!-- Шапка с большим переливающимся названием -->
+  <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-2xl overflow-hidden border border-amber-500 flex-shrink-0 shadow-[0_0_12px_#eab308]">
+      <div class="w-10 h-10 rounded-2xl overflow-hidden border border-amber-500 flex-shrink-0 shadow-[0_0_15px_#f59e0b]">
         <img src="GAROUXa.jpg" alt="GAROUX" class="w-full h-full object-cover">
       </div>
-      <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
+      <h1 class="site-title">FFGarouX</h1>
     </div>
     <button onclick="refreshAll()" 
-            class="glow-btn btn-orange flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm font-medium">
+            class="glow-btn btn-orange flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl text-sm font-medium">
       <i class="fa-solid fa-rotate"></i> Refresh All
     </button>
   </div>
@@ -218,14 +226,12 @@ async function updateAccount(index) {
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
-    // Сброс сессии каждые 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
-    // Расчёт EXP за сессию
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -350,9 +356,9 @@ function addNewAccount() {
   accounts.push({
     uid: uid,
     lastExp: 0,
-    todayExp: 0,                    // ← Начинается строго с 0
+    todayExp: 0,
     sessionStart: now,
-    sessionStartExp: 0,             // ← Важно: начинаем с 0
+    sessionStartExp: 0,
     likes: 0,
     nickname: "Загрузка...",
     level: 1,
@@ -364,9 +370,12 @@ function addNewAccount() {
 
   saveAccounts();
   renderMainAccounts();
-  
-  // Сразу обновляем данные с API
-  updateAccount(accounts.length - 1);
+
+  // Автоматическое обновление через 10 секунд после добавления
+  setTimeout(() => {
+    const newIndex = accounts.length - 1;
+    updateAccount(newIndex);
+  }, 10000);
 }
 
 function refreshAll() {
@@ -377,7 +386,9 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
+// Автообновление каждые 30 секунд
 setInterval(() => { refreshAll(); }, 30000);
+// Обновление таймера каждые 60 секунд
 setInterval(() => { renderMainAccounts(); }, 60000);
 </script>
 </body>
