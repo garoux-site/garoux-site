@@ -9,7 +9,7 @@
   <style>
     body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
     .card { background: #111111; border-radius: 16px; }
-    .progress-container { background: #1f1f1f; height: 8px; border-radius: 9999px; overflow: hidden; }
+    .progress-container { background: #1f1f1f; height: 10px; border-radius: 9999px; overflow: hidden; }
     .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); transition: width 0.6s ease; }
     .live-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -21,11 +21,8 @@
 
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
-      <img src="GAROUXa.jpg" alt="GarouX" class="w-10 h-10 rounded-xl object-cover border-2 border-red-500 shadow-lg">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
-        <p class="text-xs text-zinc-500 -mt-1">garoux.site</p>
-      </div>
+      <div class="w-9 h-9 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-xl">🔥</div>
+      <h1 class="text-3xl font-bold tracking-tighter">FFGarouX.lvl</h1>
     </div>
     <button onclick="refreshAll()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-2.5 rounded-2xl text-sm">
       <i class="fa-solid fa-rotate"></i> Refresh All
@@ -83,21 +80,6 @@ function saveAccounts() {
   localStorage.setItem('fflevel_accounts', JSON.stringify(accounts));
 }
 
-// ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ТАЙМЕРА ====================
-function getTimeUntilReset(sessionStart) {
-  const now = Date.now();
-  const resetTime = sessionStart + 24 * 60 * 60 * 1000;
-  let remaining = Math.max(0, resetTime - now);
-
-  const hours = Math.floor(remaining / (1000 * 60 * 60));
-  remaining %= (1000 * 60 * 60);
-  const minutes = Math.floor(remaining / (1000 * 60));
-  remaining %= (1000 * 60);
-  const seconds = Math.floor(remaining / 1000);
-
-  return `\( {hours.toString().padStart(2, '0')}: \){minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
-
 function calculateProgress(totalExp) {
   let level = 1;
   let baseExp = 0;
@@ -117,13 +99,18 @@ function calculateProgress(totalExp) {
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
 
-  return { 
-    level, 
-    progress: progress.toFixed(1), 
-    currentInLevel, 
-    remaining, 
-    needForNext 
-  };
+  return { level, progress: progress.toFixed(2), currentInLevel, remaining, needForNext };
+}
+
+function getTimeUntilReset(sessionStart) {
+  const now = Date.now();
+  const resetTime = sessionStart + 24 * 60 * 60 * 1000;
+  const remaining = Math.max(0, resetTime - now);
+  
+  const hours = Math.floor(remaining / (1000 * 60 * 60));
+  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours}ч ${minutes}м`;
 }
 
 async function updateAccount(index) {
@@ -135,20 +122,21 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp || 0;
-    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Неизвестно";
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp;
+    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname;
     const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
-    // Автосброс сессии каждые 24 часа
+    // Сброс каждые 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
+    // Расчёт EXP за текущие сутки
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -167,7 +155,7 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка обновления аккаунта:", e);
+    console.error("Ошибка обновления:", e);
   }
 }
 
@@ -176,14 +164,13 @@ function renderMainAccounts() {
   container.innerHTML = '';
 
   accounts.forEach((acc, index) => {
+    const startExp = acc.sessionStartExp || acc.lastExp || 0;
     const timerText = getTimeUntilReset(acc.sessionStart);
 
     const cardHTML = `
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
-          <img src="avag.jpg" alt="Avatar" 
-               class="w-20 h-20 rounded-2xl object-cover border-4 border-red-500 shadow-lg">
-          
+          <div class="w-20 h-20 bg-zinc-800 rounded-2xl flex items-center justify-center text-5xl border border-zinc-700">🔥</div>
           <div class="flex-1">
             <div class="flex items-center gap-3">
               <h2 class="text-2xl font-bold">${acc.nickname}</h2>
@@ -191,15 +178,15 @@ function renderMainAccounts() {
                 <span class="w-2.5 h-2.5 bg-white rounded-full live-dot"></span> LIVE
               </span>
             </div>
-            <p class="text-emerald-400 text-sm">UID: ${acc.uid}</p>
-            <p class="text-emerald-400 text-xl font-semibold">Level ${acc.level}</p>
+            <p class="text-emerald-400">UID: ${acc.uid}</p>
+            <p class="text-emerald-400 text-xl">Level ${acc.level}</p>
           </div>
         </div>
 
         <div>
           <div class="flex justify-between text-sm mb-1">
             <span class="text-green-400 font-semibold">${acc.progress || 0}% Progress</span>
-            <span class="text-zinc-400">${(acc.currentInLevel || 0).toLocaleString('ru-RU')} / ${(acc.needForNext || 48).toLocaleString('ru-RU')} EXP</span>
+            <span class="text-zinc-400">${(acc.currentInLevel || 0)} / ${(acc.needForNext || 48)} EXP</span>
           </div>
           <div class="progress-container">
             <div class="progress-bar" style="width: ${acc.progress || 0}%"></div>
@@ -209,7 +196,7 @@ function renderMainAccounts() {
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Current EXP</p>
-            <p class="text-3xl font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</p>
+            <p class="text-3xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
           </div>
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Remaining XP</p>
@@ -217,10 +204,10 @@ function renderMainAccounts() {
           </div>
         </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3 text-sm">
+        <div class="bg-zinc-900 rounded-3xl p-5 space-y-3">
           <div class="flex justify-between">
             <span class="text-zinc-400">Было при добавлении:</span>
-            <span class="font-medium">${(acc.sessionStartExp || 0).toLocaleString('ru-RU')}</span>
+            <span class="font-medium">${startExp.toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between text-green-400">
             <span>Добавилось за сессию:</span>
@@ -228,22 +215,21 @@ function renderMainAccounts() {
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">На данный момент:</span>
-            <span class="font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</span>
+            <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
-            <span class="font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
+            <span class="font-bold text-pink-400">${acc.likes ? acc.likes.toLocaleString('ru-RU') : '0'}</span>
           </div>
         </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-4 text-center">
-          <p class="text-amber-400 text-sm mb-1">До сброса сессии:</p>
-          <p class="font-mono text-3xl font-bold tracking-widest text-amber-300">${timerText}</p>
+        <div class="bg-zinc-900 rounded-3xl p-4 text-center text-sm text-amber-400">
+          До сброса сессии: <span class="font-semibold">${timerText}</span>
         </div>
 
         <div class="flex gap-3">
-          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-4 rounded-2xl text-sm">Обновить</button>
-          <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Удалить</button>
+          <button onclick="updateAccount(${index})" class="flex-1 bg-zinc-800 py-4 rounded-2xl text-sm">Обновить</button>
+          <button onclick="deleteAccount(${index})" class="flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm">Delete</button>
         </div>
       </div>`;
     container.innerHTML += cardHTML;
@@ -293,13 +279,15 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление данных каждые 30 секунд
-setInterval(refreshAll, 30000);
+// Автообновление каждые 30 секунд + обновление таймера
+setInterval(() => {
+  refreshAll();
+}, 30000);
 
-// Обновление таймера каждую секунду
+// Обновление таймера каждые 60 секунд (без полного запроса к API)
 setInterval(() => {
   renderMainAccounts();
-}, 1000);
+}, 60000);
 </script>
 </body>
 </html>
