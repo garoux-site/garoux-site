@@ -17,7 +17,6 @@
       border-radius: 16px; 
     }
 
-    /* Название сайта с диагональной анимацией */
     .site-title {
       font-size: 2.85rem;
       font-weight: 900;
@@ -35,7 +34,6 @@
       100% { background-position: 0% 0%; }
     }
 
-    /* Аватар */
     .glow-avatar {
       position: relative;
       width: 80px;
@@ -70,7 +68,6 @@
       100% { transform: translate(120%, 120%) rotate(30deg); }
     }
 
-    /* Прогресс-бар */
     .progress-container { 
       background: #1f1f1f; 
       height: 10px; 
@@ -88,7 +85,6 @@
       100% { background-position: 200% 50%; }
     }
 
-    /* Кнопки */
     .glow-btn {
       position: relative;
       overflow: hidden;
@@ -226,19 +222,21 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || acc.lastExp || 0;
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || 0;
     const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Unknown";
     const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
 
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
+    // Сброс сессии через 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
+    // Подсчёт EXP за сессию
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -292,7 +290,7 @@ function renderMainAccounts() {
         <div>
           <div class="flex justify-between text-sm mb-1">
             <span class="text-green-400 font-semibold">${acc.progress || 0}% Progress</span>
-            <span class="text-zinc-400">${(acc.currentInLevel || 0)} / ${(acc.needForNext || 48)} EXP</span>
+            <span class="text-zinc-400">${(acc.currentInLevel || 0).toLocaleString('ru-RU')} / ${(acc.needForNext || 48).toLocaleString('ru-RU')} EXP</span>
           </div>
           <div class="progress-container">
             <div class="progress-bar" style="width: ${acc.progress || 0}%"></div>
@@ -353,14 +351,15 @@ function deleteAccount(index) {
   }
 }
 
-function addNewAccount() {
+async function addNewAccount() {
   const uid = document.getElementById('uidInput').value.trim();
   if (!uid) return alert("Введите UID!");
   if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
 
   const now = Date.now();
 
-  accounts.push({
+  // Создаём аккаунт с заглушками
+  const newAccount = {
     uid: uid,
     lastExp: 0,
     todayExp: 0,
@@ -373,16 +372,44 @@ function addNewAccount() {
     currentInLevel: 0,
     remaining: 48,
     needForNext: 48
-  });
+  };
 
+  accounts.push(newAccount);
   saveAccounts();
   renderMainAccounts();
 
-  // Автоматическое обновление через 5 секунд после добавления
-  setTimeout(() => {
-    const newIndex = accounts.length - 1;
-    updateAccount(newIndex);
-  }, 5000);
+  // Сразу загружаем реальные данные
+  try {
+    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
+    const raw = await res.json();
+
+    const captain = raw.captainBasicInfo || {};
+    const accountInfo = raw.AccountInfo || {};
+
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || 0;
+    const nickname = captain.nickname || accountInfo.AccountName || "Unknown";
+    const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
+
+    const levelInfo = calculateProgress(totalExpNow);
+
+    // Главное исправление:
+    newAccount.lastExp = totalExpNow;
+    newAccount.sessionStartExp = totalExpNow;   // ← Теперь сессия начинается с текущего EXP
+    newAccount.todayExp = 0;
+    newAccount.nickname = nickname;
+    newAccount.likes = likes;
+    newAccount.lastUpdateTime = now;
+    
+    Object.assign(newAccount, levelInfo);
+
+    saveAccounts();
+    renderMainAccounts();
+
+  } catch (e) {
+    console.error("Ошибка при добавлении аккаунта:", e);
+    newAccount.nickname = "Ошибка загрузки";
+    renderMainAccounts();
+  }
 }
 
 function refreshAll() {
@@ -393,7 +420,7 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-setInterval(() => { refreshAll(); }, 30000);
+setInterval(() => { refreshAll(); }, 30000);     // автообновление каждые 30 сек
 setInterval(() => { renderMainAccounts(); }, 60000);
 </script>
 </body>
