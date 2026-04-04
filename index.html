@@ -147,16 +147,16 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    // Ник и EXP — из AccountInfo (чтобы был правильный ник и уровень, например "Жаба")
+    // Ник и EXP — приоритет AccountInfo
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname    = accountInfo.AccountName || captain.nickname || "Unknown";
 
-    // Лайки — ТОЛЬКО из captainBasicInfo.liked (это правильное значение лайков аккаунта)
-    let likes       = parseInt(captain.liked || 0);
+    // ЛАЙКИ — строго из captainBasicInfo.liked (это реальные лайки аккаунта)
+    let likes = parseInt(captain.liked || 0);
 
-    // Если captain.liked отсутствует — fallback
-    if (likes === 0 && accountInfo.AccountLikes) {
-      likes = parseInt(accountInfo.AccountLikes);
+    // Если captain.liked = 0 или отсутствует — пробуем AccountLikes как запасной вариант
+    if (likes === 0) {
+      likes = parseInt(accountInfo.AccountLikes || 0);
     }
 
     const now = Date.now();
