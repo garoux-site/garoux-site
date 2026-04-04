@@ -180,7 +180,6 @@ function saveAccounts() {
 
 function calculateProgress(totalExp) {
   let level = 1, baseExp = 0, needForNext = 48;
-
   for (let lvl = 1; lvl <= 100; lvl++) {
     if (EXP_TABLE[lvl]) {
       if (totalExp >= EXP_TABLE[lvl][0]) {
@@ -190,7 +189,6 @@ function calculateProgress(totalExp) {
       } else break;
     }
   }
-
   const currentInLevel = totalExp - baseExp;
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
@@ -221,10 +219,18 @@ async function updateAccount(index) {
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname = accountInfo.AccountName || captain.nickname || "Unknown";
 
-    // Получаем количество лайков
+    // === УЛУЧШЕННЫЙ ПОИСК ЛАЙКОВ ===
     let likes = 0;
-    if (captain.liked !== undefined) likes = parseInt(captain.liked) || 0;
+    
+    // Приоритетные поля (самые частые)
+    if (captain.like !== undefined) likes = parseInt(captain.like) || 0;
+    else if (captain.liked !== undefined) likes = parseInt(captain.liked) || 0;
     else if (captain.likeCnt !== undefined) likes = parseInt(captain.likeCnt) || 0;
+    else if (captain.likeCount !== undefined) likes = parseInt(captain.likeCount) || 0;
+    
+    // Дополнительные варианты
+    else if (raw.likeCount !== undefined) likes = parseInt(raw.likeCount) || 0;
+    else if (raw.social && raw.social.likeCount !== undefined) likes = parseInt(raw.social.likeCount) || 0;
     else if (raw.socialInfo && raw.socialInfo.liked !== undefined) likes = parseInt(raw.socialInfo.liked) || 0;
 
     if (totalExpNow === 0 && captain.exp) {
@@ -258,7 +264,7 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка обновления:", e);
+    console.error("Ошибка обновления аккаунта:", e);
   }
 }
 
@@ -310,7 +316,7 @@ function renderMainAccounts() {
           </div>
         </div>
 
-        <!-- Блок с лайками -->
+        <!-- Блок лайков -->
         <div class="bg-zinc-900 rounded-3xl p-5 flex items-center justify-between">
           <div>
             <p class="text-zinc-400 text-xs">Лайки профиля</p>
@@ -391,7 +397,7 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 30 секунд
+// Автообновление
 setInterval(refreshAll, 30000);
 setInterval(renderMainAccounts, 60000);
 </script>
