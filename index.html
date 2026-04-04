@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FFGarouX1</title>
+  <title>FFGarouX</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -48,40 +48,23 @@
 
     .flip-card-back {
       transform: rotateY(180deg);
-      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+      background: linear-gradient(135deg, #0f172a, #1e2937);
       overflow-y: auto;
-      padding-bottom: 30px;
-    }
-
-    /* === СВЕТОВАЯ ВОЛНА (АНИМАЦИЯ БЛИКА) === */
-    .shine-effect {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
       position: relative;
-      overflow: hidden;
     }
 
-    .shine-effect::after {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -100%;
-      width: 60%;
-      height: 200%;
-      background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,0.15),
-        rgba(255,255,255,0.4),
-        rgba(255,255,255,0.15),
-        transparent
-      );
-      transform: rotate(25deg);
-      animation: shineMove 2.5s linear infinite;
-      pointer-events: none;
+    .flip-card-back::-webkit-scrollbar {
+      width: 6px;
     }
-
-    @keyframes shineMove {
-      0% { left: -100%; }
-      100% { left: 200%; }
+    .flip-card-back::-webkit-scrollbar-thumb {
+      background: #4ade80;
+      border-radius: 20px;
+    }
+    .flip-card-back::-webkit-scrollbar-track {
+      background: #1e2937;
     }
 
     .site-title {
@@ -166,15 +149,6 @@
       top: 16px;
       right: 16px;
       z-index: 20;
-    }
-
-    /* Скроллбар серый */
-    .flip-card-back::-webkit-scrollbar {
-      width: 6px;
-    }
-    .flip-card-back::-webkit-scrollbar-thumb {
-      background: #555;
-      border-radius: 20px;
     }
   </style>
 </head>
@@ -293,10 +267,10 @@ function formatFullProfile(uid, data) {
   const skillsCount = p.EquippedSkills ? Math.floor(p.EquippedSkills.length / 4) : 0;
 
   return `
-    <div class="p-5 text-sm">
-      <b class="text-lg">👤 ПОДРОБНЫЙ ПРОФИЛЬ</b>
-      <pre class="mt-4 text-xs leading-relaxed whitespace-pre-wrap">
-──────────?? GAROUX MODZ 👾───────────
+    <div class="flex-1">
+      <b class="text-lg block mb-4 text-emerald-400">👤 ПОДРОБНЫЙ ПРОФИЛЬ</b>
+      <pre class="text-xs leading-relaxed whitespace-pre-wrap bg-zinc-950/70 p-5 rounded-2xl border border-zinc-800 overflow-auto">
+────────── GAROUX MODZ 👾 ──────────
 🎮 Основная информация
 🔹 Никнейм   : ${a.AccountName || '—'}
 🆔 UID        : ${uid}
@@ -346,7 +320,7 @@ function renderMainAccounts() {
             </button>
 
             <div class="flex items-center gap-4">
-              <div class="glow-avatar flex-shrink-0 shine-effect">
+              <div class="glow-avatar flex-shrink-0">
                 <img src="avag.jpg" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
               </div>
               <div class="flex-1 min-w-0">
@@ -414,13 +388,17 @@ function renderMainAccounts() {
           </div>
 
           <!-- === BACK === -->
-          <div class="flip-card-back p-6 shine-effect" id="back-${index}">
+          <div class="flip-card-back" id="back-${index}">
             <button onclick="toggleFlip(${index})" 
-                    class="absolute top-4 right-4 bg-zinc-800 hover:bg-zinc-700 px-5 py-2 rounded-2xl text-sm z-10">
+                    class="absolute top-3 right-3 bg-zinc-800 hover:bg-zinc-700 px-5 py-2 rounded-2xl text-sm font-medium z-20 transition-all active:scale-95">
               ← Назад к уровню
             </button>
-            <div class="pt-12" id="full-info-${index}">
-              <p class="text-center text-zinc-500">Загрузка полной информации...</p>
+
+            <div class="flex-1 mt-14" id="full-info-${index}">
+              <div class="animate-pulse text-center text-zinc-500 py-8">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 text-emerald-400"></i>
+                <p>Загрузка подробной информации...</p>
+              </div>
             </div>
           </div>
 
@@ -451,6 +429,7 @@ function toggleFlip(index) {
   }
 }
 
+// ==================== Остальные функции ====================
 async function updateAccount(index) {
   const acc = accounts[index];
   try {
