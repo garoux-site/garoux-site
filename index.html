@@ -33,7 +33,6 @@
       100% { background-position: 0% 0%; } 
     }
 
-    /* Аватарка с красивым блеском каждые 10 сек */
     .glow-avatar {
       position: relative; 
       width: 80px; 
@@ -142,7 +141,7 @@
 </div>
 
 <script>
-// ==================== EXP TABLE (без изменений) ====================
+// ==================== EXP TABLE ====================
 const EXP_TABLE = { 
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],6:[1844,948],7:[2792,1008],
   8:[3800,1070],9:[4870,1134],10:[6004,1188],11:[7192,1256],12:[8448,1328],13:[9776,1364],
@@ -221,10 +220,14 @@ async function updateAccount(index) {
 
     // === ИСПРАВЛЕНИЕ ЛАЙКОВ ===
     let likes = 0;
-    if (captain.liked != null) {
-      likes = parseInt(captain.liked) || 0;           // Основной источник
+    if (captain.liked != null && parseInt(captain.liked) > 0) {
+      likes = parseInt(captain.liked);        // ← Основной источник (реальные лайки профиля)
+      console.log(`Аккаунт ${acc.uid}: лайки взяты из captain.liked = ${likes}`);
     } else if (accountInfo.AccountLikes != null) {
-      likes = parseInt(accountInfo.AccountLikes) || 0; // Fallback
+      likes = parseInt(accountInfo.AccountLikes);
+      console.log(`Аккаунт ${acc.uid}: лайки взяты из AccountLikes = ${likes}`);
+    } else {
+      console.log(`Аккаунт ${acc.uid}: лайки не найдены`);
     }
 
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
@@ -236,7 +239,7 @@ async function updateAccount(index) {
     }
 
     const now = Date.now();
-    const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+    const hoursPassed = (now - (acc.sessionStart || now)) / (1000 * 60 * 60);
 
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
@@ -251,7 +254,7 @@ async function updateAccount(index) {
     acc.todayExp = Math.max(0, totalExpNow - acc.sessionStartExp);
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
-    acc.likes = likes;          // ← Теперь лайки правильные
+    acc.likes = likes;
     acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
