@@ -113,10 +113,7 @@ function saveAccounts() {
 }
 
 function calculateProgress(totalExp) {
-  let level = 1;
-  let baseExp = 0;
-  let needForNext = 48;
-
+  let level = 1; let baseExp = 0; let needForNext = 48;
   for (let lvl = 1; lvl <= 100; lvl++) {
     if (EXP_TABLE[lvl]) {
       if (totalExp >= EXP_TABLE[lvl][0]) {
@@ -126,11 +123,9 @@ function calculateProgress(totalExp) {
       } else break;
     }
   }
-
   const currentInLevel = totalExp - baseExp;
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
-
   return { level, progress: progress.toFixed(2), currentInLevel, remaining, needForNext };
 }
 
@@ -152,16 +147,12 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    // Главное исправление: приоритет AccountInfo (основной профиль)
+    // Ник и EXP — приоритет AccountInfo
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname    = accountInfo.AccountName || captain.nickname || "Unknown";
-    let likes       = parseInt(captain.liked || accountInfo.AccountLikes || 0);
 
-    // Если AccountInfo пустой — берём из captain
-    if (!accountInfo.AccountEXP && captain.exp) {
-      totalExpNow = parseInt(captain.exp);
-      nickname = captain.nickname || nickname;
-    }
+    // Лайки — приоритет captainBasicInfo.liked (это правильное значение)
+    let likes       = parseInt(captain.liked || accountInfo.AccountLikes || 0);
 
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
