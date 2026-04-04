@@ -172,8 +172,13 @@ async function updateAccount(index) {
       acc.todayExp = 0;
     }
 
+    // Если это первое обновление — фиксируем начальный EXP
+    if (!acc.sessionStartExp || acc.sessionStartExp === 0) {
+      acc.sessionStartExp = totalExpNow;
+    }
+
     // Расчёт EXP за сессию
-    acc.todayExp = Math.max(0, totalExpNow - (acc.sessionStartExp || totalExpNow));
+    acc.todayExp = Math.max(0, totalExpNow - acc.sessionStartExp);
 
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
@@ -291,7 +296,7 @@ async function addNewAccount() {
     lastExp: 0,
     todayExp: 0,
     sessionStart: now,
-    sessionStartExp: 0,
+    sessionStartExp: 0,        // будет установлено при первом обновлении
     likes: 0,
     nickname: "Загрузка...",
     level: 1,
@@ -305,7 +310,7 @@ async function addNewAccount() {
   saveAccounts();
   renderMainAccounts();
 
-  // Сразу обновляем данные
+  // Сразу обновляем, чтобы зафиксировать "Было при добавлении"
   await updateAccount(accounts.length - 1);
 }
 
@@ -313,12 +318,12 @@ function refreshAll() {
   accounts.forEach((_, i) => updateAccount(i));
 }
 
-// Инициализация
+// Запуск
 loadAccounts();
 refreshAll();
 
-// Автообновление
-setInterval(() => refreshAll(), 10000);
+// Автообновление каждые 30 секунд
+setInterval(() => refreshAll(), 30000);
 setInterval(() => renderMainAccounts(), 60000);
 </script>
 </body>
