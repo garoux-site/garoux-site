@@ -213,30 +213,66 @@ function getTimeUntilReset(sessionStart) {
   return `${hours}ч ${minutes}м`;
 }
 
+// ==================== УЛУЧШЕННЫЙ FETCH ====================
+async function fetchAccount(uid) {
+  const timestamp = Date.now();
+  const url = `https://gojoinfoapi-mu.vercel.app/get?uid=\( {uid}&region=RU&_t= \){timestamp}`;
+  
+  const res = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  });
+
+  if (!res.ok) throw new Error('API error');
+  return await res.json();
+}
+
+// ==================== ОБНОВЛЕНИЕ АККАУНТА ====================
 async function updateAccount(index) {
   const acc = accounts[index];
   try {
-    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
-    const raw = await res.json();
+    const raw = await fetchAccount(acc.uid);
 
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || 0;
-    const nickname = captain.nickname || accountInfo.AccountName || acc.nickname || "Unknown";
-    const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
+    // Улучшенный парсинг ника и EXP (главное исправление)
+    const totalExpNow = parseInt(
+      captain.exp || 
+      accountInfo.AccountEXP || 
+      raw.exp || 
+      raw.AccountEXP || 
+      acc.lastExp || 0
+    );
+
+    const nickname = 
+      captain.nickname || 
+      accountInfo.AccountName || 
+      raw.nickname || 
+      raw.AccountName || 
+      acc.nickname || "Unknown";
+
+    const likes = parseInt(
+      accountInfo.AccountLikes || 
+      captain.liked || 
+      raw.likes || 
+      raw.AccountLikes || 
+      0
+    );
 
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
-    // Сброс сессии через 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
-    // Подсчёт EXP за сессию
     if (totalExpNow > acc.sessionStartExp) {
       acc.todayExp = totalExpNow - acc.sessionStartExp;
     } else {
@@ -255,7 +291,7 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка обновления:", e);
+    console.error(`Ошибка обновления ${acc.uid}:`, e);
   }
 }
 
@@ -358,7 +394,6 @@ async function addNewAccount() {
 
   const now = Date.now();
 
-  // Создаём аккаунт с заглушками
   const newAccount = {
     uid: uid,
     lastExp: 0,
@@ -378,23 +413,40 @@ async function addNewAccount() {
   saveAccounts();
   renderMainAccounts();
 
-  // Сразу загружаем реальные данные
+  // Загружаем реальные данные
   try {
-    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
-    const raw = await res.json();
+    const raw = await fetchAccount(uid);
 
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP) || 0;
-    const nickname = captain.nickname || accountInfo.AccountName || "Unknown";
-    const likes = parseInt(accountInfo.AccountLikes || captain.liked) || 0;
+    const totalExpNow = parseInt(
+      captain.exp || 
+      accountInfo.AccountEXP || 
+      raw.exp || 
+      raw.AccountEXP || 
+      0
+    );
+
+    const nickname = 
+      captain.nickname || 
+      accountInfo.AccountName || 
+      raw.nickname || 
+      raw.AccountName || 
+      "Unknown";
+
+    const likes = parseInt(
+      accountInfo.AccountLikes || 
+      captain.liked || 
+      raw.likes || 
+      raw.AccountLikes || 
+      0
+    );
 
     const levelInfo = calculateProgress(totalExpNow);
 
-    // Главное исправление:
     newAccount.lastExp = totalExpNow;
-    newAccount.sessionStartExp = totalExpNow;   // ← Теперь сессия начинается с текущего EXP
+    newAccount.sessionStartExp = totalExpNow;
     newAccount.todayExp = 0;
     newAccount.nickname = nickname;
     newAccount.likes = likes;
@@ -406,7 +458,7 @@ async function addNewAccount() {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка при добавлении аккаунта:", e);
+    console.error("Ошибка при добавлении:", e);
     newAccount.nickname = "Ошибка загрузки";
     renderMainAccounts();
   }
@@ -420,7 +472,9 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-setInterval(() => { refreshAll(); }, 30000);     // автообновление каждые 30 сек
+// Автообновление каждые 15 секунд
+setInterval(() => { refreshAll(); }, 15000);
+
 setInterval(() => { renderMainAccounts(); }, 60000);
 </script>
 </body>
