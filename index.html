@@ -52,13 +52,7 @@
       content: '';
       position: absolute;
       inset: -150%;
-      background: linear-gradient(
-        135deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.55) 48%,
-        rgba(255, 255, 255, 0.30) 52%,
-        transparent 60%
-      );
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.55) 48%, rgba(255,255,255,0.30) 52%, transparent 60%);
       animation: avatarShine 4s linear infinite;
     }
 
@@ -213,7 +207,7 @@ function getTimeUntilReset(sessionStart) {
   return `${hours}ч ${minutes}м`;
 }
 
-// ==================== УЛУЧШЕННЫЙ FETCH ====================
+// ==================== ЗАПРОС К API ====================
 async function fetchAccount(uid) {
   const timestamp = Date.now();
   const url = `https://gojoinfoapi-mu.vercel.app/get?uid=\( {uid}&region=RU&_t= \){timestamp}`;
@@ -222,12 +216,11 @@ async function fetchAccount(uid) {
     cache: 'no-store',
     headers: {
       'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
+      'Pragma': 'no-cache'
     }
   });
 
-  if (!res.ok) throw new Error('API error');
+  if (!res.ok) throw new Error('API не ответил');
   return await res.json();
 }
 
@@ -237,10 +230,10 @@ async function updateAccount(index) {
   try {
     const raw = await fetchAccount(acc.uid);
 
-    const captain = raw.captainBasicInfo || {};
-    const accountInfo = raw.AccountInfo || {};
+    const captain = raw.captainBasicInfo || raw || {};
+    const accountInfo = raw.AccountInfo || raw || {};
 
-    // Улучшенный парсинг ника и EXP (главное исправление)
+    // Главное исправление — проверяем все возможные поля
     const totalExpNow = parseInt(
       captain.exp || 
       accountInfo.AccountEXP || 
@@ -291,7 +284,9 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error(`Ошибка обновления ${acc.uid}:`, e);
+    console.error(`Ошибка обновления UID ${acc.uid}:`, e);
+    acc.nickname = "Ошибка загрузки (нажми Обновить)";
+    renderMainAccounts();
   }
 }
 
@@ -313,7 +308,7 @@ function renderMainAccounts() {
           
           <div class="flex-1">
             <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-bold">${acc.nickname}</h2>
+              <h2 class="text-2xl font-bold \( {acc.nickname.includes('Ошибка') ? 'text-red-400' : ''}"> \){acc.nickname}</h2>
               <span class="bg-emerald-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5">
                 <span class="w-2.5 h-2.5 bg-white rounded-full live-dot"></span> LIVE
               </span>
@@ -413,35 +408,15 @@ async function addNewAccount() {
   saveAccounts();
   renderMainAccounts();
 
-  // Загружаем реальные данные
   try {
     const raw = await fetchAccount(uid);
 
-    const captain = raw.captainBasicInfo || {};
-    const accountInfo = raw.AccountInfo || {};
+    const captain = raw.captainBasicInfo || raw || {};
+    const accountInfo = raw.AccountInfo || raw || {};
 
-    const totalExpNow = parseInt(
-      captain.exp || 
-      accountInfo.AccountEXP || 
-      raw.exp || 
-      raw.AccountEXP || 
-      0
-    );
-
-    const nickname = 
-      captain.nickname || 
-      accountInfo.AccountName || 
-      raw.nickname || 
-      raw.AccountName || 
-      "Unknown";
-
-    const likes = parseInt(
-      accountInfo.AccountLikes || 
-      captain.liked || 
-      raw.likes || 
-      raw.AccountLikes || 
-      0
-    );
+    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP || raw.exp || raw.AccountEXP || 0);
+    const nickname = captain.nickname || accountInfo.AccountName || raw.nickname || raw.AccountName || "Unknown";
+    const likes = parseInt(accountInfo.AccountLikes || captain.liked || raw.likes || raw.AccountLikes || 0);
 
     const levelInfo = calculateProgress(totalExpNow);
 
@@ -450,15 +425,13 @@ async function addNewAccount() {
     newAccount.todayExp = 0;
     newAccount.nickname = nickname;
     newAccount.likes = likes;
-    newAccount.lastUpdateTime = now;
-    
     Object.assign(newAccount, levelInfo);
 
     saveAccounts();
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка при добавлении:", e);
+    console.error("Ошибка при добавлении аккаунта:", e);
     newAccount.nickname = "Ошибка загрузки";
     renderMainAccounts();
   }
