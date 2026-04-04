@@ -76,7 +76,7 @@
 </div>
 
 <script>
-// ==================== EXP TABLE (без изменений) ====================
+// ==================== EXP TABLE ====================
 const EXP_TABLE = { 
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
   6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
@@ -147,12 +147,17 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    // Ник и EXP — приоритет AccountInfo
+    // Ник и EXP — из AccountInfo (чтобы был правильный ник и уровень, например "Жаба")
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname    = accountInfo.AccountName || captain.nickname || "Unknown";
 
-    // Лайки — приоритет captainBasicInfo.liked (это правильное значение)
-    let likes       = parseInt(captain.liked || accountInfo.AccountLikes || 0);
+    // Лайки — ТОЛЬКО из captainBasicInfo.liked (это правильное значение лайков аккаунта)
+    let likes       = parseInt(captain.liked || 0);
+
+    // Если captain.liked отсутствует — fallback
+    if (likes === 0 && accountInfo.AccountLikes) {
+      likes = parseInt(accountInfo.AccountLikes);
+    }
 
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
