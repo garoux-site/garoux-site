@@ -33,14 +33,14 @@
       100% { background-position: 0% 0%; } 
     }
 
-    /* === КРАСИВАЯ АВАТАРКА С ДИАГОНАЛЬНЫМ БЛИКОМ === */
+    /* === ЯРКАЯ АНИМАЦИЯ АВАТАРКИ === */
     .glow-avatar {
       position: relative; 
       width: 80px; 
       height: 80px; 
       overflow: hidden;
       border: 3px solid #27272a;
-      box-shadow: 0 0 20px rgba(39, 39, 42, 0.85);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
       border-radius: 0;
     }
 
@@ -48,43 +48,45 @@
       width: 100%; 
       height: 100%; 
       object-fit: cover; 
-      transition: transform 0.5s ease;
+      transition: transform 0.6s ease;
     }
 
     .glow-avatar:hover img { 
-      transform: scale(1.09); 
+      transform: scale(1.1); 
     }
 
-    /* Диагональная световая волна (слева-сверху → вправо-внизу) каждые 10 секунд */
+    /* Яркая диагональная световая волна (сверху-лево → вниз-право) */
     .avatar-shine {
       position: absolute;
-      top: -180%;
-      left: -180%;
-      width: 55%;
-      height: 450%;
+      top: -200%;
+      left: -200%;
+      width: 70%;
+      height: 500%;
       background: linear-gradient(
         135deg,
-        transparent 38%,
-        rgba(255, 255, 255, 0.98) 47%,
-        rgba(255, 230, 180, 0.80) 51%,
-        rgba(255, 255, 255, 0.70) 54%,
-        transparent 68%
+        transparent 30%,
+        rgba(255, 255, 255, 0.95) 42%,
+        rgba(255, 240, 180, 0.95) 48%,
+        rgba(255, 255, 255, 0.85) 52%,
+        rgba(255, 220, 120, 0.7) 57%,
+        transparent 72%
       );
-      animation: avatarDiagonalShine 10s linear infinite;
+      animation: avatarBrightShine 10s linear infinite;
       pointer-events: none;
-      z-index: 2;
-      filter: blur(1px);
+      z-index: 3;
+      filter: blur(0.5px);
+      opacity: 0.9;
     }
 
-    @keyframes avatarDiagonalShine {
+    @keyframes avatarBrightShine {
       0% {
-        transform: translate(-140%, -140%) rotate(-8deg);
+        transform: translate(-150%, -150%) rotate(-12deg);
       }
-      10% {
-        transform: translate(300%, 300%) rotate(-8deg);
+      8% {
+        transform: translate(320%, 320%) rotate(-12deg);
       }
       100% {
-        transform: translate(300%, 300%) rotate(-8deg);
+        transform: translate(320%, 320%) rotate(-12deg);
       }
     }
 
@@ -198,7 +200,6 @@ function saveAccounts() {
 
 function calculateProgress(totalExp) {
   let level = 1, baseExp = 0, needForNext = 48;
-
   for (let lvl = 1; lvl <= 100; lvl++) {
     if (EXP_TABLE[lvl]) {
       if (totalExp >= EXP_TABLE[lvl][0]) {
@@ -208,11 +209,9 @@ function calculateProgress(totalExp) {
       } else break;
     }
   }
-
   const currentInLevel = totalExp - baseExp;
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
-
   return { level, progress: parseFloat(progress.toFixed(2)), currentInLevel, remaining, needForNext };
 }
 
@@ -228,14 +227,11 @@ function getTimeUntilReset(sessionStart) {
 async function updateAccount(index) {
   const acc = accounts[index];
   if (!acc) return;
-
   try {
     const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
     const raw = await res.json();
-
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
-
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname = accountInfo.AccountName || captain.nickname || "Unknown";
 
@@ -252,7 +248,6 @@ async function updateAccount(index) {
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
-
     if (!acc.sessionStartExp || acc.sessionStartExp === 0) {
       acc.sessionStartExp = totalExpNow;
     }
@@ -267,7 +262,6 @@ async function updateAccount(index) {
 
     saveAccounts();
     renderMainAccounts();
-
   } catch (e) {
     console.error("Ошибка обновления:", e);
   }
@@ -364,7 +358,6 @@ async function addNewAccount() {
   if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
 
   const now = Date.now();
-
   accounts.push({
     uid,
     lastExp: 0,
