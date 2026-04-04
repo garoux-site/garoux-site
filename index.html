@@ -76,7 +76,7 @@
 </div>
 
 <script>
-// ==================== EXP TABLE (без изменений) ====================
+// ==================== EXP TABLE ====================
 const EXP_TABLE = { 
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
   6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
@@ -105,7 +105,6 @@ let accounts = [];
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
   accounts = saved ? JSON.parse(saved) : [];
-  renderMainAccounts();
 }
 
 function saveAccounts() {
@@ -131,7 +130,7 @@ function calculateProgress(totalExp) {
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
 
-  return { level, progress: progress.toFixed(2), currentInLevel, remaining, needForNext };
+  return { level, progress: parseFloat(progress.toFixed(2)), currentInLevel, remaining, needForNext };
 }
 
 function getTimeUntilReset(sessionStart) {
@@ -145,6 +144,8 @@ function getTimeUntilReset(sessionStart) {
 
 async function updateAccount(index) {
   const acc = accounts[index];
+  if (!acc) return;
+
   try {
     const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
     const raw = await res.json();
@@ -152,12 +153,10 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    // Главное исправление: приоритет AccountInfo (основной профиль)
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname    = accountInfo.AccountName || captain.nickname || "Unknown";
     let likes       = parseInt(captain.liked || accountInfo.AccountLikes || 0);
 
-    // Если AccountInfo пустой — берём из captain
     if (!accountInfo.AccountEXP && captain.exp) {
       totalExpNow = parseInt(captain.exp);
       nickname = captain.nickname || nickname;
@@ -166,17 +165,15 @@ async function updateAccount(index) {
     const now = Date.now();
     const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
+    // Сброс сессии каждые 24 часа
     if (hoursPassed >= 24) {
       acc.sessionStart = now;
       acc.sessionStartExp = totalExpNow;
       acc.todayExp = 0;
     }
 
-    if (totalExpNow > (acc.sessionStartExp || 0)) {
-      acc.todayExp = totalExpNow - acc.sessionStartExp;
-    } else {
-      acc.todayExp = 0;
-    }
+    // Расчёт EXP за сессию
+    acc.todayExp = Math.max(0, totalExpNow - (acc.sessionStartExp || totalExpNow));
 
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
@@ -199,8 +196,7 @@ function renderMainAccounts() {
   container.innerHTML = '';
 
   accounts.forEach((acc, index) => {
-    const startExp = acc.sessionStartExp || acc.lastExp || 0;
-    const timerText = getTimeUntilReset(acc.sessionStart);
+    const timerText = getTimeUntilReset(acc.sessionStart || Date.now());
 
     const cardHTML = `
       <div class="card p-6 space-y-6">
@@ -234,7 +230,7 @@ function renderMainAccounts() {
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Current EXP</p>
-            <p class="text-3xl font-bold">${acc.lastExp.toLocaleString('ru-RU')}</p>
+            <p class="text-3xl font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</p>
           </div>
           <div class="bg-zinc-900 rounded-3xl p-5">
             <p class="text-zinc-400 text-xs">Remaining XP</p>
@@ -245,19 +241,19 @@ function renderMainAccounts() {
         <div class="bg-zinc-900 rounded-3xl p-5 space-y-3">
           <div class="flex justify-between">
             <span class="text-zinc-400">Было при добавлении:</span>
-            <span class="font-medium">${startExp.toLocaleString('ru-RU')}</span>
+            <span class="font-medium">${(acc.sessionStartExp || 0).toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between text-green-400">
             <span>Добавилось за сессию:</span>
-            <span class="font-bold">+${(acc.todayExp || 0).toLocaleString('ru-RU')}</span>
+            <span class="font-bold text-emerald-400">+${(acc.todayExp || 0).toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">На данный момент:</span>
-            <span class="font-bold">${acc.lastExp.toLocaleString('ru-RU')}</span>
+            <span class="font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</span>
           </div>
           <div class="flex justify-between border-t border-zinc-700 pt-3">
             <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
-            <span class="font-bold text-pink-400">${acc.likes ? acc.likes.toLocaleString('ru-RU') : '0'}</span>
+            <span class="font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
           </div>
         </div>
 
@@ -267,7 +263,7 @@ function renderMainAccounts() {
 
         <div class="flex gap-3">
           <button onclick="updateAccount(${index})" class="glow-btn btn-green flex-1 bg-zinc-800 py-4 rounded-2xl text-sm font-medium">Обновить</button>
-          <button onclick="deleteAccount(${index})" class="glow-btn btn-red flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm font-medium">Delete</button>
+          <button onclick="deleteAccount(${index})" class="glow-btn btn-red flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm font-medium">Удалить</button>
         </div>
       </div>`;
 
@@ -289,16 +285,27 @@ async function addNewAccount() {
   if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
 
   const now = Date.now();
+
   const newAccount = {
-    uid, lastExp: 0, todayExp: 0, sessionStart: now, sessionStartExp: 0,
-    likes: 0, nickname: "Загрузка...", level: 1, progress: 0,
-    currentInLevel: 0, remaining: 48, needForNext: 48
+    uid: uid,
+    lastExp: 0,
+    todayExp: 0,
+    sessionStart: now,
+    sessionStartExp: 0,
+    likes: 0,
+    nickname: "Загрузка...",
+    level: 1,
+    progress: 0,
+    currentInLevel: 0,
+    remaining: 48,
+    needForNext: 48
   };
 
   accounts.push(newAccount);
   saveAccounts();
   renderMainAccounts();
 
+  // Сразу обновляем данные
   await updateAccount(accounts.length - 1);
 }
 
@@ -306,11 +313,12 @@ function refreshAll() {
   accounts.forEach((_, i) => updateAccount(i));
 }
 
-// Запуск
+// Инициализация
 loadAccounts();
 refreshAll();
 
-setInterval(() => refreshAll(), 30000);
+// Автообновление
+setInterval(() => refreshAll(), 10000);
 setInterval(() => renderMainAccounts(), 60000);
 </script>
 </body>
