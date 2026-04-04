@@ -33,6 +33,7 @@
       100% { background-position: 0% 0%; } 
     }
 
+    /* Аватарка с анимацией стеклянного щита */
     .glow-avatar {
       position: relative; 
       width: 80px; 
@@ -218,18 +219,6 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
-    // === ИСПРАВЛЕНИЕ ЛАЙКОВ ===
-    let likes = 0;
-    if (captain.liked != null && parseInt(captain.liked) > 0) {
-      likes = parseInt(captain.liked);        // ← Основной источник (реальные лайки профиля)
-      console.log(`Аккаунт ${acc.uid}: лайки взяты из captain.liked = ${likes}`);
-    } else if (accountInfo.AccountLikes != null) {
-      likes = parseInt(accountInfo.AccountLikes);
-      console.log(`Аккаунт ${acc.uid}: лайки взяты из AccountLikes = ${likes}`);
-    } else {
-      console.log(`Аккаунт ${acc.uid}: лайки не найдены`);
-    }
-
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname = accountInfo.AccountName || captain.nickname || "Unknown";
 
@@ -254,7 +243,6 @@ async function updateAccount(index) {
     acc.todayExp = Math.max(0, totalExpNow - acc.sessionStartExp);
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
-    acc.likes = likes;
     acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
@@ -329,10 +317,6 @@ function renderMainAccounts() {
             <span class="text-zinc-400">На данный момент:</span>
             <span class="font-bold">${(acc.lastExp || 0).toLocaleString('ru-RU')}</span>
           </div>
-          <div class="flex justify-between border-t border-zinc-700 pt-3">
-            <span class="text-zinc-400">❤️ Лайки аккаунта:</span>
-            <span class="font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</span>
-          </div>
         </div>
 
         <div class="bg-zinc-900 rounded-3xl p-4 text-center text-sm text-amber-400">
@@ -370,7 +354,6 @@ async function addNewAccount() {
     todayExp: 0,
     sessionStart: now,
     sessionStartExp: 0,
-    likes: 0,
     nickname: "Загрузка...",
     level: 1,
     progress: 0,
