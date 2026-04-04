@@ -7,96 +7,33 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { 
-      background: #0a0a0a; 
-      color: #ddd; 
-      font-family: system-ui, sans-serif; 
-    }
-    .card { 
-      background: #111111; 
-      border-radius: 16px; 
-    }
+    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
+    .card { background: #111111; border-radius: 16px; }
 
     .site-title {
-      font-size: 2.85rem;
-      font-weight: 900;
-      letter-spacing: -2px;
+      font-size: 2.85rem; font-weight: 900; letter-spacing: -2px;
       background: linear-gradient(135deg, #fbbf24, #f59e0b, #fb923c, #f97316, #fbbf24);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      background-size: 300% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       animation: titleDiagonal 7s linear infinite;
     }
-
-    @keyframes titleDiagonal {
-      0%   { background-position: 0% 0%; }
-      50%  { background-position: 100% 100%; }
-      100% { background-position: 0% 0%; }
-    }
+    @keyframes titleDiagonal { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
 
     .glow-avatar {
-      position: relative;
-      width: 80px;
-      height: 80px;
-      border-radius: 0;
-      overflow: hidden;
-      border: 2px solid #374151;
-      box-shadow: 0 0 8px rgba(55, 65, 81, 0.5);
+      position: relative; width: 80px; height: 80px; border-radius: 0; overflow: hidden;
+      border: 2px solid #374151; box-shadow: 0 0 8px rgba(55, 65, 81, 0.5);
     }
-    .glow-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .glow-avatar::after {
-      content: '';
-      position: absolute;
-      inset: -150%;
-      background: linear-gradient(
-        135deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.55) 48%,
-        rgba(255, 255, 255, 0.30) 52%,
-        transparent 60%
-      );
-      animation: avatarShine 4s linear infinite;
-    }
+    .glow-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    @keyframes avatarShine {
-      0%   { transform: translate(-120%, -120%) rotate(30deg); }
-      20%  { transform: translate(120%, 120%) rotate(30deg); }
-      100% { transform: translate(120%, 120%) rotate(30deg); }
-    }
-
-    .progress-container { 
-      background: #1f1f1f; 
-      height: 10px; 
-      border-radius: 9999px; 
-      overflow: hidden; 
-    }
+    .progress-container { background: #1f1f1f; height: 10px; border-radius: 9999px; overflow: hidden; }
     .progress-bar { 
-      height: 100%; 
-      background: linear-gradient(90deg, #166534, #4ade80, #22c55e, #4ade80);
-      background-size: 200% 100%;
-      animation: progressFlow 3s linear infinite;
+      height: 100%; background: linear-gradient(90deg, #166534, #4ade80, #22c55e, #4ade80);
+      background-size: 200% 100%; animation: progressFlow 3s linear infinite;
     }
-    @keyframes progressFlow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
-    }
+    @keyframes progressFlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
-    .glow-btn {
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
+    .glow-btn { position: relative; overflow: hidden; transition: all 0.3s ease; }
     .glow-btn::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -100%;
-      width: 40%;
-      height: 200%;
+      content: ''; position: absolute; top: -50%; left: -100%; width: 40%; height: 200%;
       background: linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent);
       transition: 0.8s;
     }
@@ -113,7 +50,6 @@
 <body class="min-h-screen pb-12">
 
 <div class="max-w-xl mx-auto pt-8 px-4">
-
   <!-- Шапка -->
   <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-3">
@@ -122,8 +58,7 @@
       </div>
       <h1 class="site-title">FFGarouX</h1>
     </div>
-    <button onclick="refreshAll()" 
-            class="glow-btn btn-orange flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl text-sm font-medium">
+    <button onclick="refreshAll()" class="glow-btn btn-orange flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 rounded-2xl text-sm font-medium">
       <i class="fa-solid fa-rotate"></i> Refresh All
     </button>
   </div>
@@ -134,8 +69,7 @@
     <div class="flex gap-3">
       <input id="uidInput" type="text" placeholder="Добавить новый UID" 
              class="flex-1 bg-zinc-900 border border-zinc-700 focus:border-green-500 rounded-3xl px-6 py-4 text-lg outline-none">
-      <button onclick="addNewAccount()" 
-              class="glow-btn btn-green bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
+      <button onclick="addNewAccount()" class="glow-btn btn-green bg-green-500 hover:bg-green-600 px-10 py-4 rounded-3xl font-semibold text-black">
         Добавить
       </button>
     </div>
@@ -143,7 +77,7 @@
 </div>
 
 <script>
-// ==================== EXP TABLE ====================
+// ==================== EXP TABLE (оставил без изменений) ====================
 const EXP_TABLE = { 
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
   6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
@@ -171,8 +105,7 @@ let accounts = [];
 
 function loadAccounts() {
   const saved = localStorage.getItem('fflevel_accounts');
-  if (saved) accounts = JSON.parse(saved);
-  else accounts = [];
+  accounts = saved ? JSON.parse(saved) : [];
   renderMainAccounts();
 }
 
@@ -206,75 +139,61 @@ function getTimeUntilReset(sessionStart) {
   const now = Date.now();
   const resetTime = sessionStart + 24 * 60 * 60 * 1000;
   const remaining = Math.max(0, resetTime - now);
-  
   const hours = Math.floor(remaining / (1000 * 60 * 60));
   const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-  
   return `${hours}ч ${minutes}м`;
 }
 
-// ==================== FETCH С ЗАЩИТОЙ ОТ КЭША ====================
-async function fetchAccount(uid) {
-  const timestamp = Date.now();
-  const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=\( {uid}&region=RU&_t= \){timestamp}`, {
-    cache: 'no-store',
-    headers: {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache'
-    }
-  });
-  if (!res.ok) throw new Error('API error');
-  return await res.json();
+async function fetchPlayerData(uid) {
+  try {
+    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
+    return await res.json();
+  } catch (e) {
+    console.error("Ошибка API:", e);
+    return null;
+  }
 }
 
-// ==================== ОБНОВЛЕНИЕ ====================
 async function updateAccount(index) {
   const acc = accounts[index];
-  try {
-    const raw = await fetchAccount(acc.uid);
+  const raw = await fetchPlayerData(acc.uid);
+  if (!raw) return;
 
-    const captain = raw.captainBasicInfo || {};
-    const accountInfo = raw.AccountInfo || {};
+  const captain = raw.captainBasicInfo || {};
+  const accountInfo = raw.AccountInfo || {};
 
-    // Надёжный парсинг ника и EXP
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP || raw.exp || raw.AccountEXP || acc.lastExp || 0);
-    const nickname = captain.nickname || accountInfo.AccountName || raw.nickname || raw.AccountName || acc.nickname || "Unknown";
-    const likes = parseInt(accountInfo.AccountLikes || captain.liked || raw.likes || raw.AccountLikes || 0);
+  // Главное исправление — приоритет captainBasicInfo
+  const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP || acc.lastExp || 0);
+  const nickname    = captain.nickname || accountInfo.AccountName || acc.nickname || "Unknown";
+  const likes       = parseInt(captain.liked || accountInfo.AccountLikes || acc.likes || 0);
+  const avatar      = captain.headPic ? `https://example.com/headpic/${captain.headPic}.jpg` : "avag.jpg"; // можно доработать ссылку на аватар
 
-    const now = Date.now();
-    const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+  const now = Date.now();
+  const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
 
-    if (hoursPassed >= 24) {
-      acc.sessionStart = now;
-      acc.sessionStartExp = totalExpNow;
-      acc.todayExp = 0;
-    }
-
-    if (totalExpNow > acc.sessionStartExp) {
-      acc.todayExp = totalExpNow - acc.sessionStartExp;
-    } else {
-      acc.todayExp = 0;
-    }
-
-    acc.lastExp = totalExpNow;
-    acc.nickname = nickname;
-    acc.likes = likes;
-    acc.lastUpdateTime = now;
-
-    const levelInfo = calculateProgress(totalExpNow);
-    Object.assign(acc, levelInfo);
-
-    saveAccounts();
-    renderMainAccounts();
-
-  } catch (e) {
-    console.error("Ошибка обновления:", e);
-    // При ошибке оставляем старые данные, но показываем предупреждение
-    if (acc.nickname !== "Ошибка загрузки") {
-      acc.nickname = "Ошибка загрузки (нажми Обновить)";
-      renderMainAccounts();
-    }
+  if (hoursPassed >= 24) {
+    acc.sessionStart = now;
+    acc.sessionStartExp = totalExpNow;
+    acc.todayExp = 0;
   }
+
+  if (totalExpNow > (acc.sessionStartExp || 0)) {
+    acc.todayExp = totalExpNow - acc.sessionStartExp;
+  } else {
+    acc.todayExp = 0;
+  }
+
+  acc.lastExp = totalExpNow;
+  acc.nickname = nickname;
+  acc.likes = likes;
+  acc.avatar = avatar;
+  acc.lastUpdateTime = now;
+
+  const levelInfo = calculateProgress(totalExpNow);
+  Object.assign(acc, levelInfo);
+
+  saveAccounts();
+  renderMainAccounts();
 }
 
 function renderMainAccounts() {
@@ -289,13 +208,12 @@ function renderMainAccounts() {
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
           <div class="glow-avatar flex-shrink-0">
-            <img src="avag.jpg" alt="Avatar" 
+            <img src="${acc.avatar || 'avag.jpg'}" alt="Avatar" 
                  onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
           </div>
-          
           <div class="flex-1">
             <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-bold \( {acc.nickname.includes('Ошибка') ? 'text-red-400' : ''}"> \){acc.nickname}</h2>
+              <h2 class="text-2xl font-bold">${acc.nickname}</h2>
               <span class="bg-emerald-600 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1.5">
                 <span class="w-2.5 h-2.5 bg-white rounded-full live-dot"></span> LIVE
               </span>
@@ -350,10 +268,8 @@ function renderMainAccounts() {
         </div>
 
         <div class="flex gap-3">
-          <button onclick="updateAccount(${index})" 
-                  class="glow-btn btn-green flex-1 bg-zinc-800 py-4 rounded-2xl text-sm font-medium">Обновить</button>
-          <button onclick="deleteAccount(${index})" 
-                  class="glow-btn btn-red flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm font-medium">Delete</button>
+          <button onclick="updateAccount(${index})" class="glow-btn btn-green flex-1 bg-zinc-800 py-4 rounded-2xl text-sm font-medium">Обновить</button>
+          <button onclick="deleteAccount(${index})" class="glow-btn btn-red flex-1 bg-red-600 hover:bg-red-500 py-4 rounded-2xl text-sm font-medium">Delete</button>
         </div>
       </div>`;
 
@@ -375,53 +291,17 @@ async function addNewAccount() {
   if (accounts.some(a => a.uid === uid)) return alert("Этот UID уже добавлен!");
 
   const now = Date.now();
-
   const newAccount = {
-    uid: uid,
-    lastExp: 0,
-    todayExp: 0,
-    sessionStart: now,
-    sessionStartExp: 0,
-    likes: 0,
-    nickname: "Загрузка...",
-    level: 1,
-    progress: 0,
-    currentInLevel: 0,
-    remaining: 48,
-    needForNext: 48
+    uid, lastExp: 0, todayExp: 0, sessionStart: now, sessionStartExp: 0,
+    likes: 0, nickname: "Загрузка...", avatar: "avag.jpg",
+    level: 1, progress: 0, currentInLevel: 0, remaining: 48, needForNext: 48
   };
 
   accounts.push(newAccount);
   saveAccounts();
   renderMainAccounts();
 
-  try {
-    const raw = await fetchAccount(uid);
-
-    const captain = raw.captainBasicInfo || {};
-    const accountInfo = raw.AccountInfo || {};
-
-    const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP || raw.exp || raw.AccountEXP || 0);
-    const nickname = captain.nickname || accountInfo.AccountName || raw.nickname || raw.AccountName || "Unknown";
-    const likes = parseInt(accountInfo.AccountLikes || captain.liked || raw.likes || raw.AccountLikes || 0);
-
-    const levelInfo = calculateProgress(totalExpNow);
-
-    newAccount.lastExp = totalExpNow;
-    newAccount.sessionStartExp = totalExpNow;
-    newAccount.todayExp = 0;
-    newAccount.nickname = nickname;
-    newAccount.likes = likes;
-    Object.assign(newAccount, levelInfo);
-
-    saveAccounts();
-    renderMainAccounts();
-
-  } catch (e) {
-    console.error("Ошибка при добавлении:", e);
-    newAccount.nickname = "Ошибка загрузки";
-    renderMainAccounts();
-  }
+  await updateAccount(accounts.length - 1);   // сразу загружаем правильные данные
 }
 
 function refreshAll() {
@@ -432,9 +312,8 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 15 секунд
-setInterval(() => { refreshAll(); }, 15000);
-setInterval(() => { renderMainAccounts(); }, 60000);
+setInterval(() => refreshAll(), 30000);
+setInterval(() => renderMainAccounts(), 60000);
 </script>
 </body>
 </html>
