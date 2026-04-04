@@ -219,19 +219,28 @@ async function updateAccount(index) {
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname = accountInfo.AccountName || captain.nickname || "Unknown";
 
-    // === УЛУЧШЕННЫЙ ПОИСК ЛАЙКОВ ===
+    // ==================== УЛУЧШЕННЫЙ ПОИСК ЛАЙКОВ ====================
     let likes = 0;
-    
-    // Приоритетные поля (самые частые)
-    if (captain.like !== undefined) likes = parseInt(captain.like) || 0;
-    else if (captain.liked !== undefined) likes = parseInt(captain.liked) || 0;
-    else if (captain.likeCnt !== undefined) likes = parseInt(captain.likeCnt) || 0;
-    else if (captain.likeCount !== undefined) likes = parseInt(captain.likeCount) || 0;
-    
+
+    // Приоритет 1 — самое частое правильное поле
+    if (captain.like !== undefined && captain.like !== null) {
+      likes = parseInt(captain.like);
+    }
+    // Приоритет 2
+    else if (captain.liked !== undefined && captain.liked !== null) {
+      likes = parseInt(captain.liked);
+    }
+    // Приоритет 3 и 4
+    else if (captain.likeCnt !== undefined) likes = parseInt(captain.likeCnt);
+    else if (captain.likeCount !== undefined) likes = parseInt(captain.likeCount);
+
     // Дополнительные варианты
-    else if (raw.likeCount !== undefined) likes = parseInt(raw.likeCount) || 0;
-    else if (raw.social && raw.social.likeCount !== undefined) likes = parseInt(raw.social.likeCount) || 0;
-    else if (raw.socialInfo && raw.socialInfo.liked !== undefined) likes = parseInt(raw.socialInfo.liked) || 0;
+    else if (raw.likeCount !== undefined) likes = parseInt(raw.likeCount);
+    else if (raw.social && raw.social.likeCount !== undefined) likes = parseInt(raw.social.likeCount);
+    else if (raw.socialInfo && raw.socialInfo.liked !== undefined) likes = parseInt(raw.socialInfo.liked);
+
+    // Если ничего не нашли — оставляем 0
+    likes = isNaN(likes) ? 0 : likes;
 
     if (totalExpNow === 0 && captain.exp) {
       totalExpNow = parseInt(captain.exp);
@@ -254,7 +263,7 @@ async function updateAccount(index) {
     acc.todayExp = Math.max(0, totalExpNow - acc.sessionStartExp);
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
-    acc.likes = likes;
+    acc.likes = likes;          // ← сохраняем правильное значение
     acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
@@ -263,8 +272,10 @@ async function updateAccount(index) {
     saveAccounts();
     renderMainAccounts();
 
+    console.log(`✅ Обновлён ${nickname} | Лайки: ${likes}`);
+
   } catch (e) {
-    console.error("Ошибка обновления аккаунта:", e);
+    console.error("Ошибка обновления:", e);
   }
 }
 
