@@ -50,7 +50,6 @@
 <body class="min-h-screen pb-12">
 
 <div class="max-w-xl mx-auto pt-8 px-4">
-  <!-- Шапка -->
   <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-2xl overflow-hidden border border-amber-500 flex-shrink-0 shadow-[0_0_15px_#f59e0b]">
@@ -77,7 +76,7 @@
 </div>
 
 <script>
-// ==================== EXP TABLE (оставил без изменений) ====================
+// ==================== EXP TABLE (без изменений) ====================
 const EXP_TABLE = { 
   1: [0,48],2:[48,154],3:[202,342],4:[544,468],5:[1012,832],
   6:[1844,948],7:[2792,1008],8:[3800,1070],9:[4870,1134],10:[6004,1188],
@@ -144,56 +143,55 @@ function getTimeUntilReset(sessionStart) {
   return `${hours}ч ${minutes}м`;
 }
 
-async function fetchPlayerData(uid) {
-  try {
-    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${uid}&region=RU`);
-    return await res.json();
-  } catch (e) {
-    console.error("Ошибка API:", e);
-    return null;
-  }
-}
-
 async function updateAccount(index) {
   const acc = accounts[index];
-  const raw = await fetchPlayerData(acc.uid);
-  if (!raw) return;
+  try {
+    const res = await fetch(`https://gojoinfoapi-mu.vercel.app/get?uid=${acc.uid}&region=RU`);
+    const raw = await res.json();
 
-  const captain = raw.captainBasicInfo || {};
-  const accountInfo = raw.AccountInfo || {};
+    const captain = raw.captainBasicInfo || {};
+    const accountInfo = raw.AccountInfo || {};
 
-  // Главное исправление — приоритет captainBasicInfo
-  const totalExpNow = parseInt(captain.exp || accountInfo.AccountEXP || acc.lastExp || 0);
-  const nickname    = captain.nickname || accountInfo.AccountName || acc.nickname || "Unknown";
-  const likes       = parseInt(captain.liked || accountInfo.AccountLikes || acc.likes || 0);
-  const avatar      = captain.headPic ? `https://example.com/headpic/${captain.headPic}.jpg` : "avag.jpg"; // можно доработать ссылку на аватар
+    // Главное исправление: приоритет AccountInfo (основной профиль)
+    let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
+    let nickname    = accountInfo.AccountName || captain.nickname || "Unknown";
+    let likes       = parseInt(captain.liked || accountInfo.AccountLikes || 0);
 
-  const now = Date.now();
-  const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+    // Если AccountInfo пустой — берём из captain
+    if (!accountInfo.AccountEXP && captain.exp) {
+      totalExpNow = parseInt(captain.exp);
+      nickname = captain.nickname || nickname;
+    }
 
-  if (hoursPassed >= 24) {
-    acc.sessionStart = now;
-    acc.sessionStartExp = totalExpNow;
-    acc.todayExp = 0;
+    const now = Date.now();
+    const hoursPassed = (now - acc.sessionStart) / (1000 * 60 * 60);
+
+    if (hoursPassed >= 24) {
+      acc.sessionStart = now;
+      acc.sessionStartExp = totalExpNow;
+      acc.todayExp = 0;
+    }
+
+    if (totalExpNow > (acc.sessionStartExp || 0)) {
+      acc.todayExp = totalExpNow - acc.sessionStartExp;
+    } else {
+      acc.todayExp = 0;
+    }
+
+    acc.lastExp = totalExpNow;
+    acc.nickname = nickname;
+    acc.likes = likes;
+    acc.lastUpdateTime = now;
+
+    const levelInfo = calculateProgress(totalExpNow);
+    Object.assign(acc, levelInfo);
+
+    saveAccounts();
+    renderMainAccounts();
+
+  } catch (e) {
+    console.error("Ошибка обновления:", e);
   }
-
-  if (totalExpNow > (acc.sessionStartExp || 0)) {
-    acc.todayExp = totalExpNow - acc.sessionStartExp;
-  } else {
-    acc.todayExp = 0;
-  }
-
-  acc.lastExp = totalExpNow;
-  acc.nickname = nickname;
-  acc.likes = likes;
-  acc.avatar = avatar;
-  acc.lastUpdateTime = now;
-
-  const levelInfo = calculateProgress(totalExpNow);
-  Object.assign(acc, levelInfo);
-
-  saveAccounts();
-  renderMainAccounts();
 }
 
 function renderMainAccounts() {
@@ -208,7 +206,7 @@ function renderMainAccounts() {
       <div class="card p-6 space-y-6">
         <div class="flex items-center gap-4">
           <div class="glow-avatar flex-shrink-0">
-            <img src="${acc.avatar || 'avag.jpg'}" alt="Avatar" 
+            <img src="avag.jpg" alt="Avatar" 
                  onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
           </div>
           <div class="flex-1">
@@ -293,15 +291,15 @@ async function addNewAccount() {
   const now = Date.now();
   const newAccount = {
     uid, lastExp: 0, todayExp: 0, sessionStart: now, sessionStartExp: 0,
-    likes: 0, nickname: "Загрузка...", avatar: "avag.jpg",
-    level: 1, progress: 0, currentInLevel: 0, remaining: 48, needForNext: 48
+    likes: 0, nickname: "Загрузка...", level: 1, progress: 0,
+    currentInLevel: 0, remaining: 48, needForNext: 48
   };
 
   accounts.push(newAccount);
   saveAccounts();
   renderMainAccounts();
 
-  await updateAccount(accounts.length - 1);   // сразу загружаем правильные данные
+  await updateAccount(accounts.length - 1);
 }
 
 function refreshAll() {
