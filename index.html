@@ -33,7 +33,6 @@
       100% { background-position: 0% 0%; } 
     }
 
-    /* Аватарка с анимацией стеклянного щита */
     .glow-avatar {
       position: relative; 
       width: 80px; 
@@ -222,6 +221,12 @@ async function updateAccount(index) {
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
     let nickname = accountInfo.AccountName || captain.nickname || "Unknown";
 
+    // Получаем количество лайков
+    let likes = 0;
+    if (captain.liked !== undefined) likes = parseInt(captain.liked) || 0;
+    else if (captain.likeCnt !== undefined) likes = parseInt(captain.likeCnt) || 0;
+    else if (raw.socialInfo && raw.socialInfo.liked !== undefined) likes = parseInt(raw.socialInfo.liked) || 0;
+
     if (totalExpNow === 0 && captain.exp) {
       totalExpNow = parseInt(captain.exp);
       nickname = captain.nickname || nickname;
@@ -243,6 +248,7 @@ async function updateAccount(index) {
     acc.todayExp = Math.max(0, totalExpNow - acc.sessionStartExp);
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
+    acc.likes = likes;
     acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
@@ -304,6 +310,15 @@ function renderMainAccounts() {
           </div>
         </div>
 
+        <!-- Блок с лайками -->
+        <div class="bg-zinc-900 rounded-3xl p-5 flex items-center justify-between">
+          <div>
+            <p class="text-zinc-400 text-xs">Лайки профиля</p>
+            <p class="text-3xl font-bold text-pink-400">${(acc.likes || 0).toLocaleString('ru-RU')}</p>
+          </div>
+          <i class="fa-solid fa-heart text-5xl text-pink-500"></i>
+        </div>
+
         <div class="bg-zinc-900 rounded-3xl p-5 space-y-3 text-sm">
           <div class="flex justify-between">
             <span class="text-zinc-400">Было при добавлении:</span>
@@ -359,7 +374,8 @@ async function addNewAccount() {
     progress: 0,
     currentInLevel: 0,
     remaining: 48,
-    needForNext: 48
+    needForNext: 48,
+    likes: 0
   });
 
   saveAccounts();
@@ -375,7 +391,7 @@ function refreshAll() {
 loadAccounts();
 refreshAll();
 
-// Автообновление
+// Автообновление каждые 30 секунд
 setInterval(refreshAll, 30000);
 setInterval(renderMainAccounts, 60000);
 </script>
