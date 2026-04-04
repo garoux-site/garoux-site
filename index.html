@@ -7,33 +7,105 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { background: #0a0a0a; color: #ddd; font-family: system-ui, sans-serif; }
-    .card { background: #111111; border-radius: 16px; }
+    body { 
+      background: #0a0a0a; 
+      color: #ddd; 
+      font-family: system-ui, sans-serif; 
+    }
+    .card { 
+      background: #111111; 
+      border-radius: 16px; 
+    }
 
     .site-title {
-      font-size: 2.85rem; font-weight: 900; letter-spacing: -2px;
+      font-size: 2.85rem; 
+      font-weight: 900; 
+      letter-spacing: -2px;
       background: linear-gradient(135deg, #fbbf24, #f59e0b, #fb923c, #f97316, #fbbf24);
-      background-size: 300% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-size: 300% 300%; 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent;
       animation: titleDiagonal 7s linear infinite;
     }
-    @keyframes titleDiagonal { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
+    @keyframes titleDiagonal { 
+      0% { background-position: 0% 0%; } 
+      50% { background-position: 100% 100%; } 
+      100% { background-position: 0% 0%; } 
+    }
 
+    /* Аватарка с анимацией стеклянного щита */
     .glow-avatar {
-      position: relative; width: 80px; height: 80px; border-radius: 0; overflow: hidden;
-      border: 2px solid #374151; box-shadow: 0 0 8px rgba(55, 65, 81, 0.5);
+      position: relative; 
+      width: 80px; 
+      height: 80px; 
+      border-radius: 12px; 
+      overflow: hidden;
+      border: 2px solid #f59e0b; 
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
     }
-    .glow-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .glow-avatar img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      transition: transform 0.4s ease;
+    }
+    .glow-avatar:hover img { 
+      transform: scale(1.08); 
+    }
 
-    .progress-container { background: #1f1f1f; height: 10px; border-radius: 9999px; overflow: hidden; }
+    /* Анимация блеска каждые 10 секунд */
+    .avatar-shine {
+      position: absolute;
+      top: -150%;
+      left: -100%;
+      width: 50%;
+      height: 300%;
+      background: linear-gradient(
+        120deg, 
+        transparent 20%, 
+        rgba(255, 255, 255, 0.85) 50%, 
+        transparent 80%
+      );
+      animation: avatarShine 10s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    @keyframes avatarShine {
+      0%   { transform: translateX(-120%) translateY(-120%); }
+      12%  { transform: translateX(280%) translateY(280%); }
+      100% { transform: translateX(280%) translateY(280%); }
+    }
+
+    .progress-container { 
+      background: #1f1f1f; 
+      height: 10px; 
+      border-radius: 9999px; 
+      overflow: hidden; 
+    }
     .progress-bar { 
-      height: 100%; background: linear-gradient(90deg, #166534, #4ade80, #22c55e, #4ade80);
-      background-size: 200% 100%; animation: progressFlow 3s linear infinite;
+      height: 100%; 
+      background: linear-gradient(90deg, #166534, #4ade80, #22c55e, #4ade80);
+      background-size: 200% 100%; 
+      animation: progressFlow 3s linear infinite;
     }
-    @keyframes progressFlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+    @keyframes progressFlow { 
+      0% { background-position: 0% 50%; } 
+      100% { background-position: 200% 50%; } 
+    }
 
-    .glow-btn { position: relative; overflow: hidden; transition: all 0.3s ease; }
+    .glow-btn { 
+      position: relative; 
+      overflow: hidden; 
+      transition: all 0.3s ease; 
+    }
     .glow-btn::before {
-      content: ''; position: absolute; top: -50%; left: -100%; width: 40%; height: 200%;
+      content: ''; 
+      position: absolute; 
+      top: -50%; 
+      left: -100%; 
+      width: 40%; 
+      height: 200%;
       background: linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent);
       transition: 0.8s;
     }
@@ -130,7 +202,13 @@ function calculateProgress(totalExp) {
   const remaining = Math.max(0, needForNext - currentInLevel);
   const progress = needForNext > 0 ? (currentInLevel / needForNext) * 100 : 100;
 
-  return { level, progress: parseFloat(progress.toFixed(2)), currentInLevel, remaining, needForNext };
+  return { 
+    level, 
+    progress: parseFloat(progress.toFixed(2)), 
+    currentInLevel, 
+    remaining, 
+    needForNext 
+  };
 }
 
 function getTimeUntilReset(sessionStart) {
@@ -153,9 +231,16 @@ async function updateAccount(index) {
     const captain = raw.captainBasicInfo || {};
     const accountInfo = raw.AccountInfo || {};
 
+    // Исправленное получение лайков — главный приоритет на captain.liked
+    let likes = 0;
+    if (captain.liked !== undefined) {
+      likes = parseInt(captain.liked) || 0;
+    } else if (accountInfo.AccountLikes !== undefined) {
+      likes = parseInt(accountInfo.AccountLikes) || 0;
+    }
+
     let totalExpNow = parseInt(accountInfo.AccountEXP || captain.exp || 0);
-    let nickname    = accountInfo.AccountName || captain.nickname || "Unknown";
-    let likes       = parseInt(captain.liked || accountInfo.AccountLikes || 0);
+    let nickname = accountInfo.AccountName || captain.nickname || "Unknown";
 
     if (!accountInfo.AccountEXP && captain.exp) {
       totalExpNow = parseInt(captain.exp);
@@ -172,17 +257,14 @@ async function updateAccount(index) {
       acc.todayExp = 0;
     }
 
-    // Если это первое обновление — фиксируем начальный EXP
     if (!acc.sessionStartExp || acc.sessionStartExp === 0) {
       acc.sessionStartExp = totalExpNow;
     }
 
-    // Расчёт EXP за сессию
     acc.todayExp = Math.max(0, totalExpNow - acc.sessionStartExp);
-
     acc.lastExp = totalExpNow;
     acc.nickname = nickname;
-    acc.likes = likes;
+    acc.likes = likes;                    // ← Теперь лайки берутся правильно
     acc.lastUpdateTime = now;
 
     const levelInfo = calculateProgress(totalExpNow);
@@ -192,7 +274,7 @@ async function updateAccount(index) {
     renderMainAccounts();
 
   } catch (e) {
-    console.error("Ошибка обновления:", e);
+    console.error("Ошибка обновления аккаунта:", e);
   }
 }
 
@@ -209,6 +291,7 @@ function renderMainAccounts() {
           <div class="glow-avatar flex-shrink-0">
             <img src="avag.jpg" alt="Avatar" 
                  onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E🔥%3C/text%3E%3C/svg%27';">
+            <div class="avatar-shine"></div>
           </div>
           <div class="flex-1">
             <div class="flex items-center gap-3">
@@ -296,7 +379,7 @@ async function addNewAccount() {
     lastExp: 0,
     todayExp: 0,
     sessionStart: now,
-    sessionStartExp: 0,        // будет установлено при первом обновлении
+    sessionStartExp: 0,
     likes: 0,
     nickname: "Загрузка...",
     level: 1,
@@ -310,7 +393,6 @@ async function addNewAccount() {
   saveAccounts();
   renderMainAccounts();
 
-  // Сразу обновляем, чтобы зафиксировать "Было при добавлении"
   await updateAccount(accounts.length - 1);
 }
 
@@ -318,11 +400,11 @@ function refreshAll() {
   accounts.forEach((_, i) => updateAccount(i));
 }
 
-// Запуск
+// Инициализация
 loadAccounts();
 refreshAll();
 
-// Автообновление каждые 30 секунд
+// Автообновление
 setInterval(() => refreshAll(), 30000);
 setInterval(() => renderMainAccounts(), 60000);
 </script>
