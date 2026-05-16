@@ -101,7 +101,7 @@ function getStats(totalExp) {
 async function updateAccount(i) {
     try {
         // ТВОЯ НОВАЯ ССЫЛКА (bingo-subtle-chairman-usc)
-        const apiUrl = `https://bingo-subtle-chairman-usc.trycloudflare.com/player-info?uid=${accounts[i].uid}`;
+        const apiUrl = `https://garoux-info.vercel.app/player-info?uid=${accounts[i].uid}`;
         
         const res = await fetch(apiUrl);
         if (!res.ok) throw new Error('Сеть не отвечает');
